@@ -76,6 +76,7 @@
 			die('Could not find out when last query occured.');
 		}
 		
+		$last_query = 0;
 		// read out the date of last update
 		while ($row = mysql_fetch_array($result))
 		{
