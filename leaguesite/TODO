@@ -1,0 +1,25 @@
+short term:
+
+* Convert existing features to use Smarty before adding new features.
+
+* Cached Smarty templates must not contain per-user information, such
+  as PMs.  http://www.smarty.net/docsv2/en/caching.multiple.caches.tpl
+  contains more information about this.  We use the player's user ID
+  where they have $my_cache_id in the examples on that page.
+
+* Thorough testing with multiple accounts should reveal problems.
+
+* Add web interface to manage the database CMS table, which controls
+  which add-on should be used for which page.
+
+* Move leaguesite installation instructions from README to INSTALL.
+
+* Focus on 42 theme for now and other themes after the overall
+  framework is set.
+
+
+long term:
+
+* Merge Osta's Ducati League features.
+
+* Restructure to support multiple leagues with a single web site.
