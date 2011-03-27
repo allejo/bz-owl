@@ -223,6 +223,11 @@
 			$offset = 0;
 			if (!$edit)
 			{
+				if (isset($_GET['i']) && (intval($_GET['i']) > -1))
+				{
+					$offset = intval($_GET['i']);
+				}
+				
 				// TODO: id only needed if user can edit or delete
 				// TODO: meaning room for optimisation
 				$query = $db->SQL('SELECT `id`,`title`,`timestamp`,`author`,`msg`'
@@ -244,6 +249,11 @@
 				return $rows[0];
 			}
 			
+			if ($offset > 0)
+			{
+				$tmpl->assign('offsetPrev', $offset-20);
+			}
+			
 			// process query result array
 			$n = count($rows);
 			if ($n > 0)
@@ -262,8 +272,19 @@
 					$showButtons = true;
 				}
 				
+				// next news button needed
+				if ($n > 20)
+				{
+					// remove the last row of result: show only 20 entries per page
+					unset($rows[$offset+$n-1]);
+					$n--;
+					
+					// show the button
+					$tmpl->assign('offsetNext', $offset+20);
+				}
+				
 				// article box
-				for($i = 1; $i < $n; $i++)
+				for($i = 0; $i < $n; $i++)
 				{
 					$content[$i]['id'] = $rows[$i]['id'];
 					$content[$i]['title'] = (strcmp($rows[$i]['title'], '') === 0)?

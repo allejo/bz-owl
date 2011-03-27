@@ -48,7 +48,13 @@ No menu found.
 {/foreach}
 
 <p>
-{if isset($offsetPrev)}<a class="button" href="./?i={$offsetPrev}">Previous news</a>{/if}
+{if isset($offsetPrev)}
+{if $offsetPrev === 0}
+<a class="button" href="./">Previous news</a>
+{else}
+<a class="button" href="./?i={$offsetPrev}">Previous news</a>
+{/if}
+{/if}
 {if isset($offsetPrev) && isset($offsetNext)} {/if}
 {if isset($offsetNext)}<a class="button" href="./?i={$offsetNext}">Next news</a>{/if}
 </p>

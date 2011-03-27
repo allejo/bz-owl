@@ -11,7 +11,9 @@
 			global $config;
 			
 			$this->debugging = false;
-			$this->caching = true;
+			// cache not helpful with dynamic pages
+			// turn cache on in add-ons, if helpful to you
+			$this->caching = false;
 			$this->cache_lifetime = 120;
 			
 			parent::__construct();

@@ -69,7 +69,13 @@ No menu found.
 
 
 <p>
-{if isset($offsetPrev)}<a class="button" href="./?folder={$curFolder}&amp;i={$offsetPrev}">Previous messages</a>{/if}
+{if isset($offsetPrev)}
+{if $offsetPrev === 0}
+<a class="button" href="./?folder={$curFolder}">Previous messages</a>
+{else}
+<a class="button" href="./?folder={$curFolder}&amp;i={$offsetPrev}">Previous messages</a>
+{/if}
+{/if}
 {if isset($offsetPrev) && isset($offsetNext)} {/if}
 {if isset($offsetNext)}<a class="button" href="./?folder={$curFolder}&amp;i={$offsetNext}">Next messages</a>{/if}
 </p>
