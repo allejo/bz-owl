@@ -71,6 +71,7 @@
 			switch($readonly)
 			{
 				case true:
+					$tmpl->assign('recipientPlayers', $content['recipientPlayers']);
 					$tmpl->assign('subject',  htmlent($content['subject']));
 					$tmpl->assign('authorName',  htmlent($content['author']['name']));
 					$tmpl->assign('time',  htmlent($content['timestamp']));
@@ -138,16 +139,18 @@
 				$i = 0;
 				while (isset($_POST['recipientPlayer' . $i]))
 				{
-					// exclude recipients that are requested to be removed
-					if (isset($_POST['recipientPlayer' . $i]) && !(isset($_POST['removeRecipientPlayer' . $i])))
-					{
-						$this->PMComposer->addRecipientName($_POST['recipientPlayer' . $i]);
-					}
-					
 					// user requested removal of a recipient -> do not send now
 					if (isset($_POST['removeRecipientPlayer' . $i]))
 					{
 						$confirmed = 0;
+					}
+					
+					// exclude recipients that are requested to be removed
+					if (isset($_POST['recipientPlayer' . $i]) && !(isset($_POST['removeRecipientPlayer' . $i])))
+					{
+						$this->PMComposer->addRecipientName($_POST['recipientPlayer' . $i]
+															, $confirmed > 0
+															&& !isset($_POST['addPlayerRecipient']));
 					}
 					$i++;
 				}
@@ -155,8 +158,8 @@
 				// add new player recipient if requested and do not send the message
 				if (isset($_POST['recipientPlayer']) && isset($_POST['addPlayerRecipient']))
 				{
-					$this->PMComposer->addRecipientName($_POST['recipientPlayer']);
 					$confirmed = 0;
+					$this->PMComposer->addRecipientName($_POST['recipientPlayer'], $confirmed > 0);
 				}
 			}
 			
@@ -167,11 +170,50 @@
 	class PMComposer
 	{
 		private $recipients = array();
+		private $usernameQuery;
 		
-		function addRecipientName($recipientName)
+		
+		function __construct()
 		{
-			// FIXME: Sanity checks go here
-			$this->recipients[] = $recipientName;
+			global $db;
+			
+			
+			$this->usernameQuery = $db->prepare('SELECT `id`, `name` FROM `players` WHERE `name`=? LIMIT 1');
+		}
+		
+		function addRecipientName($recipientName, $preview=false)
+		{
+			global $db;
+			
+			
+			// remove double entries, invalid names etc
+			
+			// lookup if username is already in recipient array
+			$alreadyAdded = false;
+			foreach ($this->recipients as $oneRecipient)
+			{
+				// assume case insensitive usernames
+				if (strcasecmp(($preview) ? $oneRecipient['name'] : $oneRecipient,
+							   $recipientName) === 0)
+				{
+					$alreadyAdded = true;
+				}
+			}
+			
+			if (!$alreadyAdded)
+			{
+				$db->execute($this->usernameQuery, htmlent($recipientName));
+				if ($row = $db->fetchRow($this->usernameQuery))
+				{
+					// assume case preserving usernames
+					$this->recipients[] = ($preview) ? array('id'=>$row['id'],
+															 'name'=>$row['name'],
+															 'link' => '../Players/?profile=' . $row['id'])
+															 : $row['name'];
+					unset($row);
+				}
+				$db->free($this->usernameQuery);
+			}
 		}
 		
 		function getRecipientNames()

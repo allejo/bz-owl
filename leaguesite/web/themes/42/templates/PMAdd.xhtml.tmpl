@@ -31,8 +31,8 @@ No menu found.
 		<span class="msg_subject">{$subject}</span>
 		<span class="msg_author"> by {if isset($authorLink)}<a href="{$authorLink}">{$authorName}</a>{else}{$authorName}{/if}</span>
 		<span class="msg_overview_recipients">to 
-		{foreach item="curRecipients" from=$recipients}
-			<a href="{$curRecipients.link}">{$curRecipients.name}</a>{if $curRecipients.seperator},{/if}
+		{foreach item="curRecipients" from=$recipientPlayers name="users"}
+			<a href="{$curRecipients.link}">{$curRecipients.name}</a>{if !($smarty.foreach.users.last)},{/if}
 		{/foreach}
 		</span>
 		<span class="msg_timestamp"> at {$time}</span>
