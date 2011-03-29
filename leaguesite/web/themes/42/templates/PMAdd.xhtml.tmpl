@@ -24,15 +24,21 @@ No menu found.
 
 <div class="content">
 
-{nocache}
-{if isset($content)}
+
+<form action="?add" enctype="application/x-www-form-urlencoded" method="post" accept-charset="utf-8">
+<div><input type="hidden" name="key_name" value="{$keyName}" /></div>
+<div><input type="hidden" name="{$keyName}" value="{$keyValue}" /></div>
+
+
+{if isset($showPreview) && $showPreview}
 <div class="msg_area"><div class="msg_view_full">
 	<div class="msg_header_full">
 		<span class="msg_subject">{$subject}</span>
 		<span class="msg_author"> by {if isset($authorLink)}<a href="{$authorLink}">{$authorName}</a>{else}{$authorName}{/if}</span>
 		<span class="msg_overview_recipients">to 
-		{foreach item="curRecipients" from=$recipientPlayers name="users"}
-			<a href="{$curRecipients.link}">{$curRecipients.name}</a>{if !($smarty.foreach.users.last)},{/if}
+		{foreach key="id" item="curRecipients" from=$recipientPlayers}
+			<a href="{$curRecipients.link}">{$curRecipients.name}</a>{if !$curRecipients@last},{/if}
+			<input type="hidden" name="recipientPlayer{$id}" value="{$curRecipients.name}" />
 		{/foreach}
 		</span>
 		<span class="msg_timestamp"> at {$time}</span>
@@ -40,34 +46,32 @@ No menu found.
 	<div class="msg_contents">
 		{$content}
 	</div>
-</div>
+</div></div>
 {/if}
 
 
+{if !isset($showPreview) || !$showPreview}
 <div class="static_page_box">
 
 {if isset($MSG)}<div>{$MSG}</div>{/if}
-<form action="?add" enctype="application/x-www-form-urlencoded" method="post" accept-charset="utf-8">
-<div><input type="hidden" name="key_name" value="{$keyName}" /></div>
-<div><input type="hidden" name="{$keyName}" value="{$keyValue}" /></div>
-
 <div>
 	<label for="recipientPlayer">Player recipients:</label>
 	<input type="text" name="recipientPlayer" value="Enter one callsign here" onfocus="if(this.value=='Enter one callsign here') this.value=''" onblur="if(this.value=='') this.value='Enter one callsign here'" />
-	<input type="submit" name="addPlayerRecipient" type="button" value="+"  />
+	<input type="submit" name="addPlayerRecipient" value="+"  />
 </div>
 
 {foreach key="id" item="recipientPlayer" from=$recipientPlayers}
 <div>
 	<input type="text" name="recipientPlayer{$id}" readonly="readonly" value="{$recipientPlayer}" />
-	<input type="submit" name="removeRecipientPlayer{$id}" type="button" value="-" />
+	<input type="submit" name="removeRecipientPlayer{$id}" value="-" />
 </div>
 {/foreach}
+{/if}
 
 
 {if isset($notes)}<div>{$notes}</div>{/if}
 
-{if isset($confirmationStep) && $confirmationStep < 2}
+{if !isset($showPreview) || !$showPreview}
 <div>
 	<input type="text" name="subject" value="{$subject}" onfocus="if(this.value=='Enter subject here') this.value=''" onblur="if(this.value=='') this.value='Enter subject here'" /></div>
 <div>
@@ -78,17 +82,20 @@ No menu found.
 <div><textarea cols="75" rows="20" name="content">{$rawContent}</textarea></div>
 {/if}
 
-{if isset($confirmationStep) && $confirmationStep > 1}
+{if isset($subject) && isset($rawContent) && isset($showPreview) && $showPreview}
 <div><input type="hidden" name="subject" value="{$subject}" /></div>
 <div><input type="hidden" name="content" value="{$rawContent}" /></div>
 {/if}
 
 <div><input type="hidden" name="confirmationStep" value="{$confirmationStep}" /></div>
 <p><input type="submit" name="submit" value="{$submitText}" />
-{if isset($editAgainText)}<input type="submit" name="editPageAgain" value="{$editAgainText}" />{/if}</p>
+{if isset($showPreview) && $showPreview}<input type="submit" name="editPageAgain" value="Edit again" />{/if}</p>
 </form>
+
+{if !isset($showPreview) || !$showPreview}
 </div>
-{/nocache}
+{/if}
+
 
 </div>
 </body>

@@ -83,6 +83,9 @@
 					{
 						$tmpl->assign('content',  htmlent($content['raw_msg']));
 					}
+					$tmpl->assign('showPreview', true);
+					// overwrite editor's default text ('Write changes')
+					$tmpl->assign('submitText', 'Send PM');
 					break;
 				
 				default:
@@ -124,7 +127,7 @@
 			global $tmpl;
 			
 			
-			if ($confirmed > 0)
+			if ($confirmed > 0 || isset($_POST['editPageAgain']))
 			{
 				// no need to check for a key match if no content was supplied
 				if (!$this->randomKeyMatch($confirmed))
@@ -133,7 +136,6 @@
 					$confirmed = 0;
 					return 'nokeymatch';
 				}
-				
 				
 				// add all set player recipients
 				$i = 0;
@@ -150,7 +152,8 @@
 					{
 						$this->PMComposer->addRecipientName($_POST['recipientPlayer' . $i]
 															, $confirmed > 0
-															&& !isset($_POST['addPlayerRecipient']));
+															&& !isset($_POST['addPlayerRecipient'])
+															&& !isset($_POST['editPageAgain']));
 					}
 					$i++;
 				}

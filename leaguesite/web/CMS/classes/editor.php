@@ -82,13 +82,10 @@
 			$test = $this->caller->sanityCheck($confirmed);
 			switch ($test)
 			{
-				// use bbcode if available
-				case (true && $confirmed === 1 && $config->value('bbcodeLibAvailable')):
-					$this->caller->insertEditText(true);
-					break;
-					
-				// else raw output
-				case (true && $confirmed === 1 && !$config->value('bbcodeLibAvailable')):
+				case (true && $confirmed === 1):
+					$tmpl->assign('submitText', 'Write changes');
+					// user may decide not to submit after seeing preview
+					$tmpl->assign('editAgainText', 'Edit again');
 					$this->caller->insertEditText(true);
 					break;
 				
@@ -127,9 +124,6 @@
 			switch ($confirmed)
 			{
 				case 1:
-					$tmpl->assign('submitText', 'Write changes');
-					// user may decide not to submit after seeing preview
-					$tmpl->assign('editAgainText', 'Edit again');
 					break;
 					
 				case 2:
