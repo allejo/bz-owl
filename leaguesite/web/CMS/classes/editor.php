@@ -128,7 +128,7 @@
 					
 				case 2:
 					$this->caller->writeContent($content, $page_title);
-					$tmpl->addMSG('Changes written successfully.' . $tmpl->linebreaks("\n\n"));
+					$tmpl->assign('MSG', 'Changes written successfully.' . $tmpl->linebreaks("\n\n"));
 					
 				default:
 					$tmpl->assign('USER_NOTE');

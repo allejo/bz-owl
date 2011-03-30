@@ -46,7 +46,7 @@
 			/*
 			 if ($config->value('debugSQL'))
 			 {
-			 $this->addMSG('Used menu: ' . $menuFile);
+			 $this->assign('MSG', 'Used menu: ' . $menuFile);
 			 }
 			 */
 			
@@ -314,7 +314,7 @@
 			} elseif ($config->value('debugSQL'))
 			{
 				// debug output used template
-				//				$this->addMSG('Used template: ' . $themeFolder
+				//				$this->assign('MSG', 'Used template: ' . $themeFolder
 				//							  . $template . '.tmpl.html' . $this->return_self_closing_tag('br'));
 			}
 			

@@ -59,7 +59,7 @@ if ( (isset($_GET['bzbbauth'])) && ($_GET['bzbbauth']) )
 	{
 		if ($db->getDebugSQL())
 		{
-			$helper->addMSG('<p>gu league referee detected</p>');
+			$helper->assign('MSG', '<p>gu league referee detected</p>');
 		}
 		// GU-LEAGUE.REFEREES group
 		
@@ -84,7 +84,7 @@ if ( (isset($_GET['bzbbauth'])) && ($_GET['bzbbauth']) )
 	{
 		if ($db->getDebugSQL())
 		{
-			$helper->addMSG('<p>gu league admin detected</p>');
+			$helper->assign('MSG', '<p>gu league admin detected</p>');
 		}
 		// GU-LEAGUE.ADMINS group
 		

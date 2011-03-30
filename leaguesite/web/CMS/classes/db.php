@@ -116,7 +116,7 @@
 /*
 			if ($this->getDebugSQL() && isset($tmpl))
 			{
-				$tmpl->addMSG('executing query: '. $query . $tmpl->return_self_closing_tag('br'));
+				$tmpl->assign('MSG', 'executing query: '. $query . $tmpl->return_self_closing_tag('br'));
 			}
 */
 			

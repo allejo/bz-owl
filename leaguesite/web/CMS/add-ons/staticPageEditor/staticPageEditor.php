@@ -97,13 +97,13 @@
 							// use bbcode if available
 						case (true && $confirmed === 1 && $config->value('bbcodeLibAvailable')):
 							$this->insertEditText(true);
-							$tmpl->addMSG($tmpl->encodeBBCode($content));
+							$tmpl->assign('MSG', $tmpl->encodeBBCode($content));
 							break;
 							
 							// else raw output
 						case (true && $confirmed === 1 && !$config->value('bbcodeLibAvailable')):
 							$this->insertEditText(true);
-							$tmpl->addMSG($content);
+							$tmpl->assign('MSG', $content);
 							break;
 							
 							// use this as guard to prevent selection of noperm or nokeymatch cases
@@ -112,12 +112,12 @@
 							break;
 							
 						case 'noperm':
-							$tmpl->addMSG('You need write permission to edit the content.');
+							$tmpl->assign('MSG', 'You need write permission to edit the content.');
 							break;
 							
 						case 'nokeymatch':
 							$this->insertEditText(false);
-							$tmpl->addMSG('The magic key does not match, it looks like you came from somewhere else or your session expired.');
+							$tmpl->assign('MSG', 'The magic key does not match, it looks like you came from somewhere else or your session expired.');
 							break;			
 					}
 					unset($test);
@@ -154,7 +154,7 @@
 							
 						case 2:
 							$this->writeContent($content, $page_title);
-							$tmpl->addMSG('Changes written successfully.' . $tmpl->linebreaks("\n\n"));
+							$tmpl->assign('MSG', 'Changes written successfully.' . $tmpl->linebreaks("\n\n"));
 							
 						default:
 							$tmpl->setCurrentBlock('FORM_BUTTON');
