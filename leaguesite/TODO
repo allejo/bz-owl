@@ -23,3 +23,9 @@ long term:
 * Merge Osta's Ducati League features.
 
 * Restructure to support multiple leagues with a single web site.
+
+* As much as possible should be implemented as add-on.
+
+* More themes!
+
+* Drop legacy siteoptions.php (old code depends on that file).
