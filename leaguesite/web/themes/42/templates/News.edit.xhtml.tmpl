@@ -43,8 +43,8 @@ No menu found.
 
 {if isset($confirmationStep) && $confirmationStep < 2}
 <div><input type="text" name="title" value="{$msgTitle}" /></div>
-<div>{foreach item=button from=$buttonsToFormat}{$button}
-{/foreach}</div>
+{if isset($buttonsToFormat)}<div>{foreach item=button from=$buttonsToFormat}{$button}
+{/foreach}</div>{/if}
 <div><textarea cols="75" rows="20" name="staticContent">{$rawContent}</textarea></div>
 <div><input type="text" name="time" value="{$timestamp}" /></div>
 {/if}

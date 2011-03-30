@@ -74,11 +74,11 @@ No menu found.
 {if !isset($showPreview) || !$showPreview}
 <div>
 	<input type="text" name="subject" value="{$subject}" onfocus="if(this.value=='Enter subject here') this.value=''" onblur="if(this.value=='') this.value='Enter subject here'" /></div>
-<div>
+{if isset($buttonsToFormat)}<div>
 {foreach item=button from=$buttonsToFormat}
 	{$button}
 {/foreach}
-</div>
+</div>{/if}
 <div><textarea cols="75" rows="20" name="content">{$rawContent}</textarea></div>
 {/if}
 
