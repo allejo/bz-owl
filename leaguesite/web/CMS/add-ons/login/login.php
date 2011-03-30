@@ -408,8 +408,8 @@
 									$msg .= '<p>You have been added to the list of players at this site. Thanks for visiting our site.</p>';
 									
 									// send the welcome message
-									include dirname(dirname(__FILE__)) . '/announcements/sendPrivateMSG.php';
-									sendPrivateMSG(array($_SESSION['viewerid']), array(), 0, 'Welcome!'
+									include(dirname(dirname(__FILE__)) . '/pmSystem/sendPM.php');
+									sendPM(array($_SESSION['viewerid']), array(), 0, 'Welcome!'
 												   , date('Y-m-d H:i:s')
 												   , 'Welcome and thanks for registering at this website!' . "\n"
 												   . 'In the FAQ you can find the most important informations'

@@ -1,4 +1,4 @@
-<?php
+sendPM.php<?php
 	class pmSystemAddPM extends pmSystemPM
 	{
 		private $editor;
@@ -59,7 +59,7 @@
 				$content['author'] = $db->fetchRow($query);
 				$db->free($query);
 				
-				$content['recipientPlayers'] = $this->PMComposer->getRecipientNames();
+				$content['recipientPlayers'] = $this->PMComposer->getPlayerNames();
 				$content['timestamp'] = date('Y-m-d H:i:s');
 			} else
 			{
@@ -127,6 +127,13 @@
 			global $tmpl;
 			
 			
+			// < 0: undefined, 0: edit screen, 1: preview, 2: send, > 2: undefined
+			if ($confirmed < 0 || $confirmed > 2)
+			{
+				// changed undefined values to a defined state
+				$confirmed = 0;
+			}
+			
 			if ($confirmed > 0 || isset($_POST['editPageAgain']))
 			{
 				// no need to check for a key match if no content was supplied
@@ -150,10 +157,10 @@
 					// exclude recipients that are requested to be removed
 					if (isset($_POST['recipientPlayer' . $i]) && !(isset($_POST['removeRecipientPlayer' . $i])))
 					{
-						$this->PMComposer->addRecipientName($_POST['recipientPlayer' . $i]
-															, $confirmed > 0
-															&& !isset($_POST['addPlayerRecipient'])
-															&& !isset($_POST['editPageAgain']));
+						$this->PMComposer->addPlayerName($_POST['recipientPlayer' . $i]
+														 , $confirmed > 0
+														 && !isset($_POST['addPlayerRecipient'])
+														 && !isset($_POST['editPageAgain']));
 					}
 					$i++;
 				}
@@ -162,17 +169,37 @@
 				if (isset($_POST['recipientPlayer']) && isset($_POST['addPlayerRecipient']))
 				{
 					$confirmed = 0;
-					$this->PMComposer->addRecipientName($_POST['recipientPlayer'], $confirmed > 0);
+					$this->PMComposer->addPlayerName($_POST['recipientPlayer'], $confirmed > 0);
 				}
 			}
 			
+			
+			if ($confirmed > 0 && $this->PMComposer->countPlayers() < 1)
+			{
+				$tmpl->assign('MSG', 'A PM can not be sent without any recipients set.');
+				$confirmed = 0;
+			}
+			
 			return true;
+		}
+		
+		function writeContent()
+		{
+			global $user;
+			include(dirname(__FILE__) . '/sendPM.php');
+			
+			
+			return send($user->getID());
 		}
 	}
 	
 	class PMComposer
 	{
-		private $recipients = array();
+		private $players = array();
+		private $teams = array();
+		private $subject = 'Enter subject here';
+		private $content = 'Enter message here';
+		private $timestamp = '';
 		private $usernameQuery;
 		
 		
@@ -180,11 +207,50 @@
 		{
 			global $db;
 			
-			
+			$this->timestamp = date('Y-m-d H:i:s');
 			$this->usernameQuery = $db->prepare('SELECT `id`, `name` FROM `players` WHERE `name`=? LIMIT 1');
 		}
 		
-		function addRecipientName($recipientName, $preview=false)
+		
+		function getSubject()
+		{
+			return $this->subject;
+		}
+		
+		function setSubject($subject)
+		{
+			$this->subject = $subject;
+		}
+		
+		
+		function getContent()
+		{
+			return $this->content;
+		}
+		
+		function setContent($content)
+		{
+			$this->content = $content;
+		}
+		
+		
+		function getTimestamp()
+		{
+			return $this->timestamp;
+		}
+		
+		function setTimestamp($timestamp)
+		{
+			$this->timestamp = $timestamp;
+		}
+		
+		
+		function addPlayerID($id)
+		{
+			$this->players[] = array('id' => $id);
+		}
+		
+		function addPlayerName($recipientName, $preview=false)
 		{
 			global $db;
 			
@@ -193,7 +259,7 @@
 			
 			// lookup if username is already in recipient array
 			$alreadyAdded = false;
-			foreach ($this->recipients as $oneRecipient)
+			foreach ($this->players as $oneRecipient)
 			{
 				// assume case insensitive usernames
 				if (strcasecmp(($preview) ? $oneRecipient['name'] : $oneRecipient,
@@ -209,19 +275,186 @@
 				if ($row = $db->fetchRow($this->usernameQuery))
 				{
 					// assume case preserving usernames
-					$this->recipients[] = ($preview) ? array('id'=>$row['id'],
-															 'name'=>$row['name'],
-															 'link' => '../Players/?profile=' . $row['id'])
-															 : $row['name'];
+					$this->players[] = ($preview) ? array('id'=>$row['id'],
+														  'name'=>$row['name'],
+														  'link' => '../Players/?profile=' . $row['id'])
+												  : $row['name'];
 					unset($row);
 				}
 				$db->free($this->usernameQuery);
 			}
 		}
 		
-		function getRecipientNames()
+		function countPlayers()
 		{
-			return $this->recipients;
+			return count($this->players);
 		}
+		
+		function getPlayerIDs()
+		{
+			global $db;
+			
+			
+			// initialise variables
+			$recipientIDs = array();
+			$query = $db->prepare('SELECT `id` FROM `players` WHERE `name`=?');
+			
+			// no need for queries to find out id's if id of first item already set
+			if ((count($this->players) > 0) && isset($this->players[0]['id']))
+			{
+				foreach ($this->players as $oneRecipient)
+				{
+					$recipientIDs[] = $oneRecipient['id'];
+				}
+				
+				return $recipientIDs;
+			}
+			
+			// id's not in array, have to look them up
+			foreach ($this->players as $oneRecipient)
+			{
+				$db->execute($query, $oneRecipient['name']);
+				
+				if ($row = $db->fetchRow($query))
+				{
+					$recipientIDs[] = $row['id'];
+				}
+				
+				$db->free($query);
+			}
+			
+			return $recipientIDs;
+		}
+		
+		function getPlayerNames()
+		{
+			return $this->players;
+		}
+	}
+	
+	// send private message to players and teams
+	// if an error occurs, $error will contain its description and the function will return false
+	function send($author_id=0, $from_team=0,
+				  $msg_replied_team=0, $ReplyToMSGID=0,
+				  &$error='')
+	{
+		global $config;
+		global $user;
+		global $db;
+		
+		
+		// remove duplicates
+		if (removeDuplicates($this->players) || removeDuplicates($this->teams))
+		{
+			// back to overview to let them check
+			$error = '<p>Some double entries were removed. Please check your recipients.<p>';
+			return false;
+		}
+		
+		if (strlen($message) === 0)
+		{
+			$error = '<p>You must specify a message text in order to send a message.</p>';
+			return false;
+		}
+		
+		$recipients = $this->players;
+		// add the players belonging to the specified teams to the recipients array
+		foreach ($this->teams as $teamid)
+		{
+			$tmp_players = playersInTeam($teamid);
+			foreach ($tmp_players as $playerID)
+			{
+				$recipients[] = $playerID;
+			}
+		}
+		
+		// remove possible duplicates
+		@removeDuplicates($recipients);
+		
+		// put message in database
+		$query = $db->prepare('INSERT INTO `messages_storage`'
+							  . ' (`author_id`, `subject`, `timestamp`, `message`, `from_team`, `recipients`)'
+							  . ' VALUES (?, ?, ?, ?, ?, ?)');
+		
+		// prepare recipients for SQL statement
+		$recipientsSQL = is_array($recipients) ? implode(' ', $recipients) : $recipients;
+		
+		foreach ($recipients as $recipient)
+		{
+			$db->execute($query, array($author_id, htmlent($this->subject), $this->timestamp, $this->content, $from_team, $recipientsSQL));
+			$db->free($query);
+			$rowId = $db->lastInsertId();
+			
+			// put message in people's inbox
+			if ($ReplyToMSGID > 0)
+			{
+				// this is a reply
+				$query = $db->prepare('INSERT INTO `messages_users_connection`'
+									  . '(`msgid`, `playerid`, `in_inbox`, `in_outbox`, `msg_replied_to_msgid)'
+									  . 'VALUES (?, ?, ?, ?, ?)');
+				$db->execute($query, array($rowId, $recipient, 1, 0, $ReplyToMSGID));
+				$db->free($query);
+			} else
+			{
+				// this is a new message
+				$query = $db->prepare('INSERT INTO `messages_users_connection`'
+									  . ' (`msgid`, `playerid`, `in_inbox`, `in_outbox`)'
+									  . ' VALUES (?, ?, ?, ?)');
+				$db->execute($query, array($rowId, $recipient, 1, 0));
+				$db->free($query);
+			}
+			
+			// put message in sender's outbox
+			if ($author_id > 0)
+			{
+				// system did not send the message but a human
+				$query = $db->prepare('INSERT INTO `messages_users_connection`'
+									  . ' (`msgid`, `playerid`, `in_inbox`, `in_outbox`)'
+									  . ' VALUES (?, ?, ?, ?)');
+				$db->execute($query, array($rowId, $author_id, 0, 1));
+			}
+		}
+		
+		return true;
+	}
+	
+	
+	function removeDuplicates(&$someArray)
+	{
+		$dup_check = count($someArray);
+		// array_unique is case sensitive, thus the loading of name from database
+		$players = array_unique($someArray);
+		if (!($dup_check === (count($someArray))))
+		{
+			// duplicates were removed
+			return true;
+		}
+		
+		// neither duplicates found nor removed
+		return false;
+	}
+	
+	function playersInTeam($teamid)
+	{
+		global $db;
+		
+		$teamid = intval($teamid);
+		$result = array();
+		
+		if ($teamid < 1)
+		{
+			// no valid team id -> return empty player list
+			return $result;
+		}
+		
+		$query = $db->prepare('SELECT `id` FROM `players` WHERE `teamid`=?');
+		$db->execute($query, $teamid);
+		
+		while ($row = $db->fetchRow($query))
+		{
+			$result[] = $row['id'];
+		}
+		
+		return $result;
 	}
 ?>

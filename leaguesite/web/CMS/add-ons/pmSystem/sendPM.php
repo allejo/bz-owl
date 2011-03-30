@@ -1,10 +1,10 @@
 <?php
 	// send private message to players and teams
 	// if an error occurs, $error will contain its description and the function will return false
-	function sendPrivateMSG($players=array(), $teams=array(),
-							$author_id=0, $subject='Enter subject here',
-							$timestamp, $message, $from_team=0,
-							$msg_replied_team=0, $ReplyToMSGID=0, &$error='')
+	function sendPM($players=array(), $teams=array(),
+					$author_id=0, $subject='Enter subject here',
+					$timestamp, $message, $from_team=0,
+					$msg_replied_team=0, $ReplyToMSGID=0, &$error='')
 	{
 		global $config;
 		global $user;
