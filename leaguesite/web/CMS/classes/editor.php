@@ -101,7 +101,7 @@
 				case 'nokeymatch':
 					$this->caller->insertEditText(false);
 					$tmpl->assign('MSG', 'The magic key does not match, it looks like you came from somewhere else or your session expired.');
-					break;			
+					break;
 				unset($test);
 			}
 			
