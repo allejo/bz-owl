@@ -59,19 +59,20 @@ sendPM.php<?php
 				$content['author'] = $db->fetchRow($query);
 				$db->free($query);
 				
-				$content['recipientPlayers'] = $this->PMComposer->getPlayerNames();
+				$content['playerRecipients'] = $this->PMComposer->getPlayerNames();
 				$content['timestamp'] = date('Y-m-d H:i:s');
 			} else
 			{
 				// new message -> recipient players yet
-				$content['recipientPlayers'] = array();
+				$content['playerRecipients'] = array();
 			}
 			
+			$tmpl->assign('teamRecipients', $this->PMComposer->getTeamNames());
 			
 			switch($readonly)
 			{
 				case true:
-					$tmpl->assign('recipientPlayers', $content['recipientPlayers']);
+					$tmpl->assign('playerRecipients', $content['playerRecipients']);
 					$tmpl->assign('subject',  htmlent($content['subject']));
 					$tmpl->assign('authorName',  htmlent($content['author']['name']));
 					$tmpl->assign('time',  htmlent($content['timestamp']));
@@ -89,7 +90,7 @@ sendPM.php<?php
 					break;
 				
 				default:
-					$tmpl->assign('recipientPlayers', $content['recipientPlayers']);
+					$tmpl->assign('playerRecipients', $content['playerRecipients']);
 					$tmpl->assign('rawContent', htmlspecialchars($content['raw_msg']
 																 , ENT_COMPAT, 'UTF-8'));
 					$tmpl->assign('subject', htmlspecialchars($content['subject']
@@ -144,20 +145,51 @@ sendPM.php<?php
 					return 'nokeymatch';
 				}
 				
-				// add all set player recipients
+				
+				// add all set team recipients
 				$i = 0;
-				while (isset($_POST['recipientPlayer' . $i]))
+				while (isset($_POST['teamRecipient' . $i]))
 				{
 					// user requested removal of a recipient -> do not send now
-					if (isset($_POST['removeRecipientPlayer' . $i]))
+					if (isset($_POST['removeTeamRecipient' . $i]))
 					{
 						$confirmed = 0;
 					}
 					
-					// exclude recipients that are requested to be removed
-					if (isset($_POST['recipientPlayer' . $i]) && !(isset($_POST['removeRecipientPlayer' . $i])))
+					// exclude team recipients that are requested to be removed
+					if (isset($_POST['teamRecipient' . $i]) && !(isset($_POST['removeTeamRecipient' . $i])))
 					{
-						$this->PMComposer->addPlayerName($_POST['recipientPlayer' . $i]
+						$this->PMComposer->addTeamName($_POST['teamRecipient' . $i]
+														 , $confirmed > 0
+														 && !isset($_POST['addTeamRecipient'])
+														 && !isset($_POST['addPlayerRecipient'])
+														 && !isset($_POST['editPageAgain']));
+					}
+					$i++;
+				}
+				
+				// add new team recipient if requested and do not send the message
+				if (isset($_POST['teamRecipient']) && isset($_POST['addTeamRecipient']))
+				{
+					$confirmed = 0;
+					$this->PMComposer->addTeamName($_POST['teamRecipient'], $confirmed > 0);
+				}
+				
+				
+				// add all set player recipients
+				$i = 0;
+				while (isset($_POST['playerRecipient' . $i]))
+				{
+					// user requested removal of a recipient -> do not send now
+					if (isset($_POST['removePlayerRecipient' . $i]))
+					{
+						$confirmed = 0;
+					}
+					
+					// exclude player recipients that are requested to be removed
+					if (isset($_POST['playerRecipient' . $i]) && !(isset($_POST['removePlayerRecipient' . $i])))
+					{
+						$this->PMComposer->addPlayerName($_POST['playerRecipient' . $i]
 														 , $confirmed > 0
 														 && !isset($_POST['addPlayerRecipient'])
 														 && !isset($_POST['editPageAgain']));
@@ -166,15 +198,15 @@ sendPM.php<?php
 				}
 				
 				// add new player recipient if requested and do not send the message
-				if (isset($_POST['recipientPlayer']) && isset($_POST['addPlayerRecipient']))
+				if (isset($_POST['playerRecipient']) && isset($_POST['addPlayerRecipient']))
 				{
 					$confirmed = 0;
-					$this->PMComposer->addPlayerName($_POST['recipientPlayer'], $confirmed > 0);
+					$this->PMComposer->addPlayerName($_POST['playerRecipient'], $confirmed > 0);
 				}
 			}
 			
 			
-			if ($confirmed > 0 && $this->PMComposer->countPlayers() < 1)
+			if ($confirmed > 0 && $this->PMComposer->countPlayers() < 1 && $this->PMComposer->countTeams() < 1)
 			{
 				$tmpl->assign('MSG', 'A PM can not be sent without any recipients set.');
 				$confirmed = 0;
@@ -201,6 +233,7 @@ sendPM.php<?php
 		private $content = 'Enter message here';
 		private $timestamp = '';
 		private $usernameQuery;
+		private $teamnameQuery;
 		
 		
 		function __construct()
@@ -209,6 +242,7 @@ sendPM.php<?php
 			
 			$this->timestamp = date('Y-m-d H:i:s');
 			$this->usernameQuery = $db->prepare('SELECT `id`, `name` FROM `players` WHERE `name`=? LIMIT 1');
+			$this->teamnameQuery = $db->prepare('SELECT `id`, `name` FROM `teams` WHERE `name`=? LIMIT 1');
 		}
 		
 		
@@ -285,10 +319,53 @@ sendPM.php<?php
 			}
 		}
 		
+		
+		function addTeamName($recipientName, $preview=false)
+		{
+			global $db;
+			
+			
+			// remove double entries, invalid names etc
+			
+			// lookup if username is already in recipient array
+			$alreadyAdded = false;
+			foreach ($this->teams as $oneRecipient)
+			{
+				// assume case insensitive usernames
+				if (strcasecmp(($preview) ? $oneRecipient['name'] : $oneRecipient,
+							   $recipientName) === 0)
+				{
+					$alreadyAdded = true;
+				}
+			}
+			
+			if (!$alreadyAdded)
+			{
+				$db->execute($this->teamnameQuery, htmlent($recipientName));
+				if ($row = $db->fetchRow($this->teamnameQuery))
+				{
+					// assume case preserving usernames
+					$this->teams[] = ($preview) ? array('id'=>$row['id'],
+														  'name'=>$row['name'],
+														  'link' => '../Teams/?profile=' . $row['id'])
+												  : $row['name'];
+					unset($row);
+				}
+				$db->free($this->teamnameQuery);
+			}
+		}
+		
+		
 		function countPlayers()
 		{
 			return count($this->players);
 		}
+		
+		function countTeams()
+		{
+			return count($this->teams);
+		}
+		
 		
 		function getPlayerIDs()
 		{
@@ -329,6 +406,11 @@ sendPM.php<?php
 		function getPlayerNames()
 		{
 			return $this->players;
+		}
+		
+		function getTeamNames()
+		{
+			return $this->teams;
 		}
 	}
 	

@@ -36,7 +36,7 @@ No menu found.
 		<span class="msg_subject">{$subject}</span>
 		<span class="msg_author"> by {if isset($authorLink)}<a href="{$authorLink}">{$authorName}</a>{else}{$authorName}{/if}</span>
 		<span class="msg_overview_recipients">to 
-		{foreach key="id" item="curRecipients" from=$recipientPlayers}
+		{foreach key="id" item="curRecipients" from=$playerRecipients}
 			<a href="{$curRecipients.link}">{$curRecipients.name}</a>{if !$curRecipients@last},{/if}
 			<input type="hidden" name="recipientPlayer{$id}" value="{$curRecipients.name}" />
 		{/foreach}
@@ -55,15 +55,28 @@ No menu found.
 
 {if isset($MSG)}<div>{$MSG}</div>{/if}
 <div>
-	<label for="recipientPlayer">Player recipients:</label>
-	<input type="text" name="recipientPlayer" value="Enter one callsign here" onfocus="if(this.value=='Enter one callsign here') this.value=''" onblur="if(this.value=='') this.value='Enter one callsign here'" />
+	<label for="teamRecipient">Team recipients:</label>
+	<input type="text" name="teamRecipient" value="Enter one team name here" onfocus="if(this.value=='Enter one team name here') this.value=''" onblur="if(this.value=='') this.value='Enter one team name here'" />
+	<input type="submit" name="addTeamRecipient" value="+"  />
+</div>
+
+{foreach key="id" item="teamRecipient" from=$teamRecipients}
+<div>
+	<input type="text" name="teamRecipient{$id}" readonly="readonly" value="{$teamRecipient}" />
+	<input type="submit" name="removeTeamRecipient{$id}" value="-" />
+</div>
+{/foreach}
+
+<div>
+	<label for="playerRecipient">Player recipients:</label>
+	<input type="text" name="playerRecipient" value="Enter one callsign here" onfocus="if(this.value=='Enter one callsign here') this.value=''" onblur="if(this.value=='') this.value='Enter one callsign here'" />
 	<input type="submit" name="addPlayerRecipient" value="+"  />
 </div>
 
-{foreach key="id" item="recipientPlayer" from=$recipientPlayers}
+{foreach key="id" item="playerRecipient" from=$playerRecipients}
 <div>
-	<input type="text" name="recipientPlayer{$id}" readonly="readonly" value="{$recipientPlayer}" />
-	<input type="submit" name="removeRecipientPlayer{$id}" value="-" />
+	<input type="text" name="playerRecipient{$id}" readonly="readonly" value="{$playerRecipient}" />
+	<input type="submit" name="removePlayerRecipient{$id}" value="-" />
 </div>
 {/foreach}
 {/if}
