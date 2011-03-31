@@ -36,20 +36,12 @@ sendPM.php<?php
 		function insertEditText($readonly=false)
 		{
 			global $tmpl;
-			global $page_title;
-			global $author;
-			global $last_modified;
 			global $config;
 			global $user;
 			global $db;
 			
 			
 			$content = array();
-			$content['raw_msg'] = isset($_POST['content']) && (strlen($_POST['content']) > 0)
-								  ?  strval($_POST['content']) : 'Enter message here';
-			$content['subject'] = isset($_POST['subject']) && (strlen($_POST['subject']) > 0)
-								  ? strval($_POST['subject']) : 'Enter subject here';
-			
 			if ($readonly || isset($_POST['confirmationStep']))
 			{
 				// data passed to form -> use it
@@ -58,25 +50,18 @@ sendPM.php<?php
 				$db->execute($query, $user->getID());
 				$content['author'] = $db->fetchRow($query);
 				$db->free($query);
-				
-				$content['playerRecipients'] = $this->PMComposer->getPlayerNames();
-				$content['timestamp'] = date('Y-m-d H:i:s');
-			} else
-			{
-				// new message -> recipient players yet
-				$content['playerRecipients'] = array();
 			}
 			
+			$tmpl->assign('subject', $this->PMComposer->getSubject());
+			$tmpl->assign('time', $this->PMComposer->getTimestamp());
+			$tmpl->assign('playerRecipients', $this->PMComposer->getPlayerNames());
 			$tmpl->assign('teamRecipients', $this->PMComposer->getTeamNames());
+			$tmpl->assign('rawContent', htmlent($this->PMComposer->getContent()));
 			
 			switch($readonly)
 			{
 				case true:
-					$tmpl->assign('playerRecipients', $content['playerRecipients']);
-					$tmpl->assign('subject',  htmlent($content['subject']));
 					$tmpl->assign('authorName',  htmlent($content['author']['name']));
-					$tmpl->assign('time',  htmlent($content['timestamp']));
-					$tmpl->assign('rawContent', htmlent($content['raw_msg']));
 					if ($config->value('bbcodeLibAvailable'))
 					{
 						$tmpl->assign('content',  $tmpl->encodeBBCode($content['raw_msg']));
@@ -90,11 +75,6 @@ sendPM.php<?php
 					break;
 				
 				default:
-					$tmpl->assign('playerRecipients', $content['playerRecipients']);
-					$tmpl->assign('rawContent', htmlspecialchars($content['raw_msg']
-																 , ENT_COMPAT, 'UTF-8'));
-					$tmpl->assign('subject', htmlspecialchars($content['subject']
-															   , ENT_COMPAT, 'UTF-8'));
 					// display the formatting buttons addded by addFormatButtons
 					$this->editor->showFormatButtons();
 					break;
@@ -143,6 +123,17 @@ sendPM.php<?php
 					// editing cancelled due to random key mismatch
 					$confirmed = 0;
 					return 'nokeymatch';
+				}
+				
+				
+				if (isset($_POST['subject']) && (strlen($_POST['subject']) > 0))
+				{
+					$this->PMComposer->setSubject(strval($_POST['subject']));
+				}
+				
+				if (isset($_POST['content']) && (strlen($_POST['content']) > 0))
+				{
+					$this->PMComposer->setContent(strval($_POST['content']));
 				}
 				
 				

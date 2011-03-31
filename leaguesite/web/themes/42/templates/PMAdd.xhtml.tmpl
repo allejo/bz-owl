@@ -36,10 +36,23 @@ No menu found.
 		<span class="msg_subject">{$subject}</span>
 		<span class="msg_author"> by {if isset($authorLink)}<a href="{$authorLink}">{$authorName}</a>{else}{$authorName}{/if}</span>
 		<span class="msg_overview_recipients">to 
-		{foreach key="id" item="curRecipients" from=$playerRecipients}
-			<a href="{$curRecipients.link}">{$curRecipients.name}</a>{if !$curRecipients@last},{/if}
-			<input type="hidden" name="recipientPlayer{$id}" value="{$curRecipients.name}" />
-		{/foreach}
+		
+		{if isset($playerRecipients)}
+			player{if count($playerRecipients) > 1}s{/if}:
+			{foreach key="id" item="curRecipients" from=$playerRecipients}
+				<a href="{$curRecipients.link}">{$curRecipients.name}</a>{if !$curRecipients@last},{/if}
+				<input type="hidden" name="playerRecipient{$id}" value="{$curRecipients.name}" />
+			{/foreach}
+		{/if}
+		
+		{if isset($teamRecipients)}
+			{if isset($playerRecipients)}&amp; {/if}team{if count($teamRecipients) > 1}s{/if}:
+			{foreach key="id" item="curRecipients" from=$teamRecipients}
+				<a href="{$curRecipients.link}">{$curRecipients.name}</a>{if !$curRecipients@last},{/if}
+				<input type="hidden" name="teamRecipient{$id}" value="{$curRecipients.name}" />
+			{/foreach}
+		{/if}
+		
 		</span>
 		<span class="msg_timestamp"> at {$time}</span>
 	</div>
