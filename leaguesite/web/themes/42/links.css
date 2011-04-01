@@ -57,3 +57,23 @@ a.button:hover
 	border-top: 2px solid #74250c;
 	border-left: 2px solid #74250c;
 }
+
+table a, td > a.button
+{
+	color: #005981;
+}
+
+table a:hover, td > a.button:hover
+{
+	color: #4e405a;
+}
+
+td > a.button, td > a.button:hover
+{
+	border-style: none;
+	border-color: none;
+	background-color: transparent;
+	box-shadow:inset 10px 10px 1em 15px transparent;
+	-moz-box-shadow:inset 10px 10px 1em 15px transparent;
+	-webkit-box-shadow:inset 10px 10px 1em 15px transparent;
+}
