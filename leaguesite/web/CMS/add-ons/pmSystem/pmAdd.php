@@ -11,6 +11,7 @@ sendPM.php<?php
 			global $tmpl;
 			
 			
+			include(dirname(__FILE__) . '/classes/PMComposer.php');
 			$this->PMComposer = new PMComposer();
 			
 			// FIXME: fallback to default permission name until add-on system is completly implemented
