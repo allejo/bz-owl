@@ -8,6 +8,7 @@
 			global $tmpl;
 			global $user;
 			
+			
 			if (!isset($site))
 			{
 				require_once (dirname(dirname(dirname(__FILE__))) . '/site.php');
