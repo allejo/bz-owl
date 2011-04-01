@@ -35,7 +35,7 @@ No menu found.
 
 <div class="static_page_box">
 {if isset($MSG)}<div>{$MSG}</div>{/if}
-<form action="./?edit" enctype="application/x-www-form-urlencoded" method="post" accept-charset="utf-8">
+<form action="{$formAction}" enctype="application/x-www-form-urlencoded" method="post" accept-charset="utf-8">
 <div><input type="hidden" name="key_name" value="{$keyName}" /></div>
 <div><input type="hidden" name="{$keyName}" value="{$keyValue}" /></div>
 

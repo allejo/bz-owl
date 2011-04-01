@@ -2,9 +2,11 @@
 	class newsSystem
 	{
 		private $editor;
+		public $randomKeyName = 'newsSystem';
 		
 		function __construct($title, $path)
 		{
+			global $entry_add_permission;
 			global $entry_edit_permission;
 			global $entry_delete_permission;
 			global $site;
@@ -19,7 +21,6 @@
 			
 			$tmpl->setTemplate('News');
 			
-			$tmpl->assign('name', 'Ned');
 			$tmpl->assign('title', $title);
 			
 			// FIXME: fallback to default permission name until add-on system is completly implemented
@@ -51,6 +52,7 @@
 			}
 			
 			
+			require_once (dirname(dirname(dirname(__FILE__))) . '/classes/editor.php');
 			
 			// otherwise we'd need a custom name per setup
 			// as top level dir could be named different
@@ -65,10 +67,11 @@
 				{
 					$tmpl->noTemplateFound();
 				}
-				include(dirname(dirname(dirname(__FILE__))) . '/classes/editor.php');
+				$id = intval($_GET['edit']);	// FIXME: use better validation than intval()
+				$tmpl->assign('formAction', './?edit=' . $id);
 				$this->editor = new editor($this);
 				$this->editor->addFormatButtons('staticContent');
-				$this->editor->edit();
+				$this->editor->edit($id);
 				$tmpl->display();
 				die();
 			}
@@ -77,10 +80,23 @@
 			if ($user->getPermission($entry_add_permission) && isset($_GET['add']))
 			{
 				// user has permission to add news to the page and requests it
-				$tmpl->setTemplate($templateToUse . '.edit');
-				$this->add();
+				if (!$tmpl->setTemplate($templateToUse . '.edit'))
+				{
+					$tmpl->noTemplateFound();
+				}
+				$tmpl->assign('formAction', './?add');
+				$this->editor = new editor($this);
+				$this->editor->edit();
 				$tmpl->display();
 				die();
+			}
+			
+			
+			if ($user->getPermission($entry_delete_permission) && isset($_GET['delete']))
+			{
+				// user has permission to delete news from the page and requests it
+				$this->delete();
+				// fall through to read-only display
 			}
 			
 			// user looks at page in read mode
@@ -97,11 +113,26 @@
 		}
 		
 		
-		function add()
+		function delete()
 		{
+			global $db;
 			global $tmpl;
 			
-			echo('blub');
+			if (isset($_GET['delete']))
+			{
+				$query = $db->prepare('DELETE FROM `news` WHERE `id`=?');
+				if ($db->execute($query, intval($_GET['delete'])))	// FIXME: use better validation than intval()
+				{
+					$tmpl->assign('MSG', 'Article deleted.' . $tmpl->linebreaks("\n\n"));
+				} else
+				{
+					$tmpl->assign('MSG', 'No such article.' . $tmpl->linebreaks("\n\n"));
+				}
+				$db->free($query);
+			} else
+			{
+				$tmpl->assign('MSG', 'No article specified.' . $tmpl->linebreaks("\n\n"));
+			}
 		}
 		
 		
@@ -153,9 +184,15 @@
 				
 				$content['title'] = $_POST['title'];
 				$content['timestamp'] = $_POST['time'];
-			} else
+			} elseif (isset($_GET['edit']))
 			{
 				$content = $this->readContent($page_title, $author, $last_modified, true);
+			} else
+			{
+				$content = array();
+				$content['raw_msg'] = '';
+				$content['timestamp'] = '';
+				$content['title'] = '';
 			}
 			
 			
@@ -217,6 +254,7 @@
 			global $user;
 			global $db;
 			
+			$max_per_page = 20;	// FIXME: move to settings.php (or define per theme)
 			
 			// initialise return variable so any returned value will be always in a defined state
 			$content = array();
@@ -225,21 +263,26 @@
 			{
 				if (isset($_GET['i']) && (intval($_GET['i']) > -1))
 				{
-					$offset = intval($_GET['i']);
+					$offset = intval($_GET['i']);	// FIXME: use better validation than intval()
 				}
 				
 				// TODO: id only needed if user can edit or delete
 				// TODO: meaning room for optimisation
 				$query = $db->SQL('SELECT `id`,`title`,`timestamp`,`author`,`msg`'
 								  . ' FROM `news` ORDER BY `timestamp` DESC'
-								  . ' LIMIT ' . intval($offset) .', 21');
+								  . ' LIMIT ' . $offset . ', ' . strval($max_per_page+1));	// FIXME: parameterize
+				$db->execute($query, '');
 			} else
 			{
-				$query = $db->SQL('SELECT `title`,`timestamp`,`author`,`raw_msg`'
-								  . ' FROM `news` ORDER BY `timestamp` DESC'
-								  . ' LIMIT ' . intval($offset) .', 1');
+				$id = -1;
+				if (isset($_GET['edit']) && (intval($_GET['edit']) > -1))
+				{
+					$id = intval($_GET['edit']);	// FIXME: use better validation than intval()
+				}
+				$query = $db->prepare('SELECT `title`,`timestamp`,`author`,`raw_msg`'
+								  . ' FROM `news` WHERE `id`=?');
+				$db->execute($query, $id);
 			}
-			$db->execute($query, $offset);
 			$rows = $db->fetchAll($query);
 			$db->free($query);
 			
@@ -251,7 +294,12 @@
 			
 			if ($offset > 0)
 			{
-				$tmpl->assign('offsetPrev', $offset-20);
+				$prev_offset = $offset - $max_per_page;
+				if ($prev_offset < 0)
+				{
+					$prev_offset = 0;
+				}
+				$tmpl->assign('offsetPrev', $prev_offset);
 			}
 			
 			// process query result array
@@ -273,14 +321,14 @@
 				}
 				
 				// next news button needed
-				if ($n > 20)
+				if ($n > $max_per_page)
 				{
-					// remove the last row of result: show only 20 entries per page
+					// remove the last row of result to show only $max_per_page entries
 					unset($rows[$offset+$n-1]);
 					$n--;
 					
 					// show the button
-					$tmpl->assign('offsetNext', $offset+20);
+					$tmpl->assign('offsetNext', $offset+$max_per_page);
 				}
 				
 				// article box
@@ -312,7 +360,7 @@
 			$tmpl->assign('entries', $content);
 		}
 		
-		function writeContent(&$content, $page_title, $table)
+		function writeContent(&$content, $id=-1)
 		{
 			global $site;
 			global $config;
@@ -323,58 +371,64 @@
 			if (strcmp($content, '') === 0)
 			{
 				// empty content
-				$query = $db->prepare('DELETE FROM `static_pages` WHERE `page_name`=?');
-				$db->execute($query, $page_title);
+				$query = $db->prepare('DELETE FROM `news` WHERE `id`=?');
+				$db->execute($query, $id);
+				$db->free($query);
 				return;
 			}
 			
-			$query = $db->prepare('SELECT `id` FROM `static_pages` WHERE `page_name`=? LIMIT 1');
-			$db->execute($query, $page_title);
+			$query = $db->prepare('SELECT `id` FROM `news` WHERE `id`=? LIMIT 1');
+			$db->execute($query, $id);
 			
 			// number of rows
 			$rows = $db->rowCount($query);
+			$db->free($query);
 			$date_format = date('Y-m-d H:i:s');
+
+			$query = $db->prepare('SELECT `name` FROM `players` WHERE `id`=? LIMIT 1');
+			$db->execute($query, $user->getID());
+			$author = $db->fetchRow($query);
+			$db->free($query);
+
+			if (isset($_POST['title']))
+			{
+				$title = htmlspecialchars_decode($_POST['title'], ENT_COMPAT);
+			} else
+			{
+				$title = 'News';
+			}
+
+			$args = array($author['name'], $title, $date_format, $content);
+			if ($config->value('bbcodeLibAvailable'))
+			{
+				$args[] = $tmpl->encodeBBCode($content);
+			} else
+			{
+				$args[] = $content;
+			}
+
 			if ($rows < ((int) 1))
 			{
 				// no entry in table regarding current page
 				// thus insert new data
-				$query = $db->prepare('INSERT INTO `?`'
-									  . ' (`author`, `page_name`, `raw_content`, `content`, `last_modified`)'
-									  . ' VALUES (?, ?, ?, ?, ?)');
-				$args = array($table, $user->getID(), $page_title, $content);
-				if ($config->value('bbcodeLibAvailable'))
-				{
-					$args[] = $tmpl->encodeBBCode($content);
-				} else
-				{
-					$args[] = $content;
-				}
-				$args[] = $date_format;
-				
-				//			$db->prepare($query);
-				//			$db->execute();
+				$query = $db->prepare('INSERT INTO `news`'
+					. ' (`author`, `title`, `timestamp`, `raw_msg`, `msg`)'
+					. ' VALUES (?, ?, ?, ?, ?)');
 			} else
 			{
 				// either 1 or more entries found, just assume there is only one
-				$query = $db->prepare('UPDATE `?` SET `author`?='
-									  . ', `raw_content`=?'
-									  . ', `content`=?'
-									  . ', `last_modified`=?'
-									  . ' WHERE `page_name`=?'
+				$query = $db->prepare('UPDATE `news` SET `author`=?'
+									  . ', `title`=?'
+									  . ', `timestamp`=?'
+									  . ', `raw_msg`=?'
+									  . ', `msg`=?'
+									  . ' WHERE `id`=?'
 									  . ' LIMIT 1');
-				$args = array($table, $user->getID(), $content);
-				if ($config->value('bbcodeLibAvailable'))
-				{
-					$args[] = $tmpl->encodeBBCode($content);
-				} else
-				{
-					$args[] = $content;
-				}
-				$ags[] = $date_format;
-				$args[] = $page_title;
+				$args[] = $id;
 			}
 			
-			$result = $db->execute($query, $args);
+			$db->execute($query, $args);
+			$db->free($query);
 		}
 	}
 ?>
