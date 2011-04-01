@@ -14,7 +14,7 @@ short term:
 
 * Move leaguesite installation instructions from README to INSTALL.
 
-* Focus on 42 theme for now and other themes after the overall
+* Focus on 42 theme for now and update other themes after the overall
   framework is set.
 
 
@@ -29,3 +29,7 @@ long term:
 * More themes!
 
 * Drop legacy siteoptions.php (old code depends on that file).
+
+* Merge database `news` and `bans` tables by adding a new `page`
+  column.  This will make it easier to add other news-style pages.
+  Will need a process to convert existing databases.
