@@ -2,6 +2,7 @@
 	class newsSystem
 	{
 		private $editor;
+		private $page_title;
 		public $randomKeyName = 'newsSystem';
 		
 		function __construct($title, $path)
@@ -13,45 +14,32 @@
 			global $tmpl;
 			global $user;
 			
-			if (!isset($site))
+			if (isset($title) && (strcmp($title, 'News') === 0
+// not yet supported			   || strcmp($title, 'Bans') === 0))
+					      ))
 			{
-				require_once (dirname(dirname(dirname(__FILE__))) . '/site.php');
-				$site = new site();
+				$this->page_title = $title;
+			} else
+			{
+				$tmpl->setTemplate('404');
+				$tmpl->assign('errorMsg', 'No support for ' . $title . ' as a news page.');
+				$tmpl->display();
+				die();
 			}
-			
-			$tmpl->setTemplate('News');
-			
-			$tmpl->assign('title', $title);
+
+			$templateToUse = 'News';
+			if (!$tmpl->setTemplate($templateToUse))
+			{
+				$tmpl->noTemplateFound();	// does not return
+			}
+
+			$tmpl->assign('title', $this->page_title);
 			
 			// FIXME: fallback to default permission name until add-on system is completly implemented
 			$entry_add_permission = 'allow_add_news';
 			$entry_edit_permission = 'allow_edit_news';
 			$entry_delete_permission = 'allow_delete_news';
-			
-			// find out which template should be used
-			// fallback template is static
-			$templateToUse = 'News';
-			
-			// use suggested name in $page_title
-			if (isset($path))
-			{
-				if (strcmp($path, '/') === 0)
-				{
-					// force call this template home
-					$templateToUse = 'Home';
-				} else
-				{
-					$templateToUse = $title;
-				}
-				
-				// revert back to default if file does not exist
-				if (!$tmpl->existsTemplate($templateToUse))
-				{
-					$templateToUse = 'News';
-				}
-			}
-			
-			
+
 			require_once (dirname(dirname(dirname(__FILE__))) . '/classes/editor.php');
 			
 			// otherwise we'd need a custom name per setup
@@ -65,7 +53,7 @@
 				}
 				if (!$tmpl->setTemplate($templateToUse . '.edit'))
 				{
-					$tmpl->noTemplateFound();
+					$tmpl->noTemplateFound();	// does not return
 				}
 				$id = intval($_GET['edit']);	// FIXME: use better validation than intval()
 				$tmpl->assign('formAction', './?edit=' . $id);
@@ -82,7 +70,7 @@
 				// user has permission to add news to the page and requests it
 				if (!$tmpl->setTemplate($templateToUse . '.edit'))
 				{
-					$tmpl->noTemplateFound();
+					$tmpl->noTemplateFound();	// does not return
 				}
 				$tmpl->assign('formAction', './?add');
 				$this->editor = new editor($this);
@@ -100,13 +88,11 @@
 			}
 			
 			// user looks at page in read mode
-			$tmpl->setTemplate($templateToUse);
-			
 			if ($user->getPermission($entry_add_permission))
 			{
 				$tmpl->assign('showAddButton', true);
 			}
-			$this->readContent($path, $author, $last_modified, false);
+			$this->readContent($this->page_title, $author, $last_modified, false);
 			
 			// done, display page
 			$tmpl->display();
@@ -164,7 +150,6 @@
 		function insertEditText($readonly=false)
 		{
 			global $tmpl;
-			global $page_title;
 			global $author;
 			global $last_modified;
 			global $config;
@@ -186,7 +171,7 @@
 				$content['timestamp'] = $_POST['time'];
 			} elseif (isset($_GET['edit']))
 			{
-				$content = $this->readContent($page_title, $author, $last_modified, true);
+				$content = $this->readContent($this->page_title, $author, $last_modified, true);
 			} else
 			{
 				$content = array();
@@ -337,23 +322,11 @@
 					$content[$i]['id'] = $rows[$i]['id'];
 					$content[$i]['title'] = (strcmp($rows[$i]['title'], '') === 0)?
 									   'News' : $rows[$i]['title'];
-
 					$content[$i]['author'] = $rows[$i]['author'];
 					$content[$i]['time'] = $rows[$i]['timestamp'];
-					
-					$edit ? $content[$i]['content'] = $rows[$i]['raw_msg']
-						 : $content[$i]['content'] = $rows[$i]['msg'];
-					$author = $rows[$i]['author'];
+					$content[$i]['content'] = $rows[$i][$edit ? 'raw_msg' : 'msg'];
 
-/*
-					if ($edit)
-					{
-						$content = $rows[$i]['raw_msg'];
-					} else
-					{
-						$content[$i]['content'] = $rows[$i]['msg'];
-					}
-*/
+					$author = $rows[$i]['author'];
 				}
 			}
 			
@@ -362,7 +335,6 @@
 		
 		function writeContent(&$content, $id=-1)
 		{
-			global $site;
 			global $config;
 			global $user;
 			global $tmpl;
