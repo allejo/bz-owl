@@ -237,9 +237,24 @@
 		
 		foreach ($recipients as $recipient)
 		{
+			// lock tables for critical section
+			$db->SQL('LOCK TABLES `messages_storage` WRITE');
+			$db->SQL('SET AUTOCOMMIT = 0');
+			
+			// do the insert
 			$db->execute($query, array($author_id, htmlent($this->subject), $this->timestamp, $this->content, $from_team, $recipientsSQL));
 			$db->free($query);
-			$rowId = $db->lastInsertId();
+			$db->SQL('COMMIT');
+			
+			// find out generated id
+			$queryLastID = $db->SQL('SELECT `id` FROM `messages_storage` ORDER BY `id` DESC LIMIT 1');
+			$rowId = intval($db->fetchRow($queryLastID));
+			$db->free($queryLastID);
+			$db->SQL('COMMIT');
+			
+			// unlock tables as critical section passed
+			$db->SQL('UNLOCK TABLES');
+			$db->SQL('SET AUTOCOMMIT = 1');
 			
 			// put message in people's inbox
 			if ($ReplyToMSGID > 0)
