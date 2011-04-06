@@ -16,7 +16,7 @@
 			ini_set('session.gc_maxlifetime', '7200');
 			session_start();
 			
-			// database connectivity
+			// site config information
 			include dirname(__FILE__) . '/classes/config.php';
 			$config = new config();
 			
@@ -34,6 +34,40 @@
 			// template builder
 			require dirname(__FILE__) . '/classes/tmpl.php';
 			$tmpl = new tmpl();
+			
+			
+			
+			// session fixation protection
+			if (!isset($_SESSION['creationTime']))
+			{
+				$_SESSION['creationTime'] = time();
+			} else
+			{
+				// invalidate old session
+				// default: 15 minutes (60*15)
+				$sessionRegenTime = ($config->value('sessionRegenTime')) ?
+									 $config->value('sessionRegenTime') : (60*15);
+				if (time() - $_SESSION['creationTime'] > (60*15))
+				{
+					// session creationTime older than $sessionRegenTime
+					
+					// force regenerate SID, invalidate old id
+					session_regenerate_id(true);
+					// update timestamp
+					$_SESSION['creationTime'] = time();
+				}
+			}
+			
+			// logout inactive users
+			// default: 2 hours (60*60*2)
+			$sessionExpiryTime = ($config->value('logoutUserAfterXSecondsInactive')) ?
+								  $config->value('logoutUserAfterXSecondsInactive') : (60*60*2);
+			if (isset($_SESSION['lastActivity']) && (time() - $_SESSION['lastActivity']) > $sessionExpiryTime)
+			{
+				// last access older than $sessionExpiryTime
+				$user->logout();
+			}
+			$_SESSION['lastActivity'] = time();
 		}
 		
 		function magic_quotes_on()
