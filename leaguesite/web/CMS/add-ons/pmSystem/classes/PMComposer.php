@@ -186,7 +186,6 @@
 		{
 			return $this->teams;
 		}
-	}
 	
 	// send private message to players and teams
 	// if an error occurs, $error will contain its description and the function will return false
@@ -207,13 +206,18 @@
 			return false;
 		}
 		
-		if (strlen($message) === 0)
+		if (strlen($this->content) === 0)
 		{
 			$error = '<p>You must specify a message text in order to send a message.</p>';
 			return false;
 		}
 		
-		$recipients = $this->players;
+		$recipients = array();
+		foreach ($this->players as $player)
+		{
+			$recipients[] = $player['id'];
+		}
+
 		// add the players belonging to the specified teams to the recipients array
 		foreach ($this->teams as $teamid)
 		{
@@ -288,44 +292,5 @@
 		
 		return true;
 	}
-	
-	
-	function removeDuplicates(&$someArray)
-	{
-		$dup_check = count($someArray);
-		// array_unique is case sensitive, thus the loading of name from database
-		$players = array_unique($someArray);
-		if (!($dup_check === (count($someArray))))
-		{
-			// duplicates were removed
-			return true;
-		}
-		
-		// neither duplicates found nor removed
-		return false;
-	}
-	
-	function playersInTeam($teamid)
-	{
-		global $db;
-		
-		$teamid = intval($teamid);
-		$result = array();
-		
-		if ($teamid < 1)
-		{
-			// no valid team id -> return empty player list
-			return $result;
-		}
-		
-		$query = $db->prepare('SELECT `id` FROM `players` WHERE `teamid`=?');
-		$db->execute($query, $teamid);
-		
-		while ($row = $db->fetchRow($query))
-		{
-			$result[] = $row['id'];
-		}
-		
-		return $result;
 	}
 ?>

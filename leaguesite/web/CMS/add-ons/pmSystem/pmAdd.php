@@ -65,10 +65,10 @@ sendPM.php<?php
 					$tmpl->assign('authorName',  htmlent($content['author']['name']));
 					if ($config->value('bbcodeLibAvailable'))
 					{
-						$tmpl->assign('content',  $tmpl->encodeBBCode($content['raw_msg']));
+						$tmpl->assign('content',  $tmpl->encodeBBCode($this->PMComposer->getContent()));
 					} else
 					{
-						$tmpl->assign('content',  htmlent($content['raw_msg']));
+						$tmpl->assign('content',  htmlent($this->PMComposer->getContent()));
 					}
 					$tmpl->assign('showPreview', true);
 					// overwrite editor's default text ('Write changes')
@@ -213,7 +213,7 @@ sendPM.php<?php
 			include(dirname(__FILE__) . '/sendPM.php');
 			
 			
-			return send($user->getID());
+			return $this->PMComposer->send($user->getID());
 		}
 	}
 ?>
