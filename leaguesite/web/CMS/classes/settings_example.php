@@ -20,7 +20,7 @@
 					 // for a complete list of supported timezones
 					 'timezone' => 'UTC',
 					 // shut entire site down (e.g. during install or update)
-					 'maintenance.now' = false;
+					 'maintenance.now' => false;
 					 // message shown during maintenance.now
 					 'maintenance.msg' => 'This site has been shut down due to maintenance' . "\n";
 					 // regenerate session id after x seconds, default 15 minutes (60*15)
