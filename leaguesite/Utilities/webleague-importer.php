@@ -6,12 +6,11 @@
 	@session_start();
 	
 	$display_page_title = 'Webleague DB importer';
-	require_once (dirname(__FILE__) . '/web/CMS/index.inc');
-	//	require realpath('../CMS/navi.inc');
+	require_once (dirname(dirname(__FILE__)) . '/web/CMS/index.inc');
 	
 	if (!isset($site))
 	{
-		require_once (dirname(__FILE__) . '/web/CMS/siteinfo.php');
+		require_once (dirname(dirname(__FILE__)) . '/web/CMS/siteinfo.php');
 		$site = new siteinfo();
 	}
 	
@@ -772,7 +771,7 @@
 	
 	// do maintenance after importing the database to clean it
 	// a check inside the maintenance logic will make sure it will be only performed one time per day at max
-	require_once('web/CMS/maintenance/index.php');
+	require_once(dirname(dirname(__FILE__)) . '/web/CMS/maintenance/index.php');
 	
 	// (should take about 3 minutes to import the data until this point)
 	// disable this when not doing the final import because this last step would take 90 minutes
