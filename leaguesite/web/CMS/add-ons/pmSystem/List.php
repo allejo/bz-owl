@@ -123,7 +123,13 @@
 			}
 			$tmpl->assign('authorName', $rows[0]['author']);
 			$tmpl->assign('time', $rows[0]['timestamp']);
-			$tmpl->assign('content', $tmpl->encodeBBCode($rows[0]['message']));
+			if ($config->value('bbcodeLibAvailable'))
+			{
+				$tmpl->assign('content', $tmpl->encodeBBCode($rows[0]['message']));
+			} else
+			{
+				$tmpl->assign('content',  htmlent($rows[0]['message']));
+			}
 			
 			// collect recipient list
 			$recipients = explode(' ', $rows[0]['recipients']);
