@@ -1,5 +1,5 @@
 <?php
-	include('smarty/Smarty.class.php');
+	include(dirname(__FILE__) . '/smarty/Smarty.class.php');
 	
 	class tmpl extends Smarty
 	{
@@ -242,8 +242,8 @@
 			die();
 		}
 		
-		public function display($file='')
-		{
+	    public function display($file='', $cache_id = null, $compile_id = null, $parent = null)
+	    {
 			global $user;
 			
 			
@@ -262,7 +262,11 @@
 			}
 			
 			// add userid to prevent cached output being served to other users
-			parent::display($this->templateFile, $user->getID());
+			if ($cache_id === null)
+			{
+				$cache_id = $user->getID();
+			}
+			parent::display($this->templateFile, $user->getID(), $compile_id, $parent);
 		}
 		
 		function setTemplate($template, $customTheme='')
