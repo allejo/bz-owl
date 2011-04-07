@@ -252,7 +252,8 @@
 
 				// find out generated id
 				$queryLastID = $db->SQL('SELECT `id` FROM `messages_storage` ORDER BY `id` DESC LIMIT 1');
-				$rowId = intval($db->fetchRow($queryLastID));
+				$rowId = $db->fetchRow($queryLastID);
+				$rowId = intval($rowId['id']);
 				$db->free($queryLastID);
 				$db->SQL('COMMIT');
 
