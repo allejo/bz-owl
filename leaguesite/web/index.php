@@ -75,6 +75,12 @@
 	
 	$title = 'Untitled';
 	
+	if ($config->value('maintenance.now'))
+	{
+		header('Content-Type: text/plain');
+		echo($config->value('maintenance.msg') ? $config->value('maintenance.msg') : 'This site has been shut down due to maintenance.' . "\n");
+	}
+	
 	// load the add-on
 	loadAddon(addonToUse($path, $title), $title, $path);
 ?>
