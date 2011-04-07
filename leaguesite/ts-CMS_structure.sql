@@ -4,7 +4,7 @@
 #
 # Host: localhost (MySQL 5.1.56)
 # Database: testdb
-# Generation Time: 2011-03-23 20:31:48 +0100
+# Generation Time: 2011-04-07 11:21:00 +0200
 # ************************************************************
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -202,7 +202,8 @@ DROP TABLE IF EXISTS `misc_data`;
 
 CREATE TABLE `misc_data` (
   `last_maintenance` varchar(10) DEFAULT '00.00.0000',
-  `last_servertracker_query` int(11) unsigned NOT NULL DEFAULT '0'
+  `last_servertracker_query` int(11) unsigned NOT NULL DEFAULT '0',
+  `db_version` int(11) unsigned NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -298,6 +299,32 @@ CREATE TABLE `players_profile` (
   KEY `playerid` (`playerid`),
   CONSTRAINT `players_profile_ibfk_1` FOREIGN KEY (`playerid`) REFERENCES `players` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='the players profile data';
+
+
+
+# Dump of table pmSystem.Recipients.Teams
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `pmSystem.Recipients.Teams`;
+
+CREATE TABLE `pmSystem.Recipients.Teams` (
+  `id` int(11) DEFAULT NULL,
+  `msgid` int(11) unsigned DEFAULT NULL,
+  `teamid` int(11) unsigned DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table pmSystem.Recipients.Users
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `pmSystem.Recipients.Users`;
+
+CREATE TABLE `pmSystem.Recipients.Users` (
+  `id` int(11) DEFAULT NULL,
+  `msgid` int(11) unsigned DEFAULT NULL,
+  `userid` int(11) unsigned DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 
