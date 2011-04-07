@@ -5,6 +5,12 @@
 	
 	define('MAX_DB_VERSION', 1);
 	
+	if (!(php_sapi_name() == 'cli' && empty($_SERVER['REMOTE_ADDR'])))
+	{
+		header('Content-Type: text/plain');
+		exit('File to be called on command line interface (cli) only!' . "\n");
+	}
+	
 	// use the simple site.php as it's quite convenient to use
 	// TODO: need to be able to specify a path to the installation
 	require_once (dirname(dirname(__FILE__)) . '/web/CMS/site.php');
@@ -46,7 +52,7 @@
 	{
 		updateDB($dbVersion);
 	}
-	echo('DB up to date (version ' . $dbVersion . ').');
+	echo('The used database (' . $config->value('dbName') . ') is up to date (version ' . $dbVersion . ').' . "\n");
 	
 	
 	
