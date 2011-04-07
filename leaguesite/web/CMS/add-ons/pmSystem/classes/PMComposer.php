@@ -151,9 +151,9 @@
 			$query = $db->prepare('SELECT `id` FROM `players` WHERE `name`=?');
 			
 			// no need for queries to find out id's if id of first item already set
-			if ((count($this->players) > 0) && isset($this->players[0]['id']))
+			if ((count($this->users) > 0) && isset($this->users[0]['id']))
 			{
-				foreach ($this->players as $oneRecipient)
+				foreach ($this->users as $oneRecipient)
 				{
 					$recipientIDs[] = $oneRecipient['id'];
 				}
@@ -162,7 +162,7 @@
 			}
 			
 			// id's not in array, have to look them up
-			foreach ($this->players as $oneRecipient)
+			foreach ($this->users as $oneRecipient)
 			{
 				$db->execute($query, $oneRecipient['name']);
 				
@@ -194,12 +194,11 @@
 				&$error='')
 		{
 			global $config;
-			global $user;
 			global $db;
 			
 			
 			// remove duplicates
-			if (removeDuplicates($this->players) || removeDuplicates($this->teams))
+			if ($this->removeDuplicates($this->users) || $this->removeDuplicates($this->teams))
 			{
 				// back to overview to let them check
 				$error = '<p>Some double entries were removed. Please check your recipients.<p>';
@@ -213,7 +212,7 @@
 			}
 			
 			$recipients = array();
-			foreach ($this->players as $player)
+			foreach ($this->users as $player)
 			{
 				$recipients[] = $player['id'];
 			}
@@ -221,7 +220,7 @@
 			// add the players belonging to the specified teams to the recipients array
 			foreach ($this->teams as $teamid)
 			{
-				$tmp_players = playersInTeam($teamid);
+				$tmp_players = $this->usersInTeam($teamid);
 				foreach ($tmp_players as $playerID)
 				{
 					$recipients[] = $playerID;
@@ -229,7 +228,7 @@
 			}
 			
 			// remove possible duplicates
-			@removeDuplicates($recipients);
+			@$this->removeDuplicates($recipients);
 			
 			// put message in database
 			$query = $db->prepare('INSERT INTO `pmSystem.Msg.Storage`'
@@ -269,15 +268,17 @@
 			unset($team);
 			
 			// add users as visible recipients
+			// be careful to not overwrite global variable $user
 			$query = $db->prepare('INSERT INTO `pmSystem.Msg.Recipients.Users`'
 								  . '(`msgid`, `userid`)'
 								  . 'VALUES (?, ?)');
-			foreach ($this->users as $user)
+			$userIDs = $this->getUserIDs();
+			foreach ($userIDs as $userID)
 			{
-					$db->execute($query, array($rowId, $user));
+					$db->execute($query, array($rowId, $userID));
 					$db->free($query);
 			}
-			unset($user);
+			unset($userID);
 			
 			
 			// prepare recipients for SQL statement
@@ -318,7 +319,7 @@
 			return true;
 		}
 		
-		function removeDuplicates(&$someArray)
+		function removeDuplicates(array &$someArray)
 		{
 			$dup_check = count($someArray);
 			// array_unique is case sensitive, thus the loading of name from database

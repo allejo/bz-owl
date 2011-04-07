@@ -4,7 +4,7 @@
 #
 # Host: localhost (MySQL 5.1.56)
 # Database: testdb
-# Generation Time: 2011-04-07 12:53:20 +0200
+# Generation Time: 2011-04-07 23:23:24 +0200
 # ************************************************************
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -203,7 +203,7 @@ DROP TABLE IF EXISTS `misc_data`;
 CREATE TABLE `misc_data` (
   `last_maintenance` varchar(10) DEFAULT '00.00.0000',
   `last_servertracker_query` int(11) unsigned NOT NULL DEFAULT '0',
-  `db_version` int(11) unsigned NOT NULL DEFAULT '0'
+  `db.version` int(11) unsigned NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -308,9 +308,10 @@ CREATE TABLE `players_profile` (
 DROP TABLE IF EXISTS `pmSystem.Msg.Recipients.Teams`;
 
 CREATE TABLE `pmSystem.Msg.Recipients.Teams` (
-  `id` int(11) DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `msgid` int(11) unsigned DEFAULT NULL,
-  `teamid` int(11) unsigned DEFAULT NULL
+  `teamid` int(11) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -321,9 +322,10 @@ CREATE TABLE `pmSystem.Msg.Recipients.Teams` (
 DROP TABLE IF EXISTS `pmSystem.Msg.Recipients.Users`;
 
 CREATE TABLE `pmSystem.Msg.Recipients.Users` (
-  `id` int(11) DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `msgid` int(11) unsigned DEFAULT NULL,
-  `userid` int(11) unsigned DEFAULT NULL
+  `userid` int(11) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

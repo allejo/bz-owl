@@ -53,7 +53,7 @@
 	{
 		updateDB($dbVersion);
 	}
-	echo ($error === false) ? ('The used database (' . $config->value('dbName') . ') is up to date (version ' . $dbVersion . ').' . "\n") : $error;	
+	echo ($error === false) ? ('The used database (' . $config->value('dbName') . ') is up to date (version ' . $dbVersion . ').' . "\n") : $error;
 	return;
 	
 	
