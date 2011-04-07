@@ -4,7 +4,7 @@
 #
 # Host: localhost (MySQL 5.1.56)
 # Database: testdb
-# Generation Time: 2011-04-07 11:21:00 +0200
+# Generation Time: 2011-04-07 12:53:20 +0200
 # ************************************************************
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -302,12 +302,12 @@ CREATE TABLE `players_profile` (
 
 
 
-# Dump of table pmSystem.Recipients.Teams
+# Dump of table pmSystem.Msg.Recipients.Teams
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `pmSystem.Recipients.Teams`;
+DROP TABLE IF EXISTS `pmSystem.Msg.Recipients.Teams`;
 
-CREATE TABLE `pmSystem.Recipients.Teams` (
+CREATE TABLE `pmSystem.Msg.Recipients.Teams` (
   `id` int(11) DEFAULT NULL,
   `msgid` int(11) unsigned DEFAULT NULL,
   `teamid` int(11) unsigned DEFAULT NULL
@@ -315,16 +315,33 @@ CREATE TABLE `pmSystem.Recipients.Teams` (
 
 
 
-# Dump of table pmSystem.Recipients.Users
+# Dump of table pmSystem.Msg.Recipients.Users
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `pmSystem.Recipients.Users`;
+DROP TABLE IF EXISTS `pmSystem.Msg.Recipients.Users`;
 
-CREATE TABLE `pmSystem.Recipients.Users` (
+CREATE TABLE `pmSystem.Msg.Recipients.Users` (
   `id` int(11) DEFAULT NULL,
   `msgid` int(11) unsigned DEFAULT NULL,
   `userid` int(11) unsigned DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table pmSystem.Msg.Storage
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `pmSystem.Msg.Storage`;
+
+CREATE TABLE `pmSystem.Msg.Storage` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `author_id` int(11) unsigned NOT NULL,
+  `subject` varchar(50) NOT NULL,
+  `timestamp` varchar(20) NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `message` text NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `author_id` (`author_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The message storage';
 
 
 

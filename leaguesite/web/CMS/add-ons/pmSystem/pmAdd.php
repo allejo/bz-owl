@@ -55,7 +55,7 @@
 			
 			$tmpl->assign('subject', $this->PMComposer->getSubject());
 			$tmpl->assign('time', $this->PMComposer->getTimestamp());
-			$tmpl->assign('playerRecipients', $this->PMComposer->getPlayerNames());
+			$tmpl->assign('playerRecipients', $this->PMComposer->getUserNames());
 			$tmpl->assign('teamRecipients', $this->PMComposer->getTeamNames());
 			$tmpl->assign('rawContent', htmlent($this->PMComposer->getContent()));
 			
@@ -181,10 +181,10 @@
 					// exclude player recipients that are requested to be removed
 					if (isset($_POST['playerRecipient' . $i]) && !(isset($_POST['removePlayerRecipient' . $i])))
 					{
-						$this->PMComposer->addPlayerName($_POST['playerRecipient' . $i]
-														 , $confirmed > 0
-														 && !isset($_POST['addPlayerRecipient'])
-														 && !isset($_POST['editPageAgain']));
+						$this->PMComposer->addUserName($_POST['playerRecipient' . $i]
+													   , $confirmed > 0
+													   && !isset($_POST['addPlayerRecipient'])
+													   && !isset($_POST['editPageAgain']));
 					}
 					$i++;
 				}
@@ -193,12 +193,12 @@
 				if (isset($_POST['playerRecipient']) && isset($_POST['addPlayerRecipient']))
 				{
 					$confirmed = 0;
-					$this->PMComposer->addPlayerName($_POST['playerRecipient'], $confirmed > 0);
+					$this->PMComposer->addUserName($_POST['playerRecipient'], $confirmed > 0);
 				}
 			}
 			
 			
-			if ($confirmed > 0 && $this->PMComposer->countPlayers() < 1 && $this->PMComposer->countTeams() < 1)
+			if ($confirmed > 0 && $this->PMComposer->countUsers() < 1 && $this->PMComposer->countTeams() < 1)
 			{
 				$tmpl->assign('MSG', 'A PM can not be sent without any recipients set.');
 				$confirmed = 0;

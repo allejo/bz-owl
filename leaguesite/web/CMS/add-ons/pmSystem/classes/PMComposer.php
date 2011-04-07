@@ -1,7 +1,7 @@
 <?php
 	class PMComposer
 	{
-		private $players = array();
+		private $users = array();
 		private $teams = array();
 		private $subject = 'Enter subject here';
 		private $content = 'Enter message here';
@@ -53,12 +53,12 @@
 		}
 		
 		
-		function addPlayerID($id)
+		function addUserID($id)
 		{
-			$this->players[] = array('id' => $id);
+			$this->users[] = array('id' => $id);
 		}
 		
-		function addPlayerName($recipientName, $preview=false)
+		function addUserName($recipientName, $preview=false)
 		{
 			global $db;
 		
@@ -67,7 +67,7 @@
 		
 			// lookup if username is already in recipient array
 			$alreadyAdded = false;
-			foreach ($this->players as $oneRecipient)
+			foreach ($this->users as $oneRecipient)
 			{
 				// assume case insensitive usernames
 				if (strcasecmp(($preview) ? $oneRecipient['name'] : $oneRecipient,
@@ -83,7 +83,7 @@
 				if ($row = $db->fetchRow($this->usernameQuery))
 				{
 					// assume case preserving usernames
-					$this->players[] = ($preview) ? array('id'=>$row['id'],
+					$this->users[] = ($preview) ? array('id'=>$row['id'],
 						'name'=>$row['name'],
 						'link' => '../Players/?profile=' . $row['id'])
 					: $row['name'];
@@ -130,9 +130,9 @@
 		}
 		
 		
-		function countPlayers()
+		function countUsers()
 		{
-			return count($this->players);
+			return count($this->users);
 		}
 		
 		function countTeams()
@@ -141,7 +141,7 @@
 		}
 		
 		
-		function getPlayerIDs()
+		function getUserIDs()
 		{
 			global $db;
 			
@@ -177,9 +177,9 @@
 			return $recipientIDs;
 		}
 		
-		function getPlayerNames()
+		function getUserNames()
 		{
-			return $this->players;
+			return $this->users;
 		}
 		
 		function getTeamNames()
@@ -232,35 +232,59 @@
 			@removeDuplicates($recipients);
 			
 			// put message in database
-			$query = $db->prepare('INSERT INTO `messages_storage`'
-								  . ' (`author_id`, `subject`, `timestamp`, `message`, `from_team`, `recipients`)'
-								  . ' VALUES (?, ?, ?, ?, ?, ?)');
+			$query = $db->prepare('INSERT INTO `pmSystem.Msg.Storage`'
+								  . ' (`author_id`, `subject`, `timestamp`, `message`)'
+								  . ' VALUES (?, ?, ?, ?)');
+			
+			// lock tables for critical section
+			$db->SQL('LOCK TABLES `pmSystem.Msg.Storage` WRITE');
+			$db->SQL('SET AUTOCOMMIT = 0');
+			
+			// do the insert
+			$db->execute($query, array($author_id, htmlent($this->subject), $this->timestamp, $this->content));
+			$db->free($query);
+			$db->SQL('COMMIT');
+			
+			// find out generated id
+			$queryLastID = $db->SQL('SELECT `id` FROM `pmSystem.Msg.Storage` ORDER BY `id` DESC LIMIT 1');
+			$rowId = $db->fetchRow($queryLastID);
+			$rowId = intval($rowId['id']);
+			$db->free($queryLastID);
+			$db->SQL('COMMIT');
+			
+			// unlock tables as critical section passed
+			$db->SQL('UNLOCK TABLES');
+			$db->SQL('SET AUTOCOMMIT = 1');
+			
+			
+			// add teams as visible recipients
+			$query = $db->prepare('INSERT INTO `pmSystem.Msg.Recipients.Teams`'
+								  . '(`msgid`, `teamid`)'
+								  . 'VALUES (?, ?)');
+			foreach ($this->teams as $team)
+			{
+					$db->execute($query, array($rowId, $team));
+					$db->free($query);
+			}
+			unset($team);
+			
+			// add users as visible recipients
+			$query = $db->prepare('INSERT INTO `pmSystem.Msg.Recipients.Users`'
+								  . '(`msgid`, `userid`)'
+								  . 'VALUES (?, ?)');
+			foreach ($this->users as $user)
+			{
+					$db->execute($query, array($rowId, $user));
+					$db->free($query);
+			}
+			unset($user);
+			
 			
 			// prepare recipients for SQL statement
 			$recipientsSQL = is_array($recipients) ? implode(' ', $recipients) : $recipients;
 			
 			foreach ($recipients as $recipient)
 			{
-				// lock tables for critical section
-				$db->SQL('LOCK TABLES `messages_storage` WRITE');
-				$db->SQL('SET AUTOCOMMIT = 0');
-				
-				// do the insert
-				$db->execute($query, array($author_id, htmlent($this->subject), $this->timestamp, $this->content, $from_team, $recipientsSQL));
-				$db->free($query);
-				$db->SQL('COMMIT');
-				
-				// find out generated id
-				$queryLastID = $db->SQL('SELECT `id` FROM `messages_storage` ORDER BY `id` DESC LIMIT 1');
-				$rowId = $db->fetchRow($queryLastID);
-				$rowId = intval($rowId['id']);
-				$db->free($queryLastID);
-				$db->SQL('COMMIT');
-				
-				// unlock tables as critical section passed
-				$db->SQL('UNLOCK TABLES');
-				$db->SQL('SET AUTOCOMMIT = 1');
-				
 				// put message in people's inbox
 				if ($ReplyToMSGID > 0)
 				{
