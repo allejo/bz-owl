@@ -20,14 +20,14 @@
 					 // for a complete list of supported timezones
 					 'timezone' => 'UTC',
 					 // shut entire site down (e.g. during install or update)
-					 'maintenance.now' => false;
+					 'maintenance.now' => false,
 					 // message shown during maintenance.now
-					 'maintenance.msg' => 'This site has been shut down due to maintenance' . "\n";
+					 'maintenance.msg' => 'This site has been shut down due to maintenance' . "\n",
 					 // regenerate session id after x seconds, default 15 minutes (60*15)
 					 // the lower x: safer, higher x faster
-					 'sessionRegenTime' => 60*15;
+					 'sessionRegenTime' => 60*15,
 					 // logout a user after no action in x seconds, default 2 hours (60*60*2)
-					 'logoutUserAfterXSecondsInactive' => 60*60*2;
+					 'logoutUserAfterXSecondsInactive' => 60*60*2,
 					 // print out debug messages
 					 'debugSQL' => true,
 					 'domain' => 'example.com',

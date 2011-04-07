@@ -48,11 +48,13 @@
 	// call the update script now that we know the current db version
 	// use a while loop instead of iterating inside the update function
 	// so we keep the used stack memory small
-	while ($dbVersion < MAX_DB_VERSION)
+	$error = false;
+	while ($dbVersion < MAX_DB_VERSION && $error === false)
 	{
 		updateDB($dbVersion);
 	}
-	echo('The used database (' . $config->value('dbName') . ') is up to date (version ' . $dbVersion . ').' . "\n");
+	echo ($error === false) ? ('The used database (' . $config->value('dbName') . ') is up to date (version ' . $dbVersion . ').' . "\n") : $error;	
+	return;
 	
 	
 	
@@ -62,7 +64,7 @@
 		
 		if ($version < MAX_DB_VERSION)
 		{
-			echo('UpdatingÉ');
+			echo('Updating...' . "\n");
 			
 			// TODO: update code here
 			// TODO: if non-recoverable error occurs, write it into $error
