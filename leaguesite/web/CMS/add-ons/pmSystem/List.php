@@ -29,18 +29,6 @@
 			
 			// show currently selected mail folder
 			$tmpl->assign('curFolder', $folder);
-/*
-			
-			if (strcmp($folder, 'inbox') === 0)
-			{
-				$tmpl->touchBlock('INBOX_SELECTED');
-				$tmpl->touchBlock('OUTBOX_NOT_SELECTED');
-			} else
-			{
-				$tmpl->touchBlock('INBOX_NOT_SELECTED');
-				$tmpl->touchBlock('OUTBOX_SELECTED');
-			}
-*/
 		}
 		
 		function showMail($folder, $id)

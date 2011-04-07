@@ -1,5 +1,7 @@
 short term:
 
+* Fix PM send (welcome message) to new user at login.
+
 * Convert existing features to use Smarty before adding new features.
 
 * Cached Smarty templates must not contain per-user information, such

@@ -1,4 +1,4 @@
-sendPM.php<?php
+<?php
 	class pmSystemAddPM extends pmSystemPM
 	{
 		private $editor;
@@ -210,8 +210,6 @@ sendPM.php<?php
 		function writeContent()
 		{
 			global $user;
-			include(dirname(__FILE__) . '/sendPM.php');
-			
 			
 			return $this->PMComposer->send($user->getID());
 		}

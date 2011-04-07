@@ -56,7 +56,10 @@ source code serves for examples of the following rules.
 		{
 			if (expr)
 			{
+				// comment
+				code
 				
+				more code
 			}
 		}
 	}
