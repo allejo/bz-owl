@@ -43,7 +43,7 @@
 			$tmpl->assign('title', 'Mail #' . $id);
 			
 			// show currently selected mail folder
-			$this->folderNav($folder);			
+			$this->folderNav($folder);
 			
 			// collect the necessary data
 			$query = $db->prepare('SELECT `subject`'

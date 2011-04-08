@@ -4,7 +4,7 @@
 #
 # Host: localhost (MySQL 5.1.56)
 # Database: testdb
-# Generation Time: 2011-04-07 23:23:24 +0200
+# Generation Time: 2011-04-08 15:59:10 +0200
 # ************************************************************
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -171,30 +171,6 @@ CREATE TABLE `messages_storage` (
 
 
 
-# Dump of table messages_users_connection
-# ------------------------------------------------------------
-
-DROP TABLE IF EXISTS `messages_users_connection`;
-
-CREATE TABLE `messages_users_connection` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `msgid` int(11) unsigned NOT NULL,
-  `playerid` int(11) unsigned NOT NULL,
-  `in_inbox` tinyint(1) unsigned NOT NULL,
-  `in_outbox` tinyint(1) unsigned NOT NULL,
-  `msg_status` set('new','read','replied') NOT NULL DEFAULT 'new',
-  `msg_replied_team` tinyint(1) unsigned DEFAULT '0',
-  `msg_replied_to_msgid` int(11) unsigned DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `msgid` (`msgid`),
-  KEY `playerid` (`playerid`),
-  KEY `msg_status` (`msg_status`),
-  CONSTRAINT `messages_users_connection_ibfk_3` FOREIGN KEY (`playerid`) REFERENCES `players` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `messages_users_connection_ibfk_4` FOREIGN KEY (`msgid`) REFERENCES `messages_storage` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Connects messages to users';
-
-
-
 # Dump of table misc_data
 # ------------------------------------------------------------
 
@@ -344,6 +320,27 @@ CREATE TABLE `pmSystem.Msg.Storage` (
   PRIMARY KEY (`id`),
   KEY `author_id` (`author_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The message storage';
+
+
+
+# Dump of table pmSystem.Msg.Users
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `pmSystem.Msg.Users`;
+
+CREATE TABLE `pmSystem.Msg.Users` (
+  `msgid` int(11) unsigned NOT NULL,
+  `playerid` int(11) unsigned NOT NULL,
+  `in_inbox` tinyint(1) unsigned NOT NULL,
+  `in_outbox` tinyint(1) unsigned NOT NULL,
+  `msg_status` set('new','read','replied') NOT NULL DEFAULT 'new',
+  `msg_replied_team` tinyint(1) unsigned DEFAULT '0',
+  `msg_replied_to_msgid` int(11) unsigned DEFAULT NULL,
+  KEY `msgid` (`msgid`),
+  KEY `playerid` (`playerid`),
+  KEY `msg_status` (`msg_status`),
+  CONSTRAINT `pmsystem@002emsg@002eusers_ibfk_1` FOREIGN KEY (`msgid`) REFERENCES `pmsystem.msg.storage` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Connects messages to users';
 
 
 

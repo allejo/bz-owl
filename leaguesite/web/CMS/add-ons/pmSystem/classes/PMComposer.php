@@ -290,7 +290,7 @@
 				if ($ReplyToMSGID > 0)
 				{
 					// this is a reply
-					$query = $db->prepare('INSERT INTO `messages_users_connection`'
+					$query = $db->prepare('INSERT INTO `pmSystem.Msg.Users`'
 										  . '(`msgid`, `playerid`, `in_inbox`, `in_outbox`, `msg_replied_to_msgid)'
 										  . 'VALUES (?, ?, ?, ?, ?)');
 					$db->execute($query, array($rowId, $recipient, 1, 0, $ReplyToMSGID));
@@ -298,7 +298,7 @@
 				} else
 				{
 					// this is a new message
-					$query = $db->prepare('INSERT INTO `messages_users_connection`'
+					$query = $db->prepare('INSERT INTO `pmSystem.Msg.Users`'
 										  . ' (`msgid`, `playerid`, `in_inbox`, `in_outbox`)'
 										  . ' VALUES (?, ?, ?, ?)');
 					$db->execute($query, array($rowId, $recipient, 1, 0));
@@ -309,7 +309,7 @@
 				if ($author_id > 0)
 				{
 					// system did not send the message but a human
-					$query = $db->prepare('INSERT INTO `messages_users_connection`'
+					$query = $db->prepare('INSERT INTO `pmSystem.Msg.Users`'
 										  . ' (`msgid`, `playerid`, `in_inbox`, `in_outbox`)'
 										  . ' VALUES (?, ?, ?, ?)');
 					$db->execute($query, array($rowId, $author_id, 0, 1));
