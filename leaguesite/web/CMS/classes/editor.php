@@ -127,8 +127,8 @@
 					break;
 					
 				case 2:
-					$this->caller->writeContent($content, $page_title);
-					$tmpl->assign('MSG', 'Changes written successfully.' . $tmpl->linebreaks("\n\n"));
+					$this->caller->writeContent($content);
+					$tmpl->assign('MSG', 'Changes written successfully.' . $tmpl->linebreaks("\n\n"));	// FIXME: how do we know it was successful?
 					
 				default:
 					$tmpl->assign('USER_NOTE');

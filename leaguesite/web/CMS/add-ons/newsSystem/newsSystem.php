@@ -2,6 +2,7 @@
 	class newsSystem
 	{
 		private $editor;
+		private $edit_id;
 		private $page_title;
 		public $randomKeyName = 'newsSystem';
 		
@@ -55,11 +56,11 @@
 				{
 					$tmpl->noTemplateFound();	// does not return
 				}
-				$id = intval($_GET['edit']);	// FIXME: use better validation than intval()
-				$tmpl->assign('formAction', './?edit=' . $id);
+				$this->edit_id = intval($_GET['edit']);	// FIXME: use better validation than intval()
+				$tmpl->assign('formAction', './?edit=' . $this->edit_id);
 				$this->editor = new editor($this);
 				$this->editor->addFormatButtons('staticContent');
-				$this->editor->edit($id);
+				$this->editor->edit();
 				$tmpl->display();
 				die();
 			}
@@ -259,14 +260,9 @@
 				$db->execute($query, '');
 			} else
 			{
-				$id = -1;
-				if (isset($_GET['edit']) && (intval($_GET['edit']) > -1))
-				{
-					$id = intval($_GET['edit']);	// FIXME: use better validation than intval()
-				}
 				$query = $db->prepare('SELECT `title`,`timestamp`,`author`,`raw_msg`'
 								  . ' FROM `news` WHERE `id`=?');
-				$db->execute($query, $id);
+				$db->execute($query, (isset($this->edit_id) ? $this->edit_id : -1));
 			}
 			$rows = $db->fetchAll($query);
 			$db->free($query);
@@ -333,7 +329,7 @@
 			$tmpl->assign('entries', $content);
 		}
 		
-		function writeContent(&$content, $id=-1)
+		function writeContent(&$content)
 		{
 			global $config;
 			global $user;
@@ -344,13 +340,13 @@
 			{
 				// empty content
 				$query = $db->prepare('DELETE FROM `news` WHERE `id`=?');
-				$db->execute($query, $id);
+				$db->execute($query, $this->edit_id);
 				$db->free($query);
 				return;
 			}
 			
 			$query = $db->prepare('SELECT `id` FROM `news` WHERE `id`=? LIMIT 1');
-			$db->execute($query, $id);
+			$db->execute($query, $this->edit_id);
 			
 			// number of rows
 			$rows = $db->rowCount($query);
@@ -396,7 +392,7 @@
 									  . ', `msg`=?'
 									  . ' WHERE `id`=?'
 									  . ' LIMIT 1');
-				$args[] = $id;
+				$args[] = $this->edit_id;
 			}
 			
 			$db->execute($query, $args);
