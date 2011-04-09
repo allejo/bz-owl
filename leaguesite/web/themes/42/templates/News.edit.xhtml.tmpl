@@ -27,7 +27,7 @@ No menu found.
 
 {if isset($contentPreview)}
 <div class="article">
-	<div class="articleHeader">{$titlePreview} by {$authorPreview} at {$timestampPreview}</div>
+	<div class="articleHeader">{$titlePreview} by {$authorPreview}</div>
 	<div class="articleContent">{$contentPreview}</div>
 </div>
 {/if}
@@ -46,13 +46,11 @@ No menu found.
 {if isset($buttonsToFormat)}<div>{foreach item=button from=$buttonsToFormat}{$button}
 {/foreach}</div>{/if}
 <div><textarea cols="75" rows="20" name="staticContent">{$rawContent}</textarea></div>
-<div><input type="text" name="time" value="{$timestamp}" /></div>
 {/if}
 
 {if isset($confirmationStep) && $confirmationStep > 1}
 <div><input type="hidden" name="title" value="{$titlePreview}" /></div>
 <div><input type="hidden" name="staticContent" value="{$rawContent}" /></div>
-<div><input type="hidden" name="time" value="{$timestampPreview}" /></div>
 {/if}
 
 <div><input type="hidden" name="confirmationStep" value="{$confirmationStep}" /></div>

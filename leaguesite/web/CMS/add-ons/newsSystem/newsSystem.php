@@ -169,7 +169,6 @@
 				$db->free($query);
 				
 				$content['title'] = $_POST['title'];
-				$content['timestamp'] = $_POST['time'];
 			} elseif (isset($_GET['edit']))
 			{
 				$content = $this->readContent($this->page_title, $author, $last_modified, true);
@@ -177,7 +176,6 @@
 			{
 				$content = array();
 				$content['raw_msg'] = '';
-				$content['timestamp'] = '';
 				$content['title'] = '';
 			}
 			
@@ -187,7 +185,6 @@
 				case true:
 					$tmpl->assign('titlePreview',  htmlent($content['title']));
 					$tmpl->assign('authorPreview',  htmlent($content['author']['name']));
-					$tmpl->assign('timestampPreview',  htmlent($content['timestamp']));
 					$tmpl->assign('rawContent', htmlent($content['raw_msg']));
 					if ($config->value('bbcodeLibAvailable'))
 					{
@@ -201,8 +198,6 @@
 				default:
 					$tmpl->assign('rawContent', htmlspecialchars($content['raw_msg']
 																 , ENT_COMPAT, 'UTF-8'));
-					$tmpl->assign('timestamp', htmlspecialchars($content['timestamp']
-																, ENT_COMPAT, 'UTF-8'));
 					$tmpl->assign('msgTitle', htmlspecialchars($content['title']
 															   , ENT_COMPAT, 'UTF-8'));
 					// display the formatting buttons addded by addFormatButtons
