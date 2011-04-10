@@ -36,7 +36,7 @@
 		$rows = $db->fetchAll($query);
 		$db->free($query);
 		
-		$dbVersion = (count($rows) > 1) ? MAX_DB_VERSION : 0;
+		$dbVersion = (count($rows) >= 1) ? MAX_DB_VERSION : 0;
 	} else
 	{
 		$query = $db->SQL('SELECT `db.Version` FROM `misc_data` LIMIT 1');
@@ -87,7 +87,7 @@
 		global $db;
 		
 		// PM DB changes
-		echo('renaming PM tables' . "\n");
+		echo('Renaming PM tables' . "\n");
 		$db->SQL('RENAME TABLE `messages_storage` TO `pmSystem.Msg.Storage`');
 		$db->SQL('CREATE TABLE `pmSystem.Msg.Recipients.Teams` (
 				 `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -106,7 +106,7 @@
 		$convertRecipientTeam=$db->prepare('INSERT INTO `pmSystem.Msg.Recipients.Teams` (`msgid`,`teamid`) VALUES(?,?)');
 		$convertRecipientPlayer=$db->prepare('INSERT INTO `pmSystem.Msg.Recipients.Users` (`msgid`,`userid`) VALUES(?,?)');
 		
-		echo('converting PM recipients to pmSystem.Msg.Recipients.Teams and pmSystem.Msg.Recipients.Users' . "\n"  . '.');
+		echo('Converting PM recipients to pmSystem.Msg.Recipients.Teams and pmSystem.Msg.Recipients.Users' . "\n"  . '.');
 		$time = time();
 		$query = $db->SQL('SELECT * FROM `pmSystem.Msg.Storage`');
 		while($row = $db->fetchRow($query))
@@ -136,8 +136,29 @@
 		echo("\n" . 'done converting PM recipients to v1' . "\n");
 		$db->free($query);
 		
-		echo('altering connecting tables between message and users' . "\n");
+		echo('Altering connecting tables between message and users' . "\n");
 		$db->SQL('RENAME TABLE `messages_users_connection` TO `pmSystem.Msg.Users`');
 		$db->SQL('ALTER TABLE `pmSystem.Msg.Users` DROP `id`');
+		
+		echo('Creating Content Management System (CMS) table' . "\n");
+		$db->SQL("CREATE TABLE IF NOT EXISTS `CMS` (
+				 `id` int(11) unsigned NOT NULL DEFAULT '0',
+				 `requestPath` varchar(1000) NOT NULL DEFAULT '/',
+				 `title` varchar(256) NOT NULL DEFAULT 'Untitled',
+				 `addon` varchar(256) NOT NULL DEFAULT 'static',
+				 PRIMARY KEY (`id`),
+				 KEY `requestPath` (`requestPath`(255))
+				 ) ENGINE=InnoDB DEFAULT CHARSET=utf8");
+		
+		echo('Filling CMS table with data' . "\n");
+		$db->SQL("INSERT INTO `CMS` (`id`, `requestPath`, `title`, `addon`) VALUES
+				 (0, '/', 'Home', 'staticPageEditor'),
+				 (1, 'PM/', 'Private messages', 'pmSystem'),
+				 (2, 'News/', 'News', 'newsSystem')");
+		
+		echo('Inserting title column to news table and renaming all announcements to msgs' . "\n");
+		$db->SQL("ALTER TABLE `news` ADD `title` varchar(256) NOT NULL DEFAULT 'News'  AFTER `id`");
+		$db->SQL('ALTER TABLE `news` CHANGE `announcement` `msg` text NULL DEFAULT NULL');
+		$db->SQL('ALTER TABLE `news` CHANGE `raw_announcement` `raw_msg` text NULL DEFAULT NULL');
 	}
 ?>

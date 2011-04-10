@@ -60,7 +60,7 @@
 		@mysql_query($query, $connection);
 		
 		// are there unread messages?
-		$query = ('SELECT `id` FROM `messages_users_connection` WHERE `msg_status`='
+		$query = ('SELECT `msgid` FROM `pmSystem.Msg.Users` WHERE `msg_status`='
 				  . sqlSafeStringQuotes('new')
 				  . ' AND `playerid`=' . sqlSafeStringQuotes(getUserID())
 				  . ' LIMIT 1');

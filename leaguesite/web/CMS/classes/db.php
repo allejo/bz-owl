@@ -128,7 +128,6 @@
 				if ($this->getDebugSQL())
 				{
 					echo'<p>Query ' . htmlent($query) . ' is probably not valid SQL.</p>' . "\n";
-					echo mysql_error();
 				}
 				
 				// log the error
