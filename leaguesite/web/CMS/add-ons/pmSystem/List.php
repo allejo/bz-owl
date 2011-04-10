@@ -171,6 +171,15 @@
 			{
 				$offset = intval($_GET['i']);
 			}
+			$query = $db->prepare('SELECT * FROM `pmSystem.Msg.Storage`, `pmSystem.Msg.Users`'
+								  . ' WHERE `pmSystem.Msg.Users`.`playerid`=?'
+								  . ' AND `pmSystem.Msg.Storage`.`id`=`pmSystem.Msg.Users`.`msgid`'
+								  . ' ORDER BY `id`.`id` DESC'
+								  . ' LIMIT ' . $offset . ', 201');
+			$db->execute($query, $user->getID());
+			
+			
+/*
 			$query = $db->prepare('SELECT `messages_storage`.`id`'
 								  . ',`messages_storage`.`author_id`'
 								  . ',IF(`messages_storage`.`author_id`<>0,(SELECT `name` FROM `players` WHERE `id`=`author_id`)'
@@ -189,6 +198,7 @@
 								  . ' ORDER BY `messages_users_connection`.`id` DESC'
 								  . ' LIMIT ' . $offset . ', 201');
 			$db->execute($query, array($config->value('displayedSystemUsername'), $user->getID()));
+*/
 			$rows = $db->fetchAll($query);
 			$db->free($query);
 			$n = count($rows);

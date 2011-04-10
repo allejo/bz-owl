@@ -23,6 +23,8 @@
 					 'maintenance.now' => false,
 					 // message shown during maintenance.now
 					 'maintenance.msg' => 'This site has been shut down due to maintenance' . "\n",
+					 // enable updating db from previous version
+					 'maintenance.updateDB' => false,
 					 // regenerate session id after x seconds, default 15 minutes (60*15)
 					 // the lower x: safer, higher x faster
 					 'sessionRegenTime' => 60*15,
