@@ -82,9 +82,30 @@
 		}
 	}
 	
+	function tagDBVersion($version)
+	{
+		global $db;
+		
+		echo('Tagging DB with version ' . $version . "\n");
+		
+		$query = $db->SQL('SELECT count(*) AS `numRows` FROM `misc_data');
+		$rows = $db->fetchRow($query);
+		$db->free($query);
+		if ($rows['numRows'] < 1)
+		{
+			$query = $db->prepare('INSERT INTO `misc_data` (`db.version`) VALUES (?)');
+		} else
+		{
+			$query = $db->prepare('UPDATE `misc_data` SET `db.version` = ?');
+		}
+		$db->execute($query, $version);
+	}
+	
 	function updateVersion0()
 	{
 		global $db;
+		
+		// updates v0 to v1
 		
 		// PM DB changes
 		echo('Renaming PM tables' . "\n");
@@ -160,5 +181,9 @@
 		$db->SQL("ALTER TABLE `news` ADD `title` varchar(256) NOT NULL DEFAULT 'News'  AFTER `id`");
 		$db->SQL('ALTER TABLE `news` CHANGE `announcement` `msg` text NULL DEFAULT NULL');
 		$db->SQL('ALTER TABLE `news` CHANGE `raw_announcement` `raw_msg` text NULL DEFAULT NULL');
+		
+		echo('Adding DB version column (db.version) to misc_data' . "\n");
+		$db->SQL("ALTER TABLE `misc_data` ADD `db.version` int(11) NOT NULL DEFAULT '0'  AFTER `last_servertracker_query`");
+		tagDBVersion(1);
 	}
 ?>
