@@ -16,7 +16,7 @@
 	require_once (dirname(dirname(__FILE__)) . '/web/CMS/site.php');
 	$site = new site();
 	
-	// do not run if site is in production mode
+	// do not run if website is in production mode
 	if (!$config->value('maintenance.now') || !$config->value('maintenance.updateDB'))
 	{
 		exit('Can only update DB if live website is down for maintenance.' . "\n");
@@ -154,8 +154,13 @@
 				unset($recipient);
 			}
 		}
-		echo("\n" . 'done converting PM recipients to v1' . "\n");
 		$db->free($query);
+		echo("\n");
+		
+		echo('Removing recipients column from pmSystem.Msg.Storage' . "\n" . '...' . "\n");
+		$db->SQL('ALTER TABLE `pmSystem.Msg.Storage` DROP `recipients`');
+		echo('Removing from_team column from pmSystem.Msg.Storage' . "\n" . '...' . "\n");
+		$db->SQL('ALTER TABLE `pmSystem.Msg.Storage` DROP `from_team`');
 		
 		echo('Altering connecting tables between message and users' . "\n");
 		$db->SQL('RENAME TABLE `messages_users_connection` TO `pmSystem.Msg.Users`');

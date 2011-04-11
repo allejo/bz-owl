@@ -171,37 +171,20 @@
 			{
 				$offset = intval($_GET['i']);
 			}
+			
+			// get the list of private messages to be displayed (+1 one hidden due to next button)
+			// playerid requirement ensures user only sees the messages he's allowed to
 			$query = $db->prepare('SELECT * FROM `pmSystem.Msg.Storage`, `pmSystem.Msg.Users`'
 								  . ' WHERE `pmSystem.Msg.Users`.`playerid`=?'
 								  . ' AND `pmSystem.Msg.Storage`.`id`=`pmSystem.Msg.Users`.`msgid`'
-								  . ' ORDER BY `id`.`id` DESC'
+								  . ' ORDER BY `pmSystem.Msg.Storage`.`id` DESC'
 								  . ' LIMIT ' . $offset . ', 201');
 			$db->execute($query, $user->getID());
 			
-			
-/*
-			$query = $db->prepare('SELECT `messages_storage`.`id`'
-								  . ',`messages_storage`.`author_id`'
-								  . ',IF(`messages_storage`.`author_id`<>0,(SELECT `name` FROM `players` WHERE `id`=`author_id`)'
-								  . ',?) AS `author`'
-								  . ',IF(`messages_storage`.`author_id`<>0,(SELECT `status` FROM `players` WHERE `id`=`author_id`),'
-								  . "'" . "'" . ') AS `author_status`'
-								  . ',`messages_users_connection`.`msg_status`'
-								  . ',`messages_storage`.`subject`'
-								  . ',`messages_storage`.`timestamp`'
-								  . ',`messages_storage`.`from_team`'
-								  . ',`messages_storage`.`recipients`'
-								  . ' FROM `messages_users_connection`,`messages_storage`'
-								  . ' WHERE `messages_storage`.`id`=`messages_users_connection`.`msgid`'
-								  . ' AND `messages_users_connection`.`playerid`=?'
-								  . ' AND `in_' . $folder . '`=' . "'1'"
-								  . ' ORDER BY `messages_users_connection`.`id` DESC'
-								  . ' LIMIT ' . $offset . ', 201');
-			$db->execute($query, array($config->value('displayedSystemUsername'), $user->getID()));
-*/
 			$rows = $db->fetchAll($query);
 			$db->free($query);
 			$n = count($rows);
+			
 			// last row is only a lookup row
 			// to find out whether to display next messages button
 			$showNextMSGButton = false;
@@ -210,6 +193,17 @@
 				$n = 200;
 				$showNextMSGButton = true;
 			}
+			
+			
+			// prepare recipients queries outside of the loop
+			$usersQuery = $db->prepare('SELECT `userid`,`name` AS `username`'
+									   . ' FROM `pmSystem.Msg.Recipients.Users` LEFT JOIN `players`'
+									   . ' ON `pmSystem.Msg.Recipients.Users`.`userid`=`players`.`id`'
+									   . ' WHERE `msgid`=?');
+			$teamsQuery = $db->prepare('SELECT `teamid`,`name` AS `teamname`'
+									   . ' FROM `pmSystem.Msg.Recipients.Teams` LEFT JOIN `teams`'
+									   . ' ON `pmSystem.Msg.Recipients.Teams`.`teamid`=`teams`.`id`'
+									   . ' WHERE `msgid`=?');
 			
 			$messages = array();
 			for ($i = 0; $i < $n; $i++)
@@ -232,15 +226,39 @@
 				$messages[$i]['subject'] = $rows[$i]['subject'];
 				$messages[$i]['time'] = $rows[$i]['timestamp'];
 				
+				
 				// collect recipient list
+				
+				$users = array();
+				$db->execute($usersQuery, $rows[$i]['id']);
+				while ($row = $db->fetchRow($usersQuery))
+				{
+					$users[] = array($row['userid'], $row['username']);
+				}
+				$db->free($usersQuery);
+				
+				$teams = array();
+				$db->execute($teamsQuery, $rows[$i]['id']);
+				while ($row = $db->fetchRow($usersQuery))
+				{
+					$users[] = array($row['teamid'], $row['teamname']);
+				}
+				$db->free($teamsQuery);
+				
+				
+				
+/*
 				$recipients = explode(' ', $rows[$i]['recipients']);
 				$fromTeam = strcmp($rows[$i]['from_team'], '0') !== 0;
+*/
+/*
 				$queryTeamName = $db->prepare('SELECT `name` FROM `teams` WHERE `id`=?');
 				$queryPlayerName = $db->prepare('SELECT `name` FROM `players` WHERE `id`=?');
 				$countRecipients = count($recipients) -1;
 				array_walk($recipients, 'self::displayRecipient'
 						   , array($fromTeam, $queryTeamName, $queryPlayerName, $countRecipients));
 				$messages[$i]['recipients'] = $recipients;
+*/
 				
 			}
 			$tmpl->assign('messages', $messages);
