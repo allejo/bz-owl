@@ -4,7 +4,7 @@
 #
 # Host: localhost (MySQL 5.1.56)
 # Database: testdb
-# Generation Time: 2011-04-08 15:59:10 +0200
+# Generation Time: 2011-04-11 19:30:02 +0200
 # ************************************************************
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -287,7 +287,9 @@ CREATE TABLE `pmSystem.Msg.Recipients.Teams` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `msgid` int(11) unsigned DEFAULT NULL,
   `teamid` int(11) unsigned DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `msgid` (`msgid`),
+  KEY `teamid` (`teamid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -301,7 +303,9 @@ CREATE TABLE `pmSystem.Msg.Recipients.Users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `msgid` int(11) unsigned DEFAULT NULL,
   `userid` int(11) unsigned DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `msgid` (`msgid`),
+  KEY `userid` (`userid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

@@ -30,8 +30,12 @@ long term:
 
 * More themes!
 
-* Drop legacy siteoptions.php (old code depends on that file).
+* Drop legacy siteoptions.php and siteoptions.php (old code depends on that).
 
 * Merge database `news` and `bans` tables by adding a new `page`
   column.  This will make it easier to add other news-style pages.
   Will need a process to convert existing databases.
+
+* Add add-on options to admin web interface.
+
+* Remove any hardcoded URL from code.

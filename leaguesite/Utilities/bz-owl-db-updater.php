@@ -114,13 +114,16 @@
 				 `id` int(11) NOT NULL AUTO_INCREMENT,
 				 `msgid` int(11) unsigned DEFAULT NULL,
 				 `teamid` int(11) unsigned DEFAULT NULL,
-				 PRIMARY KEY (`id`)
+				 PRIMARY KEY (`id`),
+				 KEY `msgid` (`msgid`),
+				 KEY `teamid` (`teamid`)
 				 ) ENGINE=InnoDB DEFAULT CHARSET=utf8');
 		$db->SQL('CREATE TABLE `pmSystem.Msg.Recipients.Users` (
 				 `id` int(11) NOT NULL AUTO_INCREMENT,
 				 `msgid` int(11) unsigned DEFAULT NULL,
 				 `userid` int(11) unsigned DEFAULT NULL,
-				 PRIMARY KEY (`id`)
+				 KEY `msgid` (`msgid`),
+				 KEY `userid` (`userid`)
 				 ) ENGINE=InnoDB DEFAULT CHARSET=utf8');
 		
 		// transform data to new format

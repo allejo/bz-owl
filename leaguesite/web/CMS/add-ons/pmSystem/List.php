@@ -180,7 +180,6 @@
 								  . ' ORDER BY `pmSystem.Msg.Storage`.`id` DESC'
 								  . ' LIMIT ' . $offset . ', 201');
 			$db->execute($query, $user->getID());
-			
 			$rows = $db->fetchAll($query);
 			$db->free($query);
 			$n = count($rows);
@@ -196,11 +195,11 @@
 			
 			
 			// prepare recipients queries outside of the loop
-			$usersQuery = $db->prepare('SELECT `userid`,`name` AS `username`'
+			$usersQuery = $db->prepare('SELECT `userid`,`name`'
 									   . ' FROM `pmSystem.Msg.Recipients.Users` LEFT JOIN `players`'
 									   . ' ON `pmSystem.Msg.Recipients.Users`.`userid`=`players`.`id`'
 									   . ' WHERE `msgid`=?');
-			$teamsQuery = $db->prepare('SELECT `teamid`,`name` AS `teamname`'
+			$teamsQuery = $db->prepare('SELECT `teamid`,`name`'
 									   . ' FROM `pmSystem.Msg.Recipients.Teams` LEFT JOIN `teams`'
 									   . ' ON `pmSystem.Msg.Recipients.Teams`.`teamid`=`teams`.`id`'
 									   . ' WHERE `msgid`=?');
@@ -210,7 +209,8 @@
 			{
 				$messages[$i]['userProfile'] = ($config->value('baseaddress')
 												. 'Players/?profile=' . $rows[$i]['author_id']);
-				$messages[$i]['userName'] = $rows[$i]['author'];
+				//FIXME!!!
+				$messages[$i]['userName'] = 'test'/* $rows[$i]['author'] */;
 				
 				if (strcmp($rows[$i]['msg_status'], 'new') === 0)
 				{
@@ -233,33 +233,20 @@
 				$db->execute($usersQuery, $rows[$i]['id']);
 				while ($row = $db->fetchRow($usersQuery))
 				{
-					$users[] = array($row['userid'], $row['username']);
+					$users[] = array('id' => $row['userid'], 'name' => $row['name'],
+									 'link' => '../Players/?profile=' . $row['userid']);
 				}
 				$db->free($usersQuery);
 				
 				$teams = array();
 				$db->execute($teamsQuery, $rows[$i]['id']);
-				while ($row = $db->fetchRow($usersQuery))
+				while ($row = $db->fetchRow($teamsQuery))
 				{
-					$users[] = array($row['teamid'], $row['teamname']);
+					$teams[] = array('id' => $row['teamid'], 'name' => $row['name'],
+									 'link' => '../Teams/?profile=' . $row['teamid']);
 				}
 				$db->free($teamsQuery);
-				
-				
-				
-/*
-				$recipients = explode(' ', $rows[$i]['recipients']);
-				$fromTeam = strcmp($rows[$i]['from_team'], '0') !== 0;
-*/
-/*
-				$queryTeamName = $db->prepare('SELECT `name` FROM `teams` WHERE `id`=?');
-				$queryPlayerName = $db->prepare('SELECT `name` FROM `players` WHERE `id`=?');
-				$countRecipients = count($recipients) -1;
-				array_walk($recipients, 'self::displayRecipient'
-						   , array($fromTeam, $queryTeamName, $queryPlayerName, $countRecipients));
-				$messages[$i]['recipients'] = $recipients;
-*/
-				
+				$messages[$i]['recipients'] = (array('users' => $users, 'teams' => $teams));
 			}
 			$tmpl->assign('messages', $messages);
 			
