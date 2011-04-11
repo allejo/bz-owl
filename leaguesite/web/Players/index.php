@@ -749,7 +749,7 @@
 			}
 			echo '		<div class="user_profile_location_timezone_row"><span class="user_profile_location_timezone_description">timezone: </span> <span class="user_profile_location_timezone">' . htmlent('UTC ' . $time_format) . '</span></div>' . "\n";
 			unset($time_format);
-			require_once dirname(dirname(__FILE__)) . '/CMS/Login/login_module_list.php';
+			require_once dirname(dirname(__FILE__)) . '/CMS/add-ons/login/modules/login_module_list.php';
 			$module = active_login_modules();
 			if (isset($module['bzbb']) && ($module['bzbb']) && (!(strcmp($row['external_playerid'], '') === 0)))
 			{
