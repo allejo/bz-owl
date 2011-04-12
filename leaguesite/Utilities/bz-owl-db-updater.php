@@ -220,21 +220,26 @@
 		
 		
 		status('Creating Content Management System (CMS) table');
-		$db->SQL("CREATE TABLE IF NOT EXISTS `CMS` (
-				 `id` int(11) unsigned NOT NULL DEFAULT '0',
+		$db->SQL("CREATE TABLE `CMS` (
+				 `id` int(11) NOT NULL AUTO_INCREMENT,
 				 `requestPath` varchar(1000) NOT NULL DEFAULT '/',
 				 `title` varchar(256) NOT NULL DEFAULT 'Untitled',
 				 `addon` varchar(256) NOT NULL DEFAULT 'static',
 				 PRIMARY KEY (`id`),
 				 KEY `requestPath` (`requestPath`(255))
-				 ) ENGINE=InnoDB DEFAULT CHARSET=utf8");
+				 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8");
 		
 		status('Filling CMS table with default data');
-		$db->SQL("INSERT INTO `CMS` (`id`, `requestPath`, `title`, `addon`) VALUES
-				 (0, '/', 'Home', 'staticPageEditor'),
-				 (1, 'PM/', 'Private messages', 'pmSystem'),
-				 (2, 'News/', 'News', 'newsSystem')
-				 (3,'Bans/','Bans','newsSystem')");
+		$db->SQL("INSERT INTO `CMS` (`id`,`requestPath`,`title`,`addon`)
+				 VALUES
+				 (1, '/', 'Home', 'staticPageEditor'),
+				 (2, 'PM/', 'Mail overview', 'pmSystem'),
+				 (3, 'News/', 'News', 'newsSystem'),
+				 (4, 'Rules/', 'Rules', 'staticPageEditor'),
+				 (5, 'FAQ/', 'FAQ', 'staticPageEditor'),
+				 (6, 'Links/', 'Links', 'staticPageEditor'),
+				 (7, 'Contact/', 'Contact', 'staticPageEditor'),
+				 (8, 'Bans/', 'Bans', 'newsSystem')");
 		
 		
 		status('Adding DB version column (db.version) to misc_data');

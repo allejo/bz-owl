@@ -4,7 +4,7 @@
 #
 # Host: localhost (MySQL 5.1.56)
 # Database: testdb
-# Generation Time: 2011-04-12 12:27:15 +0200
+# Generation Time: 2011-04-12 13:15:56 +0200
 # ************************************************************
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -23,22 +23,26 @@
 DROP TABLE IF EXISTS `CMS`;
 
 CREATE TABLE `CMS` (
-  `id` int(11) unsigned NOT NULL DEFAULT '0',
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `requestPath` varchar(1000) NOT NULL DEFAULT '/',
   `title` varchar(256) NOT NULL DEFAULT 'Untitled',
   `addon` varchar(256) NOT NULL DEFAULT 'staticPageEditor',
   PRIMARY KEY (`id`),
   KEY `requestPath` (`requestPath`(255))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
 
 LOCK TABLES `CMS` WRITE;
 /*!40000 ALTER TABLE `CMS` DISABLE KEYS */;
 INSERT INTO `CMS` (`id`,`requestPath`,`title`,`addon`)
 VALUES
-	(0,'/','Home','staticPageEditor'),
-	(1,'Login/','Untitled','login'),
-	(2,'News/','News','newsSystem'),
-	(3,'PM/','Mail overview','pmSystem');
+	(1,'/','Home','staticPageEditor'),
+	(2,'PM/','Mail overview','pmSystem'),
+	(3,'News/','News','newsSystem'),
+	(4,'Rules/','Rules','staticPageEditor'),
+	(5,'FAQ/','FAQ','staticPageEditor'),
+	(6,'Links/','Links','staticPageEditor'),
+	(7,'Contact/','Contact','staticPageEditor'),
+	(8,'Bans/','Bans','newsSystem');
 
 /*!40000 ALTER TABLE `CMS` ENABLE KEYS */;
 UNLOCK TABLES;
