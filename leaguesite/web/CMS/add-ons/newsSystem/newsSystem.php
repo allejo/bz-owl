@@ -26,20 +26,21 @@
 				$tmpl->display();
 				die();
 			}
-
+			
 			$templateToUse = 'News';
 			if (!$tmpl->setTemplate($templateToUse))
 			{
 				$tmpl->noTemplateFound();	// does not return
 			}
-
+			
+			$this->path = $path;
 			$tmpl->assign('title', $this->page_title);
 			
 			// FIXME: fallback to default permission name until add-on system is completly implemented
 			$entry_add_permission = 'allow_add_news';
 			$entry_edit_permission = 'allow_edit_news';
 			$entry_delete_permission = 'allow_delete_news';
-
+			
 			require_once (dirname(dirname(dirname(__FILE__))) . '/classes/editor.php');
 			
 			// otherwise we'd need a custom name per setup
@@ -253,7 +254,6 @@
 								  . ' ORDER BY `timestamp` DESC'
 								  . ' LIMIT ' . $offset . ', ' . strval($max_per_page+1));	// FIXME: parameterize
 				$db->execute($query, $path);
-				echo($path);
 			} else
 			{
 				$query = $db->prepare('SELECT `title`,`timestamp`,`author`,`raw_msg`'
@@ -317,7 +317,7 @@
 					$content[$i]['author'] = $rows[$i]['author'];
 					$content[$i]['time'] = $rows[$i]['timestamp'];
 					$content[$i]['content'] = $rows[$i][$edit ? 'raw_msg' : 'msg'];
-
+					
 					$author = $rows[$i]['author'];
 				}
 			}
@@ -348,12 +348,12 @@
 			$rows = $db->rowCount($query);
 			$db->free($query);
 			$date_format = date('Y-m-d H:i:s');
-
+			
 			$query = $db->prepare('SELECT `name` FROM `players` WHERE `id`=? LIMIT 1');
 			$db->execute($query, $user->getID());
 			$author = $db->fetchRow($query);
 			$db->free($query);
-
+			
 			if (isset($_POST['title']))
 			{
 				$title = htmlspecialchars_decode($_POST['title'], ENT_COMPAT);
@@ -361,7 +361,7 @@
 			{
 				$title = 'News';
 			}
-
+			
 			$args = array($author['name'], $title, $date_format, $content);
 			if ($config->value('bbcodeLibAvailable'))
 			{
@@ -370,7 +370,7 @@
 			{
 				$args[] = $content;
 			}
-
+			
 			if ($rows < ((int) 1))
 			{
 				// no entry in table regarding current page
