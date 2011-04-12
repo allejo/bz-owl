@@ -48,14 +48,21 @@ No menu found.
 
 {foreach item="message" from=$messages}
 <tr class="msg_overview">
-	<td class="msg_overview_author"><a href="{$message.userProfile}">{$message.userName}</a></td>
+	<td class="msg_overview_author">
+	{if isset($message.userProfile)}
+	<a href="{$message.userProfile}">{$message.userName}</a>
+	{else}
+	{$message.userName}
+	{/if}
+	</td>
 	<td class="msg_overview_subject">
 		<a {if isset($message.unread)} class="unread" {/if}href="{$message.link}">{$message.subject}</a></td>
 	<td class="msg_overview_timestamp">{$message.time}</td>
 	<td class="msg_overview_recipients">
 	{if isset($message.recipients.users) && ($message.recipients.users|count) > 0}
 		{foreach item="curRecipients" from=$message.recipients.users}
-			<a href="{$curRecipients.link}">{$curRecipients.name}</a>{if !$curRecipients@last},{/if}
+		<a href="{$curRecipients.link}">{$curRecipients.name}</a>{if !$curRecipients@last},{/if}
+		
 		{/foreach}
 	{/if}
 	{if isset($message.recipients.teams) && ($message.recipients.teams|count) > 0}
@@ -63,6 +70,7 @@ No menu found.
 			<a href="{$curRecipients.link}">{$curRecipients.name}</a>{if !$curRecipients@last},{/if}
 		{/foreach}
 	{/if}
+	
 	</td>
 </tr>
 {/foreach}

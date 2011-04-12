@@ -180,9 +180,10 @@
 								  . ' FROM `pmSystem.Msg.Storage`, `pmSystem.Msg.Users`'
 								  . ' WHERE `pmSystem.Msg.Users`.`playerid`=?'
 								  . ' AND `pmSystem.Msg.Storage`.`id`=`pmSystem.Msg.Users`.`msgid`'
+								  . ' AND `folder`=?'
 								  . ' ORDER BY `pmSystem.Msg.Storage`.`id` DESC'
 								  . ' LIMIT ' . $offset . ', 201');
-			$db->execute($query, array($config->value('displayedSystemUsername'), $user->getID()));
+			$db->execute($query, array($config->value('displayedSystemUsername'), $user->getID(), $folder));
 			$rows = $db->fetchAll($query);
 			$db->free($query);
 			$n = count($rows);
@@ -210,8 +211,13 @@
 			$messages = array();
 			for ($i = 0; $i < $n; $i++)
 			{
-				$messages[$i]['userProfile'] = ($config->value('baseaddress')
-												. 'Players/?profile=' . $rows[$i]['author_id']);
+				// only set up a link to user profile if user has no reserved id
+				// 0 is an internal system user that shares its id with not logged-in users
+				if (intval($rows[$i]['author_id']) > 0)
+				{
+					$messages[$i]['userProfile'] = ($config->value('baseaddress')
+													. 'Players/?profile=' . $rows[$i]['author_id']);
+				}
 				$messages[$i]['userName'] = $rows[$i]['author'];
 				
 				if (strcmp($rows[$i]['msg_status'], 'new') === 0)
