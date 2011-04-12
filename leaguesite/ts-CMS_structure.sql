@@ -4,7 +4,7 @@
 #
 # Host: localhost (MySQL 5.1.56)
 # Database: testdb
-# Generation Time: 2011-04-12 09:38:12 +0200
+# Generation Time: 2011-04-12 11:56:15 +0200
 # ************************************************************
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -15,22 +15,6 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
-
-# Dump of table bans
-# ------------------------------------------------------------
-
-DROP TABLE IF EXISTS `bans`;
-
-CREATE TABLE `bans` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `timestamp` varchar(20) NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `author` varchar(255) DEFAULT NULL,
-  `announcement` text,
-  `raw_announcement` text,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 
 
 # Dump of table CMS
@@ -184,18 +168,19 @@ CREATE TABLE `misc_data` (
 
 
 
-# Dump of table news
+# Dump of table newsSystem
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `news`;
+DROP TABLE IF EXISTS `newsSystem`;
 
-CREATE TABLE `news` (
+CREATE TABLE `newsSystem` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `title` varchar(256) NOT NULL DEFAULT 'News',
   `timestamp` varchar(20) NOT NULL DEFAULT '0000-00-00 00:00:00',
   `author` varchar(255) DEFAULT NULL,
   `msg` text,
   `raw_msg` text,
+  `page` varchar(1000) NOT NULL DEFAULT 'News/',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

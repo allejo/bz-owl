@@ -63,7 +63,7 @@
 							   . ') is up to date (version ' . $dbVersion . ').' . "\n") : $error;
 	exit();
 	
-	function status($message)
+	function status($message='')
 	{
 		echo($message . "\n");
 	}
@@ -90,7 +90,8 @@
 	{
 		global $db;
 		
-		echo('Tagging DB with version ' . $version . "\n");
+		status('Tagging DB with version ' . $version);
+		status();
 		
 		$query = $db->SQL('SELECT count(*) AS `numRows` FROM `misc_data');
 		$rows = $db->fetchRow($query);
@@ -167,6 +168,7 @@
 		echo('Removing from_team column from pmSystem.Msg.Storage' . "\n" . '...' . "\n");
 		$db->SQL('ALTER TABLE `pmSystem.Msg.Storage` DROP `from_team`');
 		
+		
 		status('Altering connecting tables between message and users');
 		$db->SQL('RENAME TABLE `messages_users_connection` TO `pmSystem.Msg.Users`');
 		$db->SQL('ALTER TABLE `pmSystem.Msg.Users` DROP `id`');
@@ -182,6 +184,34 @@
 		status('Deleting messages from old outbox');
 		$db->SQL('ALTER TABLE `pmSystem.Msg.Users` DROP `in_outbox`');
 		
+		
+		status('Converting news and bans tables to newsSystem add-on');
+		$db->SQL('RENAME TABLE `news` TO `newsSystem`');
+		
+		status('Inserting title and page column to newsSystem table and renaming all announcements to msgs');
+		$db->SQL("ALTER TABLE `newsSystem` ADD `title` varchar(256) NOT NULL DEFAULT 'News'  AFTER `id`");
+		$db->SQL('ALTER TABLE `newsSystem` CHANGE `announcement` `msg` text NULL DEFAULT NULL');
+		$db->SQL('ALTER TABLE `newsSystem` CHANGE `raw_announcement` `raw_msg` text NULL DEFAULT NULL');
+		$db->SQL("ALTER TABLE `newsSystem` ADD `page` varchar(1000) NOT NULL DEFAULT 'news'  AFTER `raw_msg`");
+		
+		status('Force update page column to news just in case DBMS does not do that automatically');
+		$db->SQL("UPDATE `newsSystem` SET `page`='News/'");
+		
+		status('Inserting ban entries to newsSystem');
+		$query = $db->SQL('SELECT * FROM `bans`');
+		$bansInsertQuery = $db->prepare('INSERT INTO `newsSystem` (`title`, `timestamp`, `author`, `msg`, `raw_msg`, `page`)'
+										. ' VALUES (?, ?, ?, ?, ?, ?)');
+		while ($row = $db->fetchRow($query))
+		{
+			$db->execute($bansInsertQuery, array('Ban', $row['timestamp'], $row['author'],
+												 $row['announcement'], $row['raw_announcement'], 'Bans/'));
+		}
+		$db->free($query);
+		
+		status('removing old bans table');
+		$db->SQL('DROP TABLE `bans`');
+		
+		
 		status('Creating Content Management System (CMS) table');
 		$db->SQL("CREATE TABLE IF NOT EXISTS `CMS` (
 				 `id` int(11) unsigned NOT NULL DEFAULT '0',
@@ -196,12 +226,9 @@
 		$db->SQL("INSERT INTO `CMS` (`id`, `requestPath`, `title`, `addon`) VALUES
 				 (0, '/', 'Home', 'staticPageEditor'),
 				 (1, 'PM/', 'Private messages', 'pmSystem'),
-				 (2, 'News/', 'News', 'newsSystem')");
+				 (2, 'News/', 'News', 'newsSystem')
+				 (3,'Bans/','Bans','newsSystem')");
 		
-		status('Inserting title column to news table and renaming all announcements to msgs');
-		$db->SQL("ALTER TABLE `news` ADD `title` varchar(256) NOT NULL DEFAULT 'News'  AFTER `id`");
-		$db->SQL('ALTER TABLE `news` CHANGE `announcement` `msg` text NULL DEFAULT NULL');
-		$db->SQL('ALTER TABLE `news` CHANGE `raw_announcement` `raw_msg` text NULL DEFAULT NULL');
 		
 		status('Adding DB version column (db.version) to misc_data');
 		$db->SQL("ALTER TABLE `misc_data` ADD `db.version` int(11) NOT NULL DEFAULT '0'  AFTER `last_servertracker_query`");

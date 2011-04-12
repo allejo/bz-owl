@@ -16,8 +16,7 @@
 			global $user;
 			
 			if (isset($title) && (strcmp($title, 'News') === 0
-// not yet supported			   || strcmp($title, 'Bans') === 0))
-					      ))
+								  || strcmp($title, 'Bans') === 0))
 			{
 				$this->page_title = $title;
 			} else
@@ -93,7 +92,7 @@
 			{
 				$tmpl->assign('showAddButton', true);
 			}
-			$this->readContent($this->page_title, $author, $last_modified, false);
+			$this->readContent($path, $author, $last_modified, false);
 			
 			// done, display page
 			$tmpl->display();
@@ -107,7 +106,7 @@
 			
 			if (isset($_GET['delete']))
 			{
-				$query = $db->prepare('DELETE FROM `news` WHERE `id`=?');
+				$query = $db->prepare('DELETE FROM `newsSystem` WHERE `id`=?');
 				if ($db->execute($query, intval($_GET['delete'])))	// FIXME: use better validation than intval()
 				{
 					$tmpl->assign('MSG', 'Article deleted.' . $tmpl->linebreaks("\n\n"));
@@ -249,14 +248,16 @@
 				
 				// TODO: id only needed if user can edit or delete
 				// TODO: meaning room for optimisation
-				$query = $db->SQL('SELECT `id`,`title`,`timestamp`,`author`,`msg`'
-								  . ' FROM `news` ORDER BY `timestamp` DESC'
+				$query = $db->prepare('SELECT `id`,`title`,`timestamp`,`author`,`msg`'
+								  . ' FROM `newsSystem` WHERE `page`=?'
+								  . ' ORDER BY `timestamp` DESC'
 								  . ' LIMIT ' . $offset . ', ' . strval($max_per_page+1));	// FIXME: parameterize
-				$db->execute($query, '');
+				$db->execute($query, $path);
+				echo($path);
 			} else
 			{
 				$query = $db->prepare('SELECT `title`,`timestamp`,`author`,`raw_msg`'
-								  . ' FROM `news` WHERE `id`=?');
+								  . ' FROM `newsSystem` WHERE `id`=?');
 				$db->execute($query, (isset($this->edit_id) ? $this->edit_id : -1));
 			}
 			$rows = $db->fetchAll($query);
@@ -334,13 +335,13 @@
 			if (strcmp($content, '') === 0)
 			{
 				// empty content
-				$query = $db->prepare('DELETE FROM `news` WHERE `id`=?');
+				$query = $db->prepare('DELETE FROM `newsSystem` WHERE `id`=?');
 				$db->execute($query, $this->edit_id);
 				$db->free($query);
 				return;
 			}
 			
-			$query = $db->prepare('SELECT `id` FROM `news` WHERE `id`=? LIMIT 1');
+			$query = $db->prepare('SELECT `id` FROM `newsSystem` WHERE `id`=? LIMIT 1');
 			$db->execute($query, $this->edit_id);
 			
 			// number of rows
@@ -374,13 +375,13 @@
 			{
 				// no entry in table regarding current page
 				// thus insert new data
-				$query = $db->prepare('INSERT INTO `news`'
+				$query = $db->prepare('INSERT INTO `newsSystem`'
 					. ' (`author`, `title`, `timestamp`, `raw_msg`, `msg`)'
 					. ' VALUES (?, ?, ?, ?, ?)');
 			} else
 			{
 				// either 1 or more entries found, just assume there is only one
-				$query = $db->prepare('UPDATE `news` SET `author`=?'
+				$query = $db->prepare('UPDATE `newsSystem` SET `author`=?'
 									  . ', `title`=?'
 									  . ', `timestamp`=?'
 									  . ', `raw_msg`=?'

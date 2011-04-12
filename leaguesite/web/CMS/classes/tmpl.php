@@ -48,20 +48,7 @@
 			{
 				$this->assign('MSG', 'Used menu: ' . $menuFile);
 			}
-*/
-			
-			
-			/*
-			 $menuClass = new menu();
-			 $menu = $menuClass->createMenu();
-			 
-			 foreach ($menu as $oneMenuEntry)
-			 {
-			 $this->tpl->setVariable('MENU_STRUCTURE', $oneMenuEntry);
-			 $this->parseCurrentBlock();
-			 }
-			 unset($oneMenuEntry);
-			 */
+*/			
 			
 			// count online players on match servers
 			
