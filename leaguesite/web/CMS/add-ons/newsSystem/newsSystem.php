@@ -75,6 +75,7 @@
 				}
 				$tmpl->assign('formAction', './?add');
 				$this->editor = new editor($this);
+				$this->editor->addFormatButtons('staticContent');
 				$this->editor->edit();
 				$tmpl->display();
 				die();

@@ -146,7 +146,7 @@
 			global $site;
 			global $db;
 			global $config;
-			echo $path;
+			
 			// initialise return variable so any returned value will be always in a defined state
 			$content = '';
 			if (!$raw)
