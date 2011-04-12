@@ -46,20 +46,17 @@
 			$this->folderNav($folder);
 			
 			// collect the necessary data
-			$query = $db->prepare('SELECT `subject`'
-								  . ',IF(`messages_storage`.`author_id`<>0'
-								  . ',(SELECT `name` FROM `players` WHERE `id`=`author_id`),?) AS `author`'
-								  . ',IF(`messages_storage`.`author_id`<>0,'
-								  . '(SELECT `status` FROM `players` WHERE `id`=`author_id`),'
-								  . "''" . ') AS `author_status`'
-								  . ',`author_id`,`timestamp`,`message`,`messages_storage`.`from_team`'
-								  . ',`messages_storage`.`recipients`'
-								  . ' FROM `messages_storage`,`messages_users_connection`'
-								  . ' WHERE `messages_storage`.`id`=`messages_users_connection`.`msgid`'
-								  . ' AND `messages_users_connection`.`playerid`=?'
-								  . ' AND `messages_users_connection`.`in_' . $folder . '`=' . "'1'"
-								  . ' AND `messages_storage`.`id`=? LIMIT 1');
-			$db->execute($query, array($config->value('displayedSystemUsername'), $user->getID(), $id));
+			$query = $db->prepare('SELECT `id`,`author_id`,`subject`,`timestamp`,`message`,`msg_status`,'
+								  . ' IF(`pmSystem.Msg.Storage`.`author_id`<>0,'
+								  . ' (SELECT `name` FROM `players` WHERE `id`=`author_id`),?) AS `author`'
+								  . ' FROM `pmSystem.Msg.Storage`, `pmSystem.Msg.Users`'
+								  . ' WHERE `pmSystem.Msg.Users`.`playerid`=?'
+								  . ' AND `pmSystem.Msg.Storage`.`id`=`pmSystem.Msg.Users`.`msgid`'
+								  . ' AND `folder`=?'
+								  . ' AND `pmSystem.Msg.Storage`.`id`=?'
+								  . ' ORDER BY `pmSystem.Msg.Storage`.`id` DESC'
+								  . ' LIMIT 1');
+			$db->execute($query, array($config->value('displayedSystemUsername'), $user->getID(), $folder, $id));
 			
 			$rows = $db->fetchAll($query);
 			$db->free($query);
@@ -97,6 +94,8 @@
 				// keep the error message generic to avoid
 				$tmpl->assign('errorMsg', 'This message either does not exist or you do not have permission to view the message.');
 				$tmpl->display('NoPerm');
+				
+				exit();
 			}
 			
 			// create PM view

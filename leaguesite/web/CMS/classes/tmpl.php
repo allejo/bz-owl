@@ -43,12 +43,13 @@
 			unset($menu);
 			
 			parent::assign('date', date('Y-m-d H:i:s T'));
-			/*
-			 if ($config->value('debugSQL'))
-			 {
-			 $this->assign('MSG', 'Used menu: ' . $menuFile);
-			 }
-			 */
+/*
+			if ($config->value('debugSQL'))
+			{
+				$this->assign('MSG', 'Used menu: ' . $menuFile);
+			}
+*/
+			
 			
 			/*
 			 $menuClass = new menu();

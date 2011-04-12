@@ -291,17 +291,17 @@
 				{
 					// this is a reply
 					$query = $db->prepare('INSERT INTO `pmSystem.Msg.Users`'
-										  . '(`msgid`, `playerid`, `in_inbox`, `in_outbox`, `msg_replied_to_msgid)'
-										  . 'VALUES (?, ?, ?, ?, ?)');
-					$db->execute($query, array($rowId, $recipient, 1, 0, $ReplyToMSGID));
+										  . '(`msgid`, `playerid`, `folder`, `msg_replied_to_msgid)'
+										  . 'VALUES (?, ?, ?, ?)');
+					$db->execute($query, array($rowId, $recipient, 'inbox', $ReplyToMSGID));
 					$db->free($query);
 				} else
 				{
 					// this is a new message
 					$query = $db->prepare('INSERT INTO `pmSystem.Msg.Users`'
-										  . ' (`msgid`, `playerid`, `in_inbox`, `in_outbox`)'
-										  . ' VALUES (?, ?, ?, ?)');
-					$db->execute($query, array($rowId, $recipient, 1, 0));
+										  . ' (`msgid`, `playerid`, `folder`)'
+										  . ' VALUES (?, ?, ?)');
+					$db->execute($query, array($rowId, $recipient, 'inbox'));
 					$db->free($query);
 				}
 				
@@ -310,9 +310,9 @@
 				{
 					// system did not send the message but a human
 					$query = $db->prepare('INSERT INTO `pmSystem.Msg.Users`'
-										  . ' (`msgid`, `playerid`, `in_inbox`, `in_outbox`)'
+										  . ' (`msgid`, `playerid`, `folder`, `msg_status`)'
 										  . ' VALUES (?, ?, ?, ?)');
-					$db->execute($query, array($rowId, $author_id, 0, 1));
+					$db->execute($query, array($rowId, $author_id, 'outbox', 'read'));
 				}
 			}
 			
