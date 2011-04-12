@@ -4,7 +4,7 @@
 #
 # Host: localhost (MySQL 5.1.56)
 # Database: testdb
-# Generation Time: 2011-04-12 11:56:15 +0200
+# Generation Time: 2011-04-12 12:27:15 +0200
 # ************************************************************
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -353,7 +353,7 @@ DROP TABLE IF EXISTS `static_pages`;
 CREATE TABLE `static_pages` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `author` int(11) NOT NULL,
-  `page_name` tinytext NOT NULL,
+  `page` varchar(1000) NOT NULL,
   `content` mediumtext NOT NULL,
   `raw_content` mediumtext NOT NULL,
   `last_modified` varchar(20) NOT NULL DEFAULT '0000-00-00 00:00:00',

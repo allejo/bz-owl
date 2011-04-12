@@ -112,6 +112,13 @@
 		
 		// updates v0 to v1
 		
+		// staticPage changes
+		status('Changing helper table for staticPageEditor');
+		$db->SQL('ALTER TABLE `static_pages` CHANGE `page_name` `page` varchar(1000) NOT NULL');
+		status('Fixing home static page');
+		$db->SQL("UPDATE `static_pages` SET `page`='/' WHERE `page`='_/'");
+		
+		
 		// PM DB changes
 		status('Renaming PM tables');
 		$db->SQL('RENAME TABLE `messages_storage` TO `pmSystem.Msg.Storage`');

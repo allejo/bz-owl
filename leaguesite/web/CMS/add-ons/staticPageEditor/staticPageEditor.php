@@ -2,7 +2,6 @@
 	class staticPageEditor
 	{
 		private $editor;
-		private $page_title;
 		public $randomKeyName = 'staticPageEditor';
 
 		function __construct($title, $path)
@@ -11,20 +10,8 @@
 			global $site;
 			global $tmpl;
 			global $user;
-
-			if (isset($title) && (strcmp($title, 'Home') === 0
-// others not yet supported	   || strcmp($title, 'Contact') === 0))
-								  ))
-			{
-				$this->page_title = $title;
-			} else
-			{
-				$tmpl->setTemplate('404');
-				$tmpl->assign('errorMsg', 'No support for ' . $title . ' as a static page.');
-				$tmpl->display();
-				die();
-			}
-
+			
+			
 			$templateToUse = 'static';
 			if (!$tmpl->setTemplate($templateToUse))
 			{
@@ -61,7 +48,7 @@
 			{
 				$tmpl->assign('showEditButton', true);
 			}
-			$tmpl->assign('content', $this->readContent($this->page_title, $author, $last_modified, false));
+			$tmpl->assign('content', $this->readContent($path, $author, $last_modified, false));
 
 			// done, display page
 			$tmpl->display();
