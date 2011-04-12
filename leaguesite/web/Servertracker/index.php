@@ -54,7 +54,7 @@
 		
 		formatbzfquery("dub.guleague.org:59997", $connection);
 		
-		formatbzfquery("trb.guleague.org:5158", $connection);
+//		formatbzfquery("trb.guleague.org:5158", $connection);
 		
 		formatbzfquery("brl.arpa.net:5158", $connection);
 //		
