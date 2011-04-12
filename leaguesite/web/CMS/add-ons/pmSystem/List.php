@@ -174,12 +174,15 @@
 			
 			// get the list of private messages to be displayed (+1 one hidden due to next button)
 			// playerid requirement ensures user only sees the messages he's allowed to
-			$query = $db->prepare('SELECT * FROM `pmSystem.Msg.Storage`, `pmSystem.Msg.Users`'
+			$query = $db->prepare('SELECT `id`,`author_id`,`subject`,`timestamp`,`folder`,`msg_status`,'
+								  . ' IF(`pmSystem.Msg.Storage`.`author_id`<>0,'
+								  . ' (SELECT `name` FROM `players` WHERE `id`=`author_id`),?) AS `author`'
+								  . ' FROM `pmSystem.Msg.Storage`, `pmSystem.Msg.Users`'
 								  . ' WHERE `pmSystem.Msg.Users`.`playerid`=?'
 								  . ' AND `pmSystem.Msg.Storage`.`id`=`pmSystem.Msg.Users`.`msgid`'
 								  . ' ORDER BY `pmSystem.Msg.Storage`.`id` DESC'
 								  . ' LIMIT ' . $offset . ', 201');
-			$db->execute($query, $user->getID());
+			$db->execute($query, array($config->value('displayedSystemUsername'), $user->getID()));
 			$rows = $db->fetchAll($query);
 			$db->free($query);
 			$n = count($rows);
@@ -209,8 +212,7 @@
 			{
 				$messages[$i]['userProfile'] = ($config->value('baseaddress')
 												. 'Players/?profile=' . $rows[$i]['author_id']);
-				//FIXME!!!
-				$messages[$i]['userName'] = 'test'/* $rows[$i]['author'] */;
+				$messages[$i]['userName'] = $rows[$i]['author'];
 				
 				if (strcmp($rows[$i]['msg_status'], 'new') === 0)
 				{

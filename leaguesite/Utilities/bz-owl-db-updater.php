@@ -51,9 +51,9 @@
 		}
 	}
 	
-	// call the update script now that we know the current db version
+	// call the updating code now that we know the current db version
 	// use a while loop instead of iterating inside the update function
-	// so we keep the used stack memory small
+	// so we keep the used stack memory low
 	$error = false;
 	while ($dbVersion < MAX_DB_VERSION && $error === false)
 	{
@@ -63,6 +63,10 @@
 							   . ') is up to date (version ' . $dbVersion . ').' . "\n") : $error;
 	exit();
 	
+	function status($message)
+	{
+		echo($message . "\n");
+	}
 	
 	function updateDB(&$version, &$error)
 	{
@@ -108,18 +112,15 @@
 		// updates v0 to v1
 		
 		// PM DB changes
-		echo('Renaming PM tables' . "\n");
+		status('Renaming PM tables');
 		$db->SQL('RENAME TABLE `messages_storage` TO `pmSystem.Msg.Storage`');
 		$db->SQL('CREATE TABLE `pmSystem.Msg.Recipients.Teams` (
-				 `id` int(11) NOT NULL AUTO_INCREMENT,
 				 `msgid` int(11) unsigned DEFAULT NULL,
 				 `teamid` int(11) unsigned DEFAULT NULL,
-				 PRIMARY KEY (`id`),
 				 KEY `msgid` (`msgid`),
 				 KEY `teamid` (`teamid`)
 				 ) ENGINE=InnoDB DEFAULT CHARSET=utf8');
 		$db->SQL('CREATE TABLE `pmSystem.Msg.Recipients.Users` (
-				 `id` int(11) NOT NULL AUTO_INCREMENT,
 				 `msgid` int(11) unsigned DEFAULT NULL,
 				 `userid` int(11) unsigned DEFAULT NULL,
 				 KEY `msgid` (`msgid`),
@@ -130,7 +131,8 @@
 		$convertRecipientTeam=$db->prepare('INSERT INTO `pmSystem.Msg.Recipients.Teams` (`msgid`,`teamid`) VALUES(?,?)');
 		$convertRecipientPlayer=$db->prepare('INSERT INTO `pmSystem.Msg.Recipients.Users` (`msgid`,`userid`) VALUES(?,?)');
 		
-		echo('Converting PM recipients to pmSystem.Msg.Recipients.Teams and pmSystem.Msg.Recipients.Users' . "\n"  . '.');
+		status('Converting PM recipients to pmSystem.Msg.Recipients.Teams and pmSystem.Msg.Recipients.Users');
+		echo('.');
 		$time = time();
 		$query = $db->SQL('SELECT * FROM `pmSystem.Msg.Storage`');
 		while($row = $db->fetchRow($query))
@@ -165,11 +167,22 @@
 		echo('Removing from_team column from pmSystem.Msg.Storage' . "\n" . '...' . "\n");
 		$db->SQL('ALTER TABLE `pmSystem.Msg.Storage` DROP `from_team`');
 		
-		echo('Altering connecting tables between message and users' . "\n");
+		status('Altering connecting tables between message and users');
 		$db->SQL('RENAME TABLE `messages_users_connection` TO `pmSystem.Msg.Users`');
 		$db->SQL('ALTER TABLE `pmSystem.Msg.Users` DROP `id`');
 		
-		echo('Creating Content Management System (CMS) table' . "\n");
+		status('Moving mailbox detection from seperate columns to one column of type set');
+		$db->SQL("ALTER TABLE `pmSystem.Msg.Users` ADD `folder` set('inbox','outbox') NOT NULL DEFAULT 'inbox'  AFTER `playerid`");
+		status('Adding messages to new inbox');
+		$db->SQL("UPDATE `pmSystem.Msg.Users` SET `folder`='inbox' WHERE `in_inbox`='1'");
+		status('Adding messages to new outbox');
+		$db->SQL("UPDATE `pmSystem.Msg.Users` SET `folder`='outbox' WHERE `in_outbox`='1'");
+		status('Deleting messages from old inbox');
+		$db->SQL('ALTER TABLE `pmSystem.Msg.Users` DROP `in_inbox`');
+		status('Deleting messages from old outbox');
+		$db->SQL('ALTER TABLE `pmSystem.Msg.Users` DROP `in_outbox`');
+		
+		status('Creating Content Management System (CMS) table');
 		$db->SQL("CREATE TABLE IF NOT EXISTS `CMS` (
 				 `id` int(11) unsigned NOT NULL DEFAULT '0',
 				 `requestPath` varchar(1000) NOT NULL DEFAULT '/',
@@ -179,18 +192,18 @@
 				 KEY `requestPath` (`requestPath`(255))
 				 ) ENGINE=InnoDB DEFAULT CHARSET=utf8");
 		
-		echo('Filling CMS table with data' . "\n");
+		status('Filling CMS table with default data');
 		$db->SQL("INSERT INTO `CMS` (`id`, `requestPath`, `title`, `addon`) VALUES
 				 (0, '/', 'Home', 'staticPageEditor'),
 				 (1, 'PM/', 'Private messages', 'pmSystem'),
 				 (2, 'News/', 'News', 'newsSystem')");
 		
-		echo('Inserting title column to news table and renaming all announcements to msgs' . "\n");
+		status('Inserting title column to news table and renaming all announcements to msgs');
 		$db->SQL("ALTER TABLE `news` ADD `title` varchar(256) NOT NULL DEFAULT 'News'  AFTER `id`");
 		$db->SQL('ALTER TABLE `news` CHANGE `announcement` `msg` text NULL DEFAULT NULL');
 		$db->SQL('ALTER TABLE `news` CHANGE `raw_announcement` `raw_msg` text NULL DEFAULT NULL');
 		
-		echo('Adding DB version column (db.version) to misc_data' . "\n");
+		status('Adding DB version column (db.version) to misc_data');
 		$db->SQL("ALTER TABLE `misc_data` ADD `db.version` int(11) NOT NULL DEFAULT '0'  AFTER `last_servertracker_query`");
 		tagDBVersion(1);
 	}
