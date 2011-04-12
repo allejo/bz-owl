@@ -48,7 +48,7 @@
 			{
 				$this->assign('MSG', 'Used menu: ' . $menuFile);
 			}
-*/			
+*/
 			
 			// count online players on match servers
 			
