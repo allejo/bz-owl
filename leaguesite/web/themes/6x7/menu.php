@@ -60,12 +60,12 @@
 			{
 				// the execution of the query is not that time critical and it happens often -> LOW_PRIORITY
 				$query = $db->prepare('UPDATE LOW_PRIORITY `online_users` SET `last_activity`=?'
-									  . ' WHERE `playerid`=?');
+									  . ' WHERE `userid`=?');
 				$db->execute($query, array(date('Y-m-d H:i:s'), $user->getID()));
 				
 				// are there unread messages?
 				$query = $db->prepare('SELECT `msgid` FROM `pmSystem.Msg.Users` WHERE `msg_status`=?'
-									  . ' AND `playerid`=?'
+									  . ' AND `userid`=?'
 									  . ' LIMIT 1');
 				
 				$result = $db->execute($query, array('new', $user->getID()));;

@@ -75,7 +75,7 @@
 			}
 			
 			// remove expired sessions from the list of online users
-			$query = 'SELECT `playerid`, `last_activity` FROM `online_users`';
+			$query = 'SELECT `userid`, `last_activity` FROM `online_users`';
 			$query = $db->SQL($query);
 			$rows = $db->fetchAll($query);
 			$n = count($rows);
@@ -98,7 +98,7 @@
 			}
 			
 			// count active sessions
-			$query = 'SELECT count(`playerid`) AS `num_players` FROM `online_users`';
+			$query = 'SELECT count(`userid`) AS `num_players` FROM `online_users`';
 			$result = $db->SQL($query, __FILE__);
 			
 			$n_users = ($db->fetchRow($result));

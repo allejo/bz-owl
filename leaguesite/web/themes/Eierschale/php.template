@@ -20,7 +20,7 @@
 	$connection = $site->connect_to_db();
 	
 	// remove expired sessions from the list of online users
-	$query ='SELECT `playerid`, `last_activity` FROM `online_users`';
+	$query ='SELECT `userid`, `last_activity` FROM `online_users`';
 	if (!($result = @$site->execute_silent_query('online_users', $query, $connection)))
 	{
 		// query was bad, error message was already given in $site->execute_query(...)
@@ -55,7 +55,7 @@
 	{
 		// the execution of the query is not that time critical and it happens often -> LOW_PRIORITY
 		$query = 'UPDATE LOW_PRIORITY `online_users` SET `last_activity`=';
-		$query .= sqlSafeStringQuotes(date('Y-m-d H:i:s')) . ' WHERE `playerid`=' . sqlSafeStringQuotes(getUserID());
+		$query .= sqlSafeStringQuotes(date('Y-m-d H:i:s')) . ' WHERE `userid`=' . sqlSafeStringQuotes(getUserID());
 		@mysql_select_db($site->db_used_name(), $connection);
 		@mysql_query($query, $connection);
 		
@@ -63,7 +63,7 @@
 		// are there unread messages?
 		$query = ('SELECT `msgid` FROM `pmSystem.Msg.Users` WHERE `msg_status`='
 				  . sqlSafeStringQuotes('new')
-				  . ' AND `playerid`=' . sqlSafeStringQuotes(getUserID())
+				  . ' AND `userid`=' . sqlSafeStringQuotes(getUserID())
 				  . ' LIMIT 1');
 		$result = @mysql_query($query, $connection);
 		$rows = (int) @mysql_num_rows($result);
@@ -185,7 +185,7 @@
 	if (!$online_users_page_viewed)
 	{
 		echo ' <span class="onlineUsers">Website: ';
-		$query = 'SELECT count(`playerid`) AS `num_players` FROM `online_users`';
+		$query = 'SELECT count(`userid`) AS `num_players` FROM `online_users`';
 		if (!($result = @$site->execute_silent_query('online_users', $query, $connection)))
 		{
 			$site->dieAndEndPage('<p>Could not get number of online users from database.</p>');

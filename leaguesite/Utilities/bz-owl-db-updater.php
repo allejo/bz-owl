@@ -229,6 +229,14 @@
 		$db->SQL('DROP TABLE `bans`');
 		
 		
+		status('Renaming playerid to userid in online_users table');
+		$db->SQL('ALTER TABLE `online_users` DROP FOREIGN KEY `online_users_ibfk_1`');
+		$db->SQL('ALTER TABLE `online_users` CHANGE `playerid` `userid` int(11) UNSIGNED NOT NULL');
+		$db->SQL('ALTER TABLE `online_users` ADD INDEX  (`userid`)');
+		$db->SQL('ALTER TABLE `online_users` ADD FOREIGN KEY (`userid`) REFERENCES `players` (`id`) ON DELETE CASCADE ON UPDATE CASCADE');
+		
+		
+		
 		status('Creating Content Management System (CMS) table');
 		$db->SQL("CREATE TABLE `CMS` (
 				 `id` int(11) NOT NULL AUTO_INCREMENT,
