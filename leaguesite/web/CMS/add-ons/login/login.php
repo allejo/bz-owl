@@ -718,7 +718,7 @@
 					}
 					
 					// insert logged in user into online_users table
-					$query = $db->prepare('INSERT INTO `online_users` (`playerid`, `username`, `last_activity`) Values (?, ?, ?)');
+					$query = $db->prepare('INSERT INTO `online_users` (`userid`, `username`, `last_activity`) Values (?, ?, ?)');
 					$args = array($user_id, htmlent($_SESSION['username']), $curDate);
 					$db->execute($query, $args);
 					

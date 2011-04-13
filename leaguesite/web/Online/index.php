@@ -70,7 +70,7 @@
 		{
 			echo '<table class="online_user">';
 			while ($row = mysql_fetch_object($result)) {
-				echo '<tr><td><a href="'.basepath().'Players/?profile='.$row->playerid.'">'.htmlentities($row->username).'</a></td><td>';
+				echo '<tr><td><a href="'.basepath().'Players/?profile='.$row->userid.'">'.htmlentities($row->username).'</a></td><td>';
 				echo '(idle: '.showTimeSince(convert_datetime($row->last_activity)).')</td></tr>';
 			}
 			echo '</table>';
