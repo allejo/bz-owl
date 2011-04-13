@@ -8,16 +8,6 @@
 			global $user;
 			global $tmpl;
 			
-			// FIXME: FALLBACK FOR NOW
-			if (/* isset($_GET['add']) || */ isset($_GET['edit']) || isset($_GET['delete']))
-			{
-				require_once dirname(dirname(dirname(__FILE__))) . '/siteinfo.php';
-				$site = new siteinfo();
-				
-				include dirname(dirname(dirname(__FILE__))) . '/announcements/index.php';
-				
-				die();
-			}
 			
 			if (!isset($site))
 			{
@@ -58,6 +48,7 @@
 			} elseif (isset($_GET['delete']))
 			{
 				require_once dirname(__FILE__) . '/pmDelete.php';
+				new pmDelete($folder, intval($_GET['delete']));
 			} else
 			{
 				require_once dirname(__FILE__) . '/List.php';

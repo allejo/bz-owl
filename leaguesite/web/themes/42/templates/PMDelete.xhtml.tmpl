@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="content-type" />
+	<link href="{$baseURL}themes/{$curTheme}/{$curTheme}.css" rel="stylesheet" type="text/css" />
+	<link rel="icon" type="image/png" href="{$faviconURL}" />
+<title>{$title}</title>
+</head>
+<body>
+<div class="logo"></div>
+
+{foreach $menu as $menuItem}{$menuItem}{foreachelse}
+No menu found.
+{/foreach}
+
+
+<div class="userbuttons">
+	<span class="date">{$date}</span>
+	<span class="Servers">Match servers: <a href="{$baseURL}Servertracker/">{$onlinePlayers}</a></span>
+	<span class="onlineUsers">Website: <a href="{$baseURL}Online/">{$onlineUsers}</a></span>
+	{if isset($logoutURL)}<span class="logout"><a href="{$logoutURL}">Logout</a></span>{/if}
+</div>
+
+<div class="content">
+{if isset($showNewButton)}<a class="button" href="?add">New PM</a>{/if}
+
+<div class="msg_nav">
+<span class="folder_selection">
+{if $curFolder === 'inbox'}
+<a href="./?folder=inbox">inbox!</a> <a href="./?folder=outbox">outbox</a>
+{else}
+<a href="./?folder=inbox">inbox</a> <a href="./?folder=outbox">outbox!</a>
+{/if}
+</span>
+</div>
+
+<span class="prev_next_msg_buttons">
+{if isset($prevMsg)}<a class="button" id="prev_msg" href="./?folder=inbox&amp;view={$prevMsg}">Previous message</a>{/if}
+{if isset($prevMsg) && isset($nextMsg)} {/if}
+{if isset($nextMsg)}<a class="button" id="next_msg" href="./?folder=inbox&amp;view={$nextMsg}">Next message</a>{/if}
+</span>
+
+
+<p>Do you really want to delete the following message?</p>
+<div class="msg_area"><div class="msg_view_full">
+	<div class="msg_header_full">
+		<span class="msg_subject">{$subject}</span>
+		<span class="msg_author"> by {if isset($authorLink)}<a href="{$authorLink}">{$authorName}</a>{else}{$authorName}{/if}</span>
+		<span class="msg_overview_recipients">to 
+		{foreach item="curRecipients" from=$recipients}
+			<a href="{$curRecipients.link}">{$curRecipients.name}</a>{if $curRecipients.seperator},{/if}
+		{/foreach}
+		</span>
+		<span class="msg_timestamp"> at {$time}</span>
+	</div>
+	<div class="msg_contents">
+		{$content}
+	</div>
+</div>
+
+<div class="msg_view_button_list">
+
+<form class="msg_buttons" action="?delete={$msgID}&amp;folder={$curFolder}" method="post">
+<p><input type="submit" value="Delete this message" /></p>
+</form>
+</div>
+
+</div>
+</body>
+</html>
