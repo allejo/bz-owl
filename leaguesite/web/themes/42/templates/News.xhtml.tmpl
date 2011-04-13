@@ -25,7 +25,7 @@ No menu found.
 <div class="content">
 {if isset($MSG)}<div>{$MSG}</div>{/if}
 {if isset($showAddButton) && $showAddButton}
-<a class="button" href="?add">Add news</a>
+<a class="button" href="?add">Add {$title|lower}</a>
 {/if}
 
 {foreach item=value from=$entries}

@@ -3,7 +3,7 @@
 	{
 		private $editor;
 		private $edit_id;
-		private $page_title;
+		private $page_path;
 		public $randomKeyName = 'newsSystem';
 		
 		function __construct($title, $path)
@@ -15,14 +15,14 @@
 			global $tmpl;
 			global $user;
 			
-			if (isset($title) && (strcmp($title, 'News') === 0
-								  || strcmp($title, 'Bans') === 0))
+			if (isset($path) && (strcmp($path, 'News/') === 0
+							  || strcmp($path, 'Bans/') === 0))
 			{
-				$this->page_title = $title;
+				$this->page_path = $path;
 			} else
 			{
 				$tmpl->setTemplate('404');
-				$tmpl->assign('errorMsg', 'No support for ' . $title . ' as a news page.');
+				$tmpl->assign('errorMsg', "No support for $path as a newsSystem page.");
 				$tmpl->display();
 				die();
 			}
@@ -33,8 +33,7 @@
 				$tmpl->noTemplateFound();	// does not return
 			}
 			
-			$this->path = $path;
-			$tmpl->assign('title', $this->page_title);
+			$tmpl->assign('title', $title);
 			
 			// FIXME: fallback to default permission name until add-on system is completly implemented
 			$entry_add_permission = 'allow_add_news';
@@ -94,7 +93,7 @@
 			{
 				$tmpl->assign('showAddButton', true);
 			}
-			$this->readContent($path, $author, $last_modified, false);
+			$this->readContent($this->page_path, $author, $last_modified, false);
 			
 			// done, display page
 			$tmpl->display();
@@ -172,7 +171,7 @@
 				$content['title'] = $_POST['title'];
 			} elseif (isset($_GET['edit']))
 			{
-				$content = $this->readContent($this->page_title, $author, $last_modified, true);
+				$content = $this->readContent($this->page_path, $author, $last_modified, true);
 			} else
 			{
 				$content = array();
@@ -377,8 +376,9 @@
 				// no entry in table regarding current page
 				// thus insert new data
 				$query = $db->prepare('INSERT INTO `newsSystem`'
-					. ' (`author`, `title`, `timestamp`, `raw_msg`, `msg`)'
-					. ' VALUES (?, ?, ?, ?, ?)');
+					. ' (`author`, `title`, `timestamp`, `raw_msg`, `msg`, `page`)'
+					. ' VALUES (?, ?, ?, ?, ?, ?)');
+				$args[] = $this->page_path;
 			} else
 			{
 				// either 1 or more entries found, just assume there is only one
