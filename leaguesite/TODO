@@ -11,13 +11,22 @@ short term:
 
 * Thorough testing with multiple accounts should reveal problems.
 
-* Add web interface to manage the database CMS table, which controls
+* Add web interface to manage the database `CMS` table, which controls
   which add-on should be used for which page.
 
 * Move leaguesite installation instructions from README to INSTALL.
 
 * Focus on 42 theme for now and update other themes after the overall
   framework is set.
+ 
+* Move CMS tree and other files that are not direct URL targets out of
+  the web tree.
+
+* Add error handling, especially for database queries.
+ 
+* Fix BZFlag external login cookie in upstream weblogin.php so it
+  preserves the canonical upper and lower case of callsigns.  Bullet
+  Catcher will get this done.
 
 
 long term:
@@ -30,8 +39,23 @@ long term:
 
 * More themes!
 
-* Drop legacy siteoptions.php and siteoptions.php (old code depends on that).
+* Drop legacy siteoptions.php and siteinfo.php (old code depends on that).
 
 * Add add-on options to admin web interface.
 
 * Remove any hardcoded URL from code.
+
+* Add database support for ban management, including reason, start,
+  and end.  When a ban ends, automatically send a reminder PM to
+  admins for re-adding the player to spawn group.
+
+* Add a dynamic "tasks" page for all admins and/or referrees that
+  shows things such as matches to be entered, bans to be lifted, spawn
+  requests.  Allow annotations for spawn requests.
+
+* The time zone for the `last_activity` column in the `online_users`
+  table is wrong.  When the local time offset is UTC-7 hours the
+  timestamps in the column are UTC+7 hours.  This isn't critical
+  because the same incorrect offset is used when comparing the current
+  time with stored timestamps.  (Should set the configured timezone as
+  early as possible in all pages, perhaps in index.php.)
