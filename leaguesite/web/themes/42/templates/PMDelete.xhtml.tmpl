@@ -41,16 +41,28 @@ No menu found.
 {if isset($nextMsg)}<a class="button" id="next_msg" href="./?folder=inbox&amp;view={$nextMsg}">Next message</a>{/if}
 </span>
 
-
+{if isset($showPreview)}
 <p>Do you really want to delete the following message?</p>
 <div class="msg_area"><div class="msg_view_full">
 	<div class="msg_header_full">
 		<span class="msg_subject">{$subject}</span>
 		<span class="msg_author"> by {if isset($authorLink)}<a href="{$authorLink}">{$authorName}</a>{else}{$authorName}{/if}</span>
 		<span class="msg_overview_recipients">to 
-		{foreach item="curRecipients" from=$recipients}
-			<a href="{$curRecipients.link}">{$curRecipients.name}</a>{if $curRecipients.seperator},{/if}
-		{/foreach}
+		{if isset($playerRecipients)}
+			player{if count($playerRecipients) > 1}s{/if}:
+			{foreach key="id" item="curRecipients" from=$playerRecipients}
+				<a href="{$curRecipients.link}">{$curRecipients.name}</a>{if !$curRecipients@last},{/if}
+				<input type="hidden" name="playerRecipient{$id}" value="{$curRecipients.name}" />
+			{/foreach}
+		{/if}
+		
+		{if isset($teamRecipients)}
+			{if isset($playerRecipients)}&amp; {/if}team{if count($teamRecipients) > 1}s{/if}:
+			{foreach key="id" item="curRecipients" from=$teamRecipients}
+				<a href="{$curRecipients.link}">{$curRecipients.name}</a>{if !$curRecipients@last},{/if}
+				<input type="hidden" name="teamRecipient{$id}" value="{$curRecipients.name}" />
+			{/foreach}
+		{/if}
 		</span>
 		<span class="msg_timestamp"> at {$time}</span>
 	</div>
@@ -58,6 +70,11 @@ No menu found.
 		{$content}
 	</div>
 </div>
+{else}
+{if isset($error)}An error has occurred: {$error}{else}<p>The message has been deleted.</p>
+
+<p><a href="./?folder={$curFolder}">Return to mailbox</a>.</p>{/if}
+{/if}
 
 <div class="msg_view_button_list">
 

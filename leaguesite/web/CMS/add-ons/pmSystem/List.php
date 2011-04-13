@@ -50,7 +50,7 @@
 								  . ' IF(`pmSystem.Msg.Storage`.`author_id`<>0,'
 								  . ' (SELECT `name` FROM `players` WHERE `id`=`author_id`),?) AS `author`'
 								  . ' FROM `pmSystem.Msg.Storage`, `pmSystem.Msg.Users`'
-								  . ' WHERE `pmSystem.Msg.Users`.`playerid`=?'
+								  . ' WHERE `pmSystem.Msg.Users`.`userid`=?'
 								  . ' AND `pmSystem.Msg.Storage`.`id`=`pmSystem.Msg.Users`.`msgid`'
 								  . ' AND `folder`=?'
 								  . ' AND `pmSystem.Msg.Storage`.`id`=?'
@@ -62,8 +62,8 @@
 			$db->free($query);
 			
 			// create PM navigation
-			$query = $db->prepare('SELECT `msgid` FROM `messages_users_connection`'
-								  . ' WHERE `playerid`=? AND `msgid`<?'
+			$query = $db->prepare('SELECT `msgid` FROM `pmSystem.Msg.Users`'
+								  . ' WHERE `userid`=? AND `msgid`<?'
 								  . ' AND `in_' . $folder . '`=' . "'1'"
 								  . ' ORDER BY `id` DESC LIMIT 1');
 			$db->execute($query, array($user->getID(), intval($_GET['view'])));
@@ -76,8 +76,8 @@
 			}
 			unset($prevMSG);
 			
-			$query = $db->prepare('SELECT `msgid` FROM `messages_users_connection`'
-								  . ' WHERE `playerid`=? AND `msgid`>?'
+			$query = $db->prepare('SELECT `msgid` FROM `pmSystem.Msg.Users`'
+								  . ' WHERE `userid`=? AND `msgid`>?'
 								  . ' AND `in_' . $folder . '`=' . "'1'"
 								  . ' ORDER BY `id` LIMIT 1');
 			$db->execute($query, array($user->getID(), intval($_GET['view'])));
@@ -141,7 +141,7 @@
 								  . 'SET `msg_status`=' . "'read'"
 								  . ' WHERE `msgid`=?'
 								  . ' AND `in_' . $folder . '`=' . "'1'"
-								  . ' AND `playerid`=?'
+								  . ' AND `userid`=?'
 								  . ' LIMIT 1');
 			$db->execute($query, array($id, $user->getID()));
 		}
@@ -172,12 +172,12 @@
 			}
 			
 			// get the list of private messages to be displayed (+1 one hidden due to next button)
-			// playerid requirement ensures user only sees the messages he's allowed to
+			// userid requirement ensures user only sees the messages he's allowed to
 			$query = $db->prepare('SELECT `id`,`author_id`,`subject`,`timestamp`,`folder`,`msg_status`,'
 								  . ' IF(`pmSystem.Msg.Storage`.`author_id`<>0,'
 								  . ' (SELECT `name` FROM `players` WHERE `id`=`author_id`),?) AS `author`'
 								  . ' FROM `pmSystem.Msg.Storage`, `pmSystem.Msg.Users`'
-								  . ' WHERE `pmSystem.Msg.Users`.`playerid`=?'
+								  . ' WHERE `pmSystem.Msg.Users`.`userid`=?'
 								  . ' AND `pmSystem.Msg.Storage`.`id`=`pmSystem.Msg.Users`.`msgid`'
 								  . ' AND `folder`=?'
 								  . ' ORDER BY `pmSystem.Msg.Storage`.`id` DESC'

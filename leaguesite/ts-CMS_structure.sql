@@ -4,7 +4,7 @@
 #
 # Host: localhost (MySQL 5.1.56)
 # Database: testdb
-# Generation Time: 2011-04-12 13:15:56 +0200
+# Generation Time: 2011-04-13 17:26:12 +0200
 # ************************************************************
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -137,25 +137,6 @@ CREATE TABLE `matches_edit_stats` (
   KEY `playerid` (`playerid`),
   KEY `timestamp` (`timestamp`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The match editing history';
-
-
-
-# Dump of table messages_storage
-# ------------------------------------------------------------
-
-DROP TABLE IF EXISTS `messages_storage`;
-
-CREATE TABLE `messages_storage` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `author_id` int(11) unsigned NOT NULL,
-  `subject` varchar(50) NOT NULL,
-  `timestamp` varchar(20) NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `message` text NOT NULL,
-  `from_team` tinyint(1) unsigned NOT NULL,
-  `recipients` text NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `author_id` (`author_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The message storage';
 
 
 
@@ -319,15 +300,15 @@ DROP TABLE IF EXISTS `pmSystem.Msg.Users`;
 
 CREATE TABLE `pmSystem.Msg.Users` (
   `msgid` int(11) unsigned NOT NULL,
-  `playerid` int(11) unsigned NOT NULL,
-  `in_inbox` tinyint(1) unsigned NOT NULL,
-  `in_outbox` tinyint(1) unsigned NOT NULL,
+  `userid` int(11) unsigned NOT NULL,
+  `folder` set('inbox','outbox') NOT NULL DEFAULT 'inbox',
   `msg_status` set('new','read','replied') NOT NULL DEFAULT 'new',
   `msg_replied_team` tinyint(1) unsigned DEFAULT '0',
   `msg_replied_to_msgid` int(11) unsigned DEFAULT NULL,
   KEY `msgid` (`msgid`),
-  KEY `playerid` (`playerid`),
+  KEY `userid` (`userid`),
   KEY `msg_status` (`msg_status`),
+  CONSTRAINT `pmsystem@002emsg@002eusers_ibfk_2` FOREIGN KEY (`userid`) REFERENCES `players` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `pmsystem@002emsg@002eusers_ibfk_1` FOREIGN KEY (`msgid`) REFERENCES `pmsystem.msg.storage` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Connects messages to users';
 

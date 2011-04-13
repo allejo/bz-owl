@@ -221,9 +221,9 @@
 			foreach ($this->teams as $teamid)
 			{
 				$tmp_players = $this->usersInTeam($teamid);
-				foreach ($tmp_players as $playerID)
+				foreach ($tmp_players as $userid)
 				{
-					$recipients[] = $playerID;
+					$recipients[] = $userid;
 				}
 			}
 			
@@ -291,7 +291,7 @@
 				{
 					// this is a reply
 					$query = $db->prepare('INSERT INTO `pmSystem.Msg.Users`'
-										  . '(`msgid`, `playerid`, `folder`, `msg_replied_to_msgid)'
+										  . '(`msgid`, `userid`, `folder`, `msg_replied_to_msgid)'
 										  . 'VALUES (?, ?, ?, ?)');
 					$db->execute($query, array($rowId, $recipient, 'inbox', $ReplyToMSGID));
 					$db->free($query);
@@ -299,7 +299,7 @@
 				{
 					// this is a new message
 					$query = $db->prepare('INSERT INTO `pmSystem.Msg.Users`'
-										  . ' (`msgid`, `playerid`, `folder`)'
+										  . ' (`msgid`, `userid`, `folder`)'
 										  . ' VALUES (?, ?, ?)');
 					$db->execute($query, array($rowId, $recipient, 'inbox'));
 					$db->free($query);
@@ -310,7 +310,7 @@
 				{
 					// system did not send the message but a human
 					$query = $db->prepare('INSERT INTO `pmSystem.Msg.Users`'
-										  . ' (`msgid`, `playerid`, `folder`, `msg_status`)'
+										  . ' (`msgid`, `userid`, `folder`, `msg_status`)'
 										  . ' VALUES (?, ?, ?, ?)');
 					$db->execute($query, array($rowId, $author_id, 'outbox', 'read'));
 				}

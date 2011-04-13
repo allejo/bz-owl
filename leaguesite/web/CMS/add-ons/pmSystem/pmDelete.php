@@ -27,10 +27,11 @@
 		{
 			global $tmpl;
 			
+			
 			parent::showMail($folder, $id);
 			
 			$tmpl->setTemplate('PMDelete');
-			
+			$tmpl->assign('showPreview', true);
 			$tmpl->assign('title', 'Delete ' . $tmpl->getTemplateVars('title'));
 		}
 		

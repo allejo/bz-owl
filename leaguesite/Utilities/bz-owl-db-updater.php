@@ -191,6 +191,16 @@
 		status('Deleting messages from old outbox');
 		$db->SQL('ALTER TABLE `pmSystem.Msg.Users` DROP `in_outbox`');
 		
+		status('Renaming playerid column in pmSystem.Msg.Users to userid');
+		$db->SQL('ALTER TABLE `pmSystem.Msg.Users` DROP FOREIGN KEY `pmsystem@002emsg@002eusers_ibfk_3`');
+		$db->SQL('ALTER TABLE `pmSystem.Msg.Users` DROP INDEX `playerid`');
+		$db->SQL('ALTER TABLE `pmSystem.Msg.Users` CHANGE `playerid` `userid` int(11) UNSIGNED NOT NULL');
+		$db->SQL('ALTER TABLE `pmSystem.Msg.Users` ADD INDEX  (`userid`)');
+		$db->SQL('ALTER TABLE `pmSystem.Msg.Users` ADD FOREIGN KEY (`userid`) REFERENCES `players` (`id`) ON DELETE CASCADE ON UPDATE CASCADE');
+
+		$db->SQL('ALTER TABLE `pmSystem.Msg.Users` DROP INDEX `msg_status`');
+		$db->SQL('ALTER TABLE `pmSystem.Msg.Users` ADD INDEX  (`msg_status`)');
+		
 		
 		status('Converting news and bans tables to newsSystem add-on');
 		$db->SQL('RENAME TABLE `news` TO `newsSystem`');
@@ -215,7 +225,7 @@
 		}
 		$db->free($query);
 		
-		status('removing old bans table');
+		status('Removing old bans table');
 		$db->SQL('DROP TABLE `bans`');
 		
 		
