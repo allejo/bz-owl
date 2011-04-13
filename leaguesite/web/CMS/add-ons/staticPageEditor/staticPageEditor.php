@@ -108,7 +108,7 @@
 						$tmpl->assign('contentPreview',  $tmpl->encodeBBCode($content));
 					} else
 					{
-						$tmpl->assign('contentPreview',  htmlent($content));
+						$tmpl->assign('contentPreview',  $content);
 					}
 					break;
 				

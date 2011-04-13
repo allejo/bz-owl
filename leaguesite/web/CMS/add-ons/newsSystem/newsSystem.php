@@ -191,7 +191,7 @@
 						$tmpl->assign('contentPreview',  $tmpl->encodeBBCode($content['raw_msg']));
 					} else
 					{
-						$tmpl->assign('contentPreview',  htmlent($content['raw_msg']));
+						$tmpl->assign('contentPreview',  $content['raw_msg']);
 					}
 					break;
 				
