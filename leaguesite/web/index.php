@@ -50,16 +50,13 @@
 		
 		$file = dirname(__FILE__) . '/CMS/add-ons/' . $addon
 				. '/' . $addon . '.php';
-		echo($file);
 		if (file_exists($file))
 		{
-		echo(' loaded with path ' . $path . "\n");
 			// init the addon
 			include($file);
 			$addon = new $addon($title, $path);
 		} else
 		{
-		echo("\n");
 			// the path could not be found in database
 			$tmpl->setTemplate('404');
 			$tmpl->display();
