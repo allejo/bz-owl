@@ -73,15 +73,15 @@ No menu found.
 
 <div class="msg_view_button_list">
 
-{if isset($teamID)}
-<form class="msg_buttons" action="?add&amp;reply=team&amp;id={$msgID}&amp;teamid={$teamID}" method="post">
-<p><input type="submit" value="Reply to team" /></p>
+{if isset($showReplyToAll) && $showReplyToAll==true}
+<form class="msg_buttons" action="?add&amp;reply=all&amp;id={$msgID}" method="post">
+<p><input type="submit" value="Reply to all" /></p>
 </form>
 {/if}
 
 {if isset($authorLink)}
-<form class="msg_buttons" action="?add&amp;reply=players&amp;id={$msgID}" method="post">
-<p><input type="submit" value="Reply to player{if isset($userRecipients) && count($userRecipients) > 1}s{/if}" /></p>
+<form class="msg_buttons" action="?add&amp;reply=author&amp;id={$msgID}" method="post">
+<p><input type="submit" value="Reply to author" /></p>
 </form>
 {/if}
 

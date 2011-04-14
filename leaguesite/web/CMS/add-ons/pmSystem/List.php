@@ -64,9 +64,9 @@
 			// create PM navigation
 			$query = $db->prepare('SELECT `msgid` FROM `pmSystem.Msg.Users`'
 								  . ' WHERE `userid`=? AND `msgid`<?'
-								  . ' AND `in_' . $folder . '`=' . "'1'"
-								  . ' ORDER BY `id` DESC LIMIT 1');
-			$db->execute($query, array($user->getID(), intval($_GET['view'])));
+								  . ' AND `folder`=?'
+								  . ' ORDER BY `msgid` DESC LIMIT 1');
+			$db->execute($query, array($user->getID(), intval($_GET['view']), $folder));
 			$prevMSG = $db->fetchAll($query);
 			$db->free($query);
 			
@@ -78,9 +78,9 @@
 			
 			$query = $db->prepare('SELECT `msgid` FROM `pmSystem.Msg.Users`'
 								  . ' WHERE `userid`=? AND `msgid`>?'
-								  . ' AND `in_' . $folder . '`=' . "'1'"
-								  . ' ORDER BY `id` LIMIT 1');
-			$db->execute($query, array($user->getID(), intval($_GET['view'])));
+								  . ' AND `folder`=?'
+								  . ' ORDER BY `msgid` LIMIT 1');
+			$db->execute($query, array($user->getID(), intval($_GET['view']), $folder));
 			$nextMSG = $db->fetchAll($query);
 			$db->free($query);
 			if (count($nextMSG) > 0)
@@ -132,7 +132,6 @@
 			{
 				$tmpl->assign('userRecipients', $userRecipients);
 			}
-			unset($userRecipients);
 			
 			// find out teams in recipient list
 			$db->execute($teamsQuery, $rows[0]['id']);
@@ -148,6 +147,10 @@
 			{
 				$tmpl->assign('teamRecipients', $teamRecipients);
 			}
+			
+			// compute if a 'reply to all' button should be shown (more than 1 recipient)
+			$tmpl->assign('showReplyToAll', (count($userRecipients) + count($teamRecipients)) > 1);
+			unset($userRecipients);
 			unset($teamRecipients);
 			
 			
@@ -163,13 +166,13 @@
 			$tmpl->assign('msgID', intval($_GET['view']));
 			
 			// mark the message as read for the current user
-			$query = $db->prepare('UPDATE LOW_PRIORITY `messages_users_connection`'
-								  . 'SET `msg_status`=' . "'read'"
+			$query = $db->prepare('UPDATE LOW_PRIORITY `pmSystem.Msg.Users`'
+								  . 'SET `msg_status`=?'
 								  . ' WHERE `msgid`=?'
-								  . ' AND `folder=?'
+								  . ' AND `folder`=?'
 								  . ' AND `userid`=?'
 								  . ' LIMIT 1');
-			$db->execute($query, array($id, $folder, $user->getID()));
+			$db->execute($query, array('read', $id, $folder, $user->getID()));
 		}
 		
 		function showMails($folder)

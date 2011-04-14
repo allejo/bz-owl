@@ -161,6 +161,16 @@
 			}
 			
 			$result = $query->execute($inputParameters);
+			
+			if (!$result)
+			{
+				$error=$query->errorInfo();
+	 			$this->logError('SQLSTATE error code: ' . $error[0]
+ 								. ', driver error code: ' . $error[1]
+ 								. "\n" . 'driver error message: ' . $error[2]);
+			}
+			
+			
 			return $result;
 		}
 		
@@ -171,7 +181,6 @@
 		
 		function fetchRow(PDOStatement $queryResult)
 		{
-			$queryResult->errorInfo();
 			return $queryResult->fetch();
 		}
 		
@@ -190,11 +199,6 @@
 			// executes $query and returns number of result rows
 			// do not use on SELECT queries
 			return $this->pdo->exec($query);
-		}
-		
-		function errorInfo(PDOStatement $queryResult)
-		{
-			return $queryResult->errorInfo();
 		}
 		
 		function lastInsertId($name=NULL)
