@@ -1,6 +1,17 @@
-short term:
+until next release:
+
+* Private messages, news and static pages must work as good as in the last release.
+
+* Maintenance code was specific to old DB version, must be updated.
+
+* DB updater script must work flawless.
+
+* Be able to edit a news entry without changing timestamp of the news.
 
 * Fix PM send (welcome message) to new user at login.
+
+
+short term:
 
 * Convert existing features to use Smarty before adding new features.
 
