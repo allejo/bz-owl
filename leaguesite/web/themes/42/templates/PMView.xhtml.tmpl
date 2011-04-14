@@ -46,9 +46,23 @@ No menu found.
 		<span class="msg_subject">{$subject}</span>
 		<span class="msg_author"> by {if isset($authorLink)}<a href="{$authorLink}">{$authorName}</a>{else}{$authorName}{/if}</span>
 		<span class="msg_overview_recipients">to 
-		{foreach item="curRecipients" from=$recipients}
-			<a href="{$curRecipients.link}">{$curRecipients.name}</a>{if $curRecipients.seperator},{/if}
-		{/foreach}
+		
+		{if isset($userRecipients)}
+			player{if count($userRecipients) > 1}s{/if}:
+			{foreach key="id" item="curRecipients" from=$userRecipients}
+				<a href="{$curRecipients.link}">{$curRecipients.name}</a>{if !$curRecipients@last},{/if}
+				<input type="hidden" name="playerRecipient{$id}" value="{$curRecipients.name}" />
+			{/foreach}
+		{/if}
+		
+		{if isset($teamRecipients)}
+			{if isset($playerRecipients)}&amp; {/if}team{if count($teamRecipients) > 1}s{/if}:
+			{foreach key="id" item="curRecipients" from=$teamRecipients}
+				<a href="{$curRecipients.link}">{$curRecipients.name}</a>{if !$curRecipients@last},{/if}
+				<input type="hidden" name="teamRecipient{$id}" value="{$curRecipients.name}" />
+			{/foreach}
+		{/if}
+		
 		</span>
 		<span class="msg_timestamp"> at {$time}</span>
 	</div>
@@ -67,7 +81,7 @@ No menu found.
 
 {if isset($authorLink)}
 <form class="msg_buttons" action="?add&amp;reply=players&amp;id={$msgID}" method="post">
-<p><input type="submit" value="Reply to player{if count($recipients) > 1}s{/if}" /></p>
+<p><input type="submit" value="Reply to player{if isset($userRecipients) && count($userRecipients) > 1}s{/if}" /></p>
 </form>
 {/if}
 

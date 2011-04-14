@@ -100,15 +100,57 @@
 			
 			// create PM view
 			$tmpl->assign('subject', $rows[0]['subject']);
+			
 			if (intval($rows[0]['author_id']) > 0)
 			{
-				$authorLink = ($rows[0]['from_team']) ?
-							   '../Teams/?profile=' . intval($rows[0]['author_id'])
-							   :
-							   '../Players/?profile=' . intval($rows[0]['author_id']);
-				$tmpl->assign('authorLink', $authorLink);
+				$tmpl->assign('authorLink', '../Players/?profile=' . intval($rows[0]['author_id']));
 			}
 			$tmpl->assign('authorName', $rows[0]['author']);
+			
+			
+			// prepare recipients queries
+			$usersQuery = $db->prepare('SELECT `userid`,`name`'
+									   . ' FROM `pmSystem.Msg.Recipients.Users` LEFT JOIN `players`'
+									   . ' ON `pmSystem.Msg.Recipients.Users`.`userid`=`players`.`id`'
+									   . ' WHERE `msgid`=?');
+			$teamsQuery = $db->prepare('SELECT `teamid`,`name`'
+									   . ' FROM `pmSystem.Msg.Recipients.Teams` LEFT JOIN `teams`'
+									   . ' ON `pmSystem.Msg.Recipients.Teams`.`teamid`=`teams`.`id`'
+									   . ' WHERE `msgid`=?');
+			
+			// find out users in recipient list
+			$db->execute($usersQuery, $rows[0]['id']);
+			$userRecipients = array();
+			while ($row = $db->fetchRow($usersQuery))
+			{
+				$userRecipients[] = array('link' => '../Players/?profile=' . intval($row['userid']),
+										  'name' => $row['name']);
+			}
+			$db->free($usersQuery);
+			
+			if (isset($userRecipients[0]))
+			{
+				$tmpl->assign('userRecipients', $userRecipients);
+			}
+			unset($userRecipients);
+			
+			// find out teams in recipient list
+			$db->execute($teamsQuery, $rows[0]['id']);
+			$teamRecipients = array();
+			while ($row = $db->fetchRow($teamsQuery))
+			{
+				$teamRecipients[] = array('link' => '../Players/?profile=' . intval($row['teamid']),
+										  'name' => $row['name']);
+			}
+			$db->free($teamsQuery);
+			
+			if (isset($teamRecipients[0]))
+			{
+				$tmpl->assign('teamRecipients', $teamRecipients);
+			}
+			unset($teamRecipients);
+			
+			
 			$tmpl->assign('time', $rows[0]['timestamp']);
 			if ($config->value('bbcodeLibAvailable'))
 			{
@@ -118,32 +160,16 @@
 				$tmpl->assign('content',  htmlent($rows[0]['message']));
 			}
 			
-			// collect recipient list
-			$recipients = explode(' ', $rows[0]['recipients']);
-			
-			$fromTeam = strcmp($rows[0]['from_team'], '0') !== 0;
-			if ($fromTeam)
-			{
-				$tmpl->assign('teamID', intval($recipients[0]));
-			}
-			
-			$queryTeamName = $db->prepare('SELECT `name` FROM `teams` WHERE `id`=?');
-			$queryPlayerName = $db->prepare('SELECT `name` FROM `players` WHERE `id`=?');
-			$countRecipients = count($recipients) -1;
-			array_walk($recipients, 'self::displayRecipient'
-					   , array($fromTeam, $queryTeamName, $queryPlayerName, $countRecipients));
-			$tmpl->assign('recipients', $recipients);
-			
 			$tmpl->assign('msgID', intval($_GET['view']));
 			
 			// mark the message as read for the current user
 			$query = $db->prepare('UPDATE LOW_PRIORITY `messages_users_connection`'
 								  . 'SET `msg_status`=' . "'read'"
 								  . ' WHERE `msgid`=?'
-								  . ' AND `in_' . $folder . '`=' . "'1'"
+								  . ' AND `folder=?'
 								  . ' AND `userid`=?'
 								  . ' LIMIT 1');
-			$db->execute($query, array($id, $user->getID()));
+			$db->execute($query, array($id, $folder, $user->getID()));
 		}
 		
 		function showMails($folder)
