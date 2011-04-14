@@ -60,7 +60,7 @@ long term:
   and end.  When a ban ends, automatically send a reminder PM to
   admins for re-adding the player to spawn group.
 
-* Add a dynamic "tasks" page for all admins and/or referrees that
+* Add a dynamic "tasks" page for all admins and/or referees that
   shows things such as matches to be entered, bans to be lifted, spawn
   requests.  Allow annotations for spawn requests.
 
