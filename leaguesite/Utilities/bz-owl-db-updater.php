@@ -177,6 +177,7 @@
 		
 		
 		status('Altering connecting tables between message and users');
+		$db->SQL('ALTER TABLE `messages_users_connection` DROP FOREIGN KEY `messages_users_connection_ibfk_3`');
 		$db->SQL('RENAME TABLE `messages_users_connection` TO `pmSystem.Msg.Users`');
 		$db->SQL('ALTER TABLE `pmSystem.Msg.Users` DROP `id`');
 		
@@ -192,7 +193,6 @@
 		$db->SQL('ALTER TABLE `pmSystem.Msg.Users` DROP `in_outbox`');
 		
 		status('Renaming playerid column in pmSystem.Msg.Users to userid');
-		$db->SQL('ALTER TABLE `pmSystem.Msg.Users` DROP FOREIGN KEY `pmsystem@002emsg@002eusers_ibfk_3`');
 		$db->SQL('ALTER TABLE `pmSystem.Msg.Users` DROP INDEX `playerid`');
 		$db->SQL('ALTER TABLE `pmSystem.Msg.Users` CHANGE `playerid` `userid` int(11) UNSIGNED NOT NULL');
 		$db->SQL('ALTER TABLE `pmSystem.Msg.Users` ADD INDEX  (`userid`)');
@@ -233,8 +233,17 @@
 		$db->SQL('ALTER TABLE `online_users` DROP FOREIGN KEY `online_users_ibfk_1`');
 		$db->SQL('ALTER TABLE `online_users` CHANGE `playerid` `userid` int(11) UNSIGNED NOT NULL');
 		$db->SQL('ALTER TABLE `online_users` ADD INDEX  (`userid`)');
+		// truncate table to have a low index number at end of foreign key
+		$db->SQL('TRUNCATE `online_users`');
 		$db->SQL('ALTER TABLE `online_users` ADD FOREIGN KEY (`userid`) REFERENCES `players` (`id`) ON DELETE CASCADE ON UPDATE CASCADE');
 		
+		status('Creating ERROR_LOG table');
+		$db->SQL('DROP TABLE IF EXISTS `ERROR_LOG`');
+		$db->SQL("CREATE TABLE `ERROR_LOG` (
+				 `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+				 `msg` varchar(2000) DEFAULT 'Something went wrong. You should see an actual error message instead.',
+				 PRIMARY KEY (`id`)
+				 ) ENGINE=InnoDB DEFAULT CHARSET=utf8");
 		
 		
 		status('Creating Content Management System (CMS) table');
@@ -242,7 +251,7 @@
 				 `id` int(11) NOT NULL AUTO_INCREMENT,
 				 `requestPath` varchar(1000) NOT NULL DEFAULT '/',
 				 `title` varchar(256) NOT NULL DEFAULT 'Untitled',
-				 `addon` varchar(256) NOT NULL DEFAULT 'static',
+				 `addon` varchar(256) NOT NULL DEFAULT 'staticPageEditor',
 				 PRIMARY KEY (`id`),
 				 KEY `requestPath` (`requestPath`(255))
 				 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8");

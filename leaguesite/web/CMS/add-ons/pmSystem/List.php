@@ -42,6 +42,20 @@
 			$tmpl->setTemplate('PMView');
 			$tmpl->assign('title', 'Mail #' . $id);
 			
+			$id = 0;
+			if (isset($_GET['view']))
+			{
+				$id = intval($_GET['view']);
+			} elseif (isset($_GET['delete']))
+			{
+				$id = intval($_GET['delete']);
+			} else
+			{
+				$tmpl->assign('errorMsg', 'You did not specify a message id to view');
+				$tmpl->display('NoPerm');
+				exit();
+			}
+			
 			// show currently selected mail folder
 			$this->folderNav($folder);
 			
@@ -66,7 +80,8 @@
 								  . ' WHERE `userid`=? AND `msgid`<?'
 								  . ' AND `folder`=?'
 								  . ' ORDER BY `msgid` DESC LIMIT 1');
-			$db->execute($query, array($user->getID(), intval($_GET['view']), $folder));
+			$db->execute($query, array($user->getID(), $id, $folder));
+			
 			$prevMSG = $db->fetchAll($query);
 			$db->free($query);
 			
@@ -80,7 +95,7 @@
 								  . ' WHERE `userid`=? AND `msgid`>?'
 								  . ' AND `folder`=?'
 								  . ' ORDER BY `msgid` LIMIT 1');
-			$db->execute($query, array($user->getID(), intval($_GET['view']), $folder));
+			$db->execute($query, array($user->getID(), $id, $folder));
 			$nextMSG = $db->fetchAll($query);
 			$db->free($query);
 			if (count($nextMSG) > 0)
@@ -163,7 +178,7 @@
 				$tmpl->assign('content',  htmlent($rows[0]['message']));
 			}
 			
-			$tmpl->assign('msgID', intval($_GET['view']));
+			$tmpl->assign('msgID', $id);
 			
 			// mark the message as read for the current user
 			$query = $db->prepare('UPDATE LOW_PRIORITY `pmSystem.Msg.Users`'
