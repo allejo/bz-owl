@@ -8,7 +8,7 @@ until next release:
 
 * Be able to edit a news entry without changing timestamp of the news.
 
-* Fix PM send (welcome message) to new user at login.
+* Verify PM send (welcome message) to new user at login.
 
 
 short term:

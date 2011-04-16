@@ -408,13 +408,17 @@
 									$msg .= '<p>You have been added to the list of players at this site. Thanks for visiting our site.</p>';
 									
 									// send the welcome message
-									include(dirname(dirname(__FILE__)) . '/pmSystem/sendPM.php');
-									sendPM(array($_SESSION['viewerid']), array(), 0, 'Welcome!'
-												   , date('Y-m-d H:i:s')
-												   , 'Welcome and thanks for registering at this website!' . "\n"
-												   . 'In the FAQ you can find the most important informations'
-												   . ' about organising and playing matches.' . "\n\n"
-												   . 'See you on the battlefield.');
+									include(dirname(dirname(__FILE__)) . '/pmSystem/classes/PMComposer.php');
+									$pmComposer = new pmComposer();
+									$pmComposer.setSubject('Welcome');
+									$pmComposer.setContent('Welcome and thanks for registering at this website!' . "\n"
+														   . 'In the FAQ you can find the most important informations'
+														   . ' about organising and playing matches.' . "\n\n"
+														   . 'See you on the battlefield.');
+									$pmComposer.setTimestamp(date('Y-m-d H:i:s');
+									$pmComposer.addUserID($_SESSION['viewerid']);
+									
+									$pmComposer.send();
 								} else
 								{
 									$msg .= ('Unfortunately there seems to be a database problem and thus a unique id can not be retrieved for your account. '
