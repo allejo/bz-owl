@@ -268,14 +268,17 @@
 					// execute query, ignore result
 					@$site->execute_query('players_profile', $query, $connection);
 					
-					$query = ('INSERT INTO `players_passwords` (`playerid`,`password`,`password_encoding`)'
-							  . ' VALUES '
-							  . '(' . sqlSafeStringQuotes($index_num)
-							  . ',' . sqlSafeStringQuotes($md5password)
-							  . ',' . sqlSafeStringQuotes('md5')
-							  . ')');
-					// execute query, ignore result
-					@$site->execute_query('players_profile', $query, $connection);
+					if (isset($md5password) && strlen($md5password) > 0)
+					{
+						$query = ('INSERT INTO `players_passwords` (`playerid`,`password`,`password_encoding`)'
+								  . ' VALUES '
+								  . '(' . sqlSafeStringQuotes($index_num)
+								  . ',' . sqlSafeStringQuotes($md5password)
+								  . ',' . sqlSafeStringQuotes('md5')
+								  . ')');
+						// execute query, ignore result
+						@$site->execute_query('players_passwords', $query, $connection);
+					}
 					
 					// mark the user has been added to db
 					// callsigns are case treated insensitive
