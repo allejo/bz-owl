@@ -27,7 +27,7 @@ div.team_header span.team_score span
 
 span.score700
 {
-	background-image: url(700.png);
+	background-image: url(img/700.png);
 	background-repeat: no-repeat;
 	padding-right: 19px;
 	padding-bottom: 19px;
@@ -36,7 +36,7 @@ span.score700
 
 span.score800
 {
-	background-image: url(800.png);
+	background-image: url(img/800.png);
 	background-repeat: no-repeat;
 	padding-right: 19px;
 	padding-bottom: 19px;
@@ -45,7 +45,7 @@ span.score800
 
 span.score900
 {
-	background-image: url(900.png);
+	background-image: url(img/900.png);
 	background-repeat: no-repeat;
 	padding-right: 19px;
 	padding-bottom: 19px;
@@ -54,7 +54,7 @@ span.score900
 
 span.score1000
 {
-	background-image: url(1000.png);
+	background-image: url(img/1000.png);
 	background-repeat: no-repeat;
 	padding-right: 19px;
 	padding-bottom: 19px;
@@ -63,7 +63,7 @@ span.score1000
 
 span.score1100
 {
-	background-image: url(1100.png);
+	background-image: url(img/1100.png);
 	background-repeat: no-repeat;
 	padding-right: 19px;
 	padding-bottom: 19px;
@@ -72,7 +72,7 @@ span.score1100
 
 span.score1200
 {
-	background-image: url(1200.png);
+	background-image: url(img/1200.png);
 	background-repeat: no-repeat;
 	padding-right: 19px;
 	padding-bottom: 19px;
@@ -81,7 +81,7 @@ span.score1200
 
 span.score1300
 {
-	background-image: url(1300.png);
+	background-image: url(img/1300.png);
 	background-repeat: no-repeat;
 	padding-right: 19px;
 	padding-bottom: 19px;
@@ -90,7 +90,7 @@ span.score1300
 
 span.score1400
 {
-	background-image: url(1400.png);
+	background-image: url(img/1400.png);
 	background-repeat: no-repeat;
 	padding-right: 19px;
 	padding-bottom: 19px;
@@ -99,7 +99,7 @@ span.score1400
 
 span.score1500
 {
-	background-image: url(1500.png);
+	background-image: url(img/1500.png);
 	background-repeat: no-repeat;
 	padding-right: 19px;
 	padding-bottom: 19px;
@@ -108,7 +108,7 @@ span.score1500
 
 span.score1600
 {
-	background-image: url(1600.png);
+	background-image: url(img/1600.png);
 	background-repeat: no-repeat;
 	padding-right: 19px;
 	padding-bottom: 19px;
@@ -117,7 +117,7 @@ span.score1600
 
 span.score1700
 {
-	background-image: url(1700.png);
+	background-image: url(img/1700.png);
 	background-repeat: no-repeat;
 	padding-right: 19px;
 	padding-bottom: 19px;
@@ -126,7 +126,7 @@ span.score1700
 
 span.score1800
 {
-	background-image: url(1800.png);
+	background-image: url(img/1800.png);
 	background-repeat: no-repeat;
 	padding-right: 19px;
 	padding-bottom: 19px;
@@ -135,7 +135,7 @@ span.score1800
 
 span.score1900
 {
-	background-image: url(1900.png);
+	background-image: url(img/1900.png);
 	background-repeat: no-repeat;
 	padding-right: 19px;
 	padding-bottom: 19px;
