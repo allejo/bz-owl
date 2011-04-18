@@ -8,9 +8,9 @@
 		
 		function __construct()
 		{
-			if (isMaintenanceNeeded())
+			if ($this->isMaintenanceNeeded())
 			{
-				doMaintaince();
+				$this->doMaintaince();
 			}
 		}
 		
@@ -55,7 +55,9 @@
 		
 		function doMaintaince()
 		{
-			
+			$this->maintainPlayers();
+			$this->maintainTeams();
+			$this->updateCountries();
 			echo '<p>Maintenance performed successfully.</p>';
 		}
 		
@@ -67,6 +69,50 @@
 		function maintainTeams()
 		{
 			
+		}
+		
+		function maintainPMs($userid)
+		{
+			global $db;
+			
+			
+			// delete no more used PMs
+			$queryInMailboxOfUserid = $db->prepare('SELECT `msgid` FROM `pmSystem.Msg.Users` WHERE `userid`=?');
+			$queryInMailboxOfOthers = $db->prepare('SELECT `msgid` FROM `pmSystem.Msg.Users` WHERE `msgid`<>? LIMIT 1');
+			$queryDeletePMNoOwner = $db->prepare('DELETE FROM `pmSystem.Msg.Storage` WHERE `id`=? LIMIT 1');
+			
+			$db->execute($queryInMailboxOfUserid, $userid);
+			
+			while ($row = $db->fetchRow($queryInMailboxOfUserid))
+			{
+				$pmInMailboxOfOthers = false;
+				
+				$db->execute($queryInMailboxOfOthers, $row['msgid']);
+				while ($row = $db->fetchRow($queryInMailboxOfOthers))
+				{
+					$pmInMailboxOfOthers = true;
+				}
+				$db->free($queryInMailboxOfOthers);
+				
+				
+				if ($pmInMailboxOfOthers === false)
+				{
+					// delete in global PM storage
+					$db->execute($queryDeletePMNoOwner, $row['msgid']);
+					$db->free($queryDeletePMNoOwner);
+				}
+			}
+			$db->free($queryInMailboxOfUserid);
+			
+			// delete any PM in mailbox of $userid
+			$queryDeletePMInMailbox = $db->prepare('DELETE FROM `pmSystem.Msg.Users` WHERE `userid`=?');
+			$db->execute($queryDeletePMInMailbox, $userid);
+			$db->free($queryDeletePMInMailbox);
+			
+			if ($mailOnlyInMailboxFromUserid)
+			{
+				$db->free($queryDeletePMNoOwner);
+			}
 		}
 		
 		function updateCountries()
