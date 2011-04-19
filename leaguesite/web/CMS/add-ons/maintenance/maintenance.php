@@ -72,6 +72,7 @@
 			
 		}
 		
+		
 		function maintainPMs($userid)
 		{
 			global $db;
@@ -115,6 +116,7 @@
 				$db->free($queryDeletePMNoOwner);
 			}
 		}
+		
 		
 		function updateTeamActivity($teamid=false)
 		{
@@ -199,6 +201,7 @@
 			unset($team_activity45);
 			unset($team_activity90);
 		}
+		
 		
 		function updateCountries()
 		{
