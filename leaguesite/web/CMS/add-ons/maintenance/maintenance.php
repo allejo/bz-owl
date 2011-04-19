@@ -58,6 +58,7 @@
 			$this->maintainPlayers();
 			$this->maintainTeams();
 			$this->updateCountries();
+			$this->updateTeamActivity();
 			echo '<p>Maintenance performed successfully.</p>';
 		}
 		
@@ -113,6 +114,90 @@
 			{
 				$db->free($queryDeletePMNoOwner);
 			}
+		}
+		
+		function updateTeamActivity($teamid=false)
+		{
+			global $db;
+			
+			
+			// update team activity
+			if ($teamid === false)
+			{
+				$num_active_teams = 0;
+				// find out the number of active teams
+				$query = $db->SQL('SELECT COUNT(*) AS `num_teams` FROM `teams_overview` WHERE `deleted`<>2');
+				while ($row = $db->fetchRow($query))
+				{
+					$num_active_teams = (int) $row['num_teams'] -1;
+				}
+				$db->free($query);
+				
+				$query = $db->SQL('SELECT `teamid` FROM `teams_overview` WHERE `deleted`<>2');
+				$teamid = array();
+				while ($row = $db->fetchRow($query))
+				{
+					$teamid[] = (int) $row['teamid'];
+				}
+				$db->free($query);
+			} else
+			{
+				$num_active_teams = count($teamid) -1;
+			}
+			
+			$team_activity45 = array();
+			$timestamp = strtotime('-45 days');
+			$timestamp = strftime('%Y-%m-%d %H:%M:%S', $timestamp);
+			$query = $db->prepare('SELECT COUNT(*) as `num_matches` FROM `matches` WHERE `timestamp`>?'
+								  . ' AND (`team1_teamid`=? OR `team2_teamid`=?)');
+			// find out how many matches each team did play
+			for ($i = 0; $i <= $num_active_teams; $i++)
+			{
+				$db->execute($query, array($timestamp, $teamid[$i], $teamid[$i]));
+				while ($row = $db->fetchRow($query))
+				{
+					$team_activity45[$i] = intval($row['num_matches']);
+				}
+				$db->free($query);
+				
+				$team_activity45[$i] = ($team_activity45[$i] / 45);
+				// number_format may round but it is not documented (behaviour may change), force doing it
+				$team_activity45[$i] = number_format(round($team_activity45[$i], 2), 2, '.', '');
+			}
+			
+			$team_activity90 = array();
+			$timestamp = strtotime('-90 days');
+			$timestamp = strftime('%Y-%m-%d %H:%M:%S', $timestamp);
+			// find out how many matches each team did play
+			$query = $db->prepare('SELECT COUNT(*) as `num_matches` FROM `matches` WHERE `timestamp`>?'
+								  .' AND (`team1_teamid`=? OR `team2_teamid`=?)');
+			for ($i = 0; $i <= $num_active_teams; $i++)
+			{
+				$db->execute($query, array($timestamp, $teamid[$i], $teamid[$i]));
+				while ($row = $db->fetchRow($query))
+				{
+					$team_activity90[$i] = intval($row['num_matches']);
+				}
+				$db->free($query);
+				
+				$team_activity90[$i] = ($team_activity90[$i] / 90);
+				// number_format may round but it is not documented (behaviour may change), force doing it
+				$team_activity90[$i] = number_format(round($team_activity90[$i], 2), 2, '.', '');
+			}
+			
+			$db->prepare('Update `teams_overview` SET `activity`=? WHERE `teamid`=?');
+
+			for ($i = 0; $i <= $num_active_teams; $i++)
+			{
+				$team_activity45[$i] .= ' (' . $team_activity90[$i] . ')';
+				
+				// update activity entry
+				$db->execute($query, array($team_activity45[$i], $teamid[$i]));
+			}
+			
+			unset($teamid);
+			unset($team_activity45);
+			unset($team_activity90);
 		}
 		
 		function updateCountries()
