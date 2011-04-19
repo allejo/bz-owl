@@ -410,15 +410,15 @@
 									// send the welcome message
 									include(dirname(dirname(__FILE__)) . '/pmSystem/classes/PMComposer.php');
 									$pmComposer = new pmComposer();
-									$pmComposer.setSubject('Welcome');
-									$pmComposer.setContent('Welcome and thanks for registering at this website!' . "\n"
+									$pmComposer->setSubject('Welcome');
+									$pmComposer->setContent('Welcome and thanks for registering at this website!' . "\n"
 														   . 'In the FAQ you can find the most important informations'
 														   . ' about organising and playing matches.' . "\n\n"
 														   . 'See you on the battlefield.');
-									$pmComposer.setTimestamp(date('Y-m-d H:i:s');
-									$pmComposer.addUserID($_SESSION['viewerid']);
+									$pmComposer->setTimestamp(date('Y-m-d H:i:s'));
+									$pmComposer->addUserID($_SESSION['viewerid']);
 									
-									$pmComposer.send();
+									$pmComposer->send();
 								} else
 								{
 									$msg .= ('Unfortunately there seems to be a database problem and thus a unique id can not be retrieved for your account. '
@@ -702,7 +702,7 @@
 				// use the resulting data
 				if ($onlineUsers)
 				{
-					$query = $db->prepare('SELECT * FROM `online_users` WHERE `playerid`=?');
+					$query = $db->prepare('SELECT * FROM `online_users` WHERE `userid`=?');
 					$db->execute($query, $user_id);
 					$rows = $db->rowCount($query);
 					// done
@@ -713,7 +713,7 @@
 					{
 						// already logged in
 						// so log him out
-						$query = $db->prepare('DELETE FROM `online_users` WHERE `playerid`=?');
+						$query = $db->prepare('DELETE FROM `online_users` WHERE `userid`=?');
 						if (!$db->execute($query, $user_id))
 						{
 							$msg .= 'Could not remove already logged in user from online user table. Database broken?';
