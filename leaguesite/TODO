@@ -10,6 +10,8 @@ until next release:
 
 * Verify PM send (welcome message) to new user at login.
 
+* Make sure users with empty password entry in players_passwords get updated
+  to new accounts upon using bzbb login automatically
 
 short term:
 
