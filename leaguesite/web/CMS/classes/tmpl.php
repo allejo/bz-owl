@@ -233,6 +233,7 @@
 	    public function display($file='', $cache_id = null, $compile_id = null, $parent = null)
 	    {
 			global $user;
+			global $config;
 			
 			
 			if (strlen($file) > 0)
@@ -253,6 +254,11 @@
 			if ($cache_id === null)
 			{
 				$cache_id = $user->getID();
+			}
+			
+			if ($compile_id === null)
+			{
+				$compile_id = $config->value('basepath') . ', theme ' . $user->getTheme() . ', lang en';
 			}
 			parent::display($this->templateFile, $user->getID(), $compile_id, $parent);
 		}

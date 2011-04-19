@@ -4,7 +4,7 @@
 #
 # Host: localhost (MySQL 5.1.56)
 # Database: testdb
-# Generation Time: 2011-04-13 17:26:12 +0200
+# Generation Time: 2011-04-19 14:30:05 +0200
 # ************************************************************
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -178,12 +178,12 @@ DROP TABLE IF EXISTS `online_users`;
 
 CREATE TABLE `online_users` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `playerid` int(11) unsigned NOT NULL,
+  `userid` int(11) unsigned NOT NULL,
   `username` varchar(50) NOT NULL,
   `last_activity` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
-  KEY `playerid` (`playerid`),
-  CONSTRAINT `online_users_ibfk_1` FOREIGN KEY (`playerid`) REFERENCES `players` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `userid` (`userid`),
+  CONSTRAINT `online_users_ibfk_1` FOREIGN KEY (`userid`) REFERENCES `players` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='list of online users';
 
 
@@ -308,8 +308,8 @@ CREATE TABLE `pmSystem.Msg.Users` (
   KEY `msgid` (`msgid`),
   KEY `userid` (`userid`),
   KEY `msg_status` (`msg_status`),
-  CONSTRAINT `pmsystem@002emsg@002eusers_ibfk_2` FOREIGN KEY (`userid`) REFERENCES `players` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `pmsystem@002emsg@002eusers_ibfk_1` FOREIGN KEY (`msgid`) REFERENCES `pmsystem.msg.storage` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `pmsystem@002emsg@002eusers_ibfk_1` FOREIGN KEY (`msgid`) REFERENCES `pmsystem.msg.storage` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `pmsystem@002emsg@002eusers_ibfk_2` FOREIGN KEY (`userid`) REFERENCES `players` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Connects messages to users';
 
 
