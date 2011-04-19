@@ -117,71 +117,57 @@
 				$confirmed = 0;
 			}
 			
-			// is this supposed to be a reply to all?
-			if (isset($_GET['reply']) && (strcmp($_GET['reply'], 'all') === 0)
-				&& isset($_GET['id']) && (intval($_GET['id']) > 0))
+			if (isset($_GET['reply']) && isset($_GET['id']) && (intval($_GET['id']) > 0))
 			{
 				// find out if original message was readable for user
 				$query = $db->prepare('SELECT `msgid` FROM `pmSystem.Msg.Users` WHERE `userid`=? LIMIT 1');
 				$db->execute($query, $user->getID());
 				$rows = $db->fetchRow($query);
 				$db->free($query);
-				
+
 				// silently drop on no permisson issue
 				// TODO: output error
 				if (count($rows) > 0)
 				{
-					// prepare recipients queries
-					$usersQuery = $db->prepare('SELECT `name`'
-											   . ' FROM `pmSystem.Msg.Recipients.Users` LEFT JOIN `players`'
-											   . ' ON `pmSystem.Msg.Recipients.Users`.`userid`=`players`.`id`'
-											   . ' WHERE `msgid`=?');
-					$teamsQuery = $db->prepare('SELECT `name`'
-											   . ' FROM `pmSystem.Msg.Recipients.Teams` LEFT JOIN `teams`'
-											   . ' ON `pmSystem.Msg.Recipients.Teams`.`teamid`=`teams`.`id`'
-											   . ' WHERE `msgid`=?');
-					
-					// add users to recipients
-					$db->execute($usersQuery, intval($_GET['id']));
-					while ($row = $db->fetchRow($usersQuery))
+					if (strcmp($_GET['reply'], 'all') === 0)
 					{
+						// prepare recipients queries
+						$usersQuery = $db->prepare('SELECT `name`'
+												   . ' FROM `pmSystem.Msg.Recipients.Users` LEFT JOIN `players`'
+												   . ' ON `pmSystem.Msg.Recipients.Users`.`userid`=`players`.`id`'
+												   . ' WHERE `msgid`=?');
+						$teamsQuery = $db->prepare('SELECT `name`'
+												   . ' FROM `pmSystem.Msg.Recipients.Teams` LEFT JOIN `teams`'
+												   . ' ON `pmSystem.Msg.Recipients.Teams`.`teamid`=`teams`.`id`'
+												   . ' WHERE `msgid`=?');
+
+						// add users to recipients
+						$db->execute($usersQuery, intval($_GET['id']));
+						while ($row = $db->fetchRow($usersQuery))
+						{
+							$this->PMComposer->addUserName($row['name']);
+						}
+						$db->free($usersQuery);
+
+						// add teams to recipients
+						$db->execute($teamsQuery, intval($_GET['id']));
+						while ($row = $db->fetchRow($teamsQuery))
+						{
+							$this->PMComposer->addTeamName(intval($row['name']));
+						}
+						$db->free($teamsQuery);
+					} elseif (strcmp($_GET['reply'], 'author') === 0)
+					{
+						// only 1 author, thus no loop
+						$query = $db->prepare('SELECT `name` FROM `players`'
+											  . ' WHERE `id`=(SELECT `author_id` FROM `pmSystem.Msg.Storage`'
+											  . ' WHERE `id`=? LIMIT 1) LIMIT 1');
+						$db->execute($query, intval($_GET['id']));
+						$row = $db->fetchRow($query);
+						$db->free($query);
+
 						$this->PMComposer->addUserName($row['name']);
 					}
-					$db->free($usersQuery);
-					
-					// add teams to recipients
-					$db->execute($teamsQuery, intval($_GET['id']));
-					while ($row = $db->fetchRow($teamsQuery))
-					{
-						$this->PMComposer->addTeamName(intval($row['name']));
-					}
-					$db->free($teamsQuery);
-				}
-			}
-			
-			// is this supposed to be a reply to author?
-			if (isset($_GET['reply']) && (strcmp($_GET['reply'], 'author') === 0)
-				&& isset($_GET['id']) && (intval($_GET['id']) > 0))
-			{
-				// find out if original message was readable for user
-				$query = $db->prepare('SELECT `msgid` FROM `pmSystem.Msg.Users` WHERE `userid`=? LIMIT 1');
-				$db->execute($query, $user->getID());
-				$rows = $db->fetchRow($query);
-				$db->free($query);
-				
-				// silently drop on no permisson issue
-				// TODO: output error
-				if (count($rows) > 0)
-				{
-					// only 1 author, thus no loop
-					$query = $db->prepare('SELECT `name` FROM `players`'
-										  . ' WHERE `id`=(SELECT `author_id` FROM `pmSystem.Msg.Storage`'
-										  . ' WHERE `id`=? LIMIT 1) LIMIT 1');
-					$db->execute($query, intval($_GET['id']));
-					$row = $db->fetchRow($query);
-					$db->free($query);
-					
-					$this->PMComposer->addUserName($row['name']);
 				}
 			}
 			
