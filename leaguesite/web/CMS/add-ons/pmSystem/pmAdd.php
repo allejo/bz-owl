@@ -117,18 +117,27 @@
 				$confirmed = 0;
 			}
 			
-			if (isset($_GET['reply']) && isset($_GET['id']) && (intval($_GET['id']) > 0))
+			if (isset($_GET['reply']) && isset($_GET['id']) && intval($_GET['id']) > 0)
 			{
 				// find out if original message was readable for user
-				$query = $db->prepare('SELECT `msgid` FROM `pmSystem.Msg.Users` WHERE `userid`=? LIMIT 1');
-				$db->execute($query, $user->getID());
+				$query = $db->prepare('SELECT COUNT(*) FROM `pmSystem.Msg.Users` WHERE `msgid`=? AND `userid`=?');
+				$db->execute($query, array($_GET['id'], $user->getID()));
 				$rows = $db->fetchRow($query);
 				$db->free($query);
 
 				// silently drop on no permisson issue
 				// TODO: output error
-				if (count($rows) > 0)
+				if (count($rows) > 0 && $rows['COUNT(*)'] > 0)	// message to self may be listed twice, for inbox and outbox
 				{
+					$query = $db->prepare('SELECT `subject` FROM `pmSystem.Msg.Storage` WHERE `id`=?');
+					$db->execute($query, $_GET['id']);
+					$row = $db->fetchRow($query);
+					$db->free($query);
+					if (count($row) > 0)
+					{
+						$this->PMComposer->setSubject($row['subject']);
+					}
+
 					if (strcmp($_GET['reply'], 'all') === 0)
 					{
 						// prepare recipients queries
