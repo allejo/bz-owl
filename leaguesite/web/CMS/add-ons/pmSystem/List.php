@@ -164,7 +164,7 @@
 			}
 			
 			// compute if a 'reply to all' button should be shown (more than 1 recipient)
-			$tmpl->assign('showReplyToAll', (count($userRecipients) + count($teamRecipients)) > 1);
+			$tmpl->assign('showReplyToAll', (count($userRecipients) > 1 || count($teamRecipients) > 0));
 			unset($userRecipients);
 			unset($teamRecipients);
 			

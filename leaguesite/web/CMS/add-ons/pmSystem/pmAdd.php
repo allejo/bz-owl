@@ -178,7 +178,7 @@
 						$db->execute($teamsQuery, intval($_GET['id']));
 						while ($row = $db->fetchRow($teamsQuery))
 						{
-							$this->PMComposer->addTeamName(intval($row['name']));
+							$this->PMComposer->addTeamName($row['name']);
 						}
 						$db->free($teamsQuery);
 					} elseif (strcmp($_GET['reply'], 'author') === 0)
