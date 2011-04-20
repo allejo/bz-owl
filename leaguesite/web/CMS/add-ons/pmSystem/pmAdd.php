@@ -42,16 +42,30 @@
 			global $db;
 			
 			
-			$content = array();
 			if ($readonly || isset($_POST['confirmationStep']))
 			{
 				// data passed to form -> use it
 				
 				$query = $db->prepare('SELECT `name` FROM `players` WHERE `id`=? LIMIT 1');
 				$db->execute($query, $user->getID());
-				$content['author'] = $db->fetchRow($query);
+				$author = $db->fetchRow($query);
+				if ($author === false)
+				{
+					$author = 'error: no author could be determined';
+				}
 				$db->free($query);
 			}
+			
+			$formArgs = '';
+			if (isset($_GET['reply']))
+			{
+				$formArgs .= '&amp;reply=' . $_GET['reply'];
+			}
+			if (isset($_GET['id']))
+			{
+				$formArgs .= '&amp;id=' . $_GET['id'];
+			}
+			$tmpl->assign('formArgs', $formArgs);
 			
 			$tmpl->assign('subject', $this->PMComposer->getSubject());
 			$tmpl->assign('time', $this->PMComposer->getTimestamp());
@@ -62,7 +76,7 @@
 			switch($readonly)
 			{
 				case true:
-					$tmpl->assign('authorName',  htmlent($content['author']['name']));
+					$tmpl->assign('authorName',  htmlent($author['name']));
 					if ($config->value('bbcodeLibAvailable'))
 					{
 						$tmpl->assign('content',  $tmpl->encodeBBCode($this->PMComposer->getContent()));
