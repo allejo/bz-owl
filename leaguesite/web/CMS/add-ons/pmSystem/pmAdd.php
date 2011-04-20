@@ -56,11 +56,9 @@
 				$db->free($query);
 			}
 			
+			// do not drop original message id that a reply would be refering to
+			// but drop reply mode (users and teams are already added to recipients at this point)
 			$formArgs = '';
-			if (isset($_GET['reply']))
-			{
-				$formArgs .= '&amp;reply=' . $_GET['reply'];
-			}
 			if (isset($_GET['id']))
 			{
 				$formArgs .= '&amp;id=' . $_GET['id'];
@@ -131,17 +129,21 @@
 				$confirmed = 0;
 			}
 			
+			
 			if (isset($_GET['reply']) && isset($_GET['id']) && intval($_GET['id']) > 0)
 			{
+				// add all original recipients and author or only original author to default recipients
+				
 				// find out if original message was readable for user
 				$query = $db->prepare('SELECT COUNT(*) FROM `pmSystem.Msg.Users` WHERE `msgid`=? AND `userid`=?');
 				$db->execute($query, array($_GET['id'], $user->getID()));
 				$rows = $db->fetchRow($query);
 				$db->free($query);
-
+				
 				// silently drop on no permisson issue
+				// message to self may be listed twice, for inbox and outbox
 				// TODO: output error
-				if (count($rows) > 0 && $rows['COUNT(*)'] > 0)	// message to self may be listed twice, for inbox and outbox
+				if (count($rows) > 0 && $rows['COUNT(*)'] > 0)
 				{
 					$query = $db->prepare('SELECT `subject` FROM `pmSystem.Msg.Storage` WHERE `id`=?');
 					$db->execute($query, $_GET['id']);
@@ -151,7 +153,7 @@
 					{
 						$this->PMComposer->setSubject($row['subject']);
 					}
-
+					
 					if (strcmp($_GET['reply'], 'all') === 0)
 					{
 						// prepare recipients queries
@@ -163,7 +165,7 @@
 												   . ' FROM `pmSystem.Msg.Recipients.Teams` LEFT JOIN `teams`'
 												   . ' ON `pmSystem.Msg.Recipients.Teams`.`teamid`=`teams`.`id`'
 												   . ' WHERE `msgid`=?');
-
+						
 						// add users to recipients
 						$db->execute($usersQuery, intval($_GET['id']));
 						while ($row = $db->fetchRow($usersQuery))
@@ -171,7 +173,7 @@
 							$this->PMComposer->addUserName($row['name']);
 						}
 						$db->free($usersQuery);
-
+						
 						// add teams to recipients
 						$db->execute($teamsQuery, intval($_GET['id']));
 						while ($row = $db->fetchRow($teamsQuery))
@@ -188,7 +190,7 @@
 						$db->execute($query, intval($_GET['id']));
 						$row = $db->fetchRow($query);
 						$db->free($query);
-
+						
 						$this->PMComposer->addUserName($row['name']);
 					}
 				}
