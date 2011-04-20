@@ -15,8 +15,10 @@
 			global $db;
 		
 			$this->timestamp = date('Y-m-d H:i:s');
-			$this->usernameQuery = $db->prepare('SELECT `id`, `name` FROM `players` WHERE `name`=? LIMIT 1');
-			$this->teamnameQuery = $db->prepare('SELECT `id`, `name` FROM `teams` WHERE `name`=? LIMIT 1');
+			$this->usernameQuery = $db->prepare('SELECT `id`, `name` FROM `players` WHERE `name`=? AND `status`=? LIMIT 1');
+			$this->teamnameQuery = $db->prepare('SELECT `teams`.`id`, `name` FROM `teams` LEFT JOIN `teams_overview`'
+												. ' ON `teams`.`id`=`teams_overview`.`teamid`'
+												. ' WHERE `name`=? AND `deleted` < 2 LIMIT 1');
 		}
 		
 		
@@ -79,7 +81,7 @@
 			
 			if (!$alreadyAdded)
 			{
-				$db->execute($this->usernameQuery, htmlent($recipientName));
+				$db->execute($this->usernameQuery, array(htmlent($recipientName), 'active'));
 				if ($row = $db->fetchRow($this->usernameQuery))
 				{
 					// assume case preserving usernames
