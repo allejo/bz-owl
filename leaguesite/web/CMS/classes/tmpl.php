@@ -267,7 +267,8 @@
 			// nevertheless it's still a good idea for debugging because
 			// an XML parser is a lot simpler and has no error correction  -> speed :)
 			// TODO: needs digging into http://tools.ietf.org/html/rfc2616#section-14.1
-			if ($config->value('useXhtml') && isset($_SERVER['HTTP_ACCEPT'])
+			if ($config->value('useXhtml') && !$config->value('debugSQL')
+				&& isset($_SERVER['HTTP_ACCEPT'])
 				&& !strstr($_SERVER['HTTP_ACCEPT'], 'application/xhtml+xml,q=0')
 				&& strstr($_SERVER['HTTP_ACCEPT'], 'application/xhtml+xml'))
 			{

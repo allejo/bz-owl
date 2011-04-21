@@ -35,6 +35,11 @@ No menu found.
 </span>
 </div>
 
+{if isset($pmDeleted) && ($pmDeleted === true)}
+<p>The private message has been deleted successfully.</p>
+
+<p>Return to <a href="./?folder={$curFolder}">{$curFolder}</a>.</p>
+{else}
 <span class="prev_next_msg_buttons">
 {if isset($prevMsg)}<a class="button" id="prev_msg" href="./?folder=inbox&amp;view={$prevMsg}">Previous message</a>{/if}
 {if isset($prevMsg) && isset($nextMsg)} {/if}
@@ -79,9 +84,11 @@ No menu found.
 <div class="msg_view_button_list">
 
 <form class="msg_buttons" action="?delete={$msgID}&amp;folder={$curFolder}" method="post">
+<div><input type="hidden" name="confirmationStep" value="1" /></div>
 <p><input type="submit" value="Delete this message" /></p>
 </form>
 </div>
+{/if}
 
 </div>
 </body>
