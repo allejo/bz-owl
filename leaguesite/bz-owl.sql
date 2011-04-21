@@ -4,7 +4,7 @@
 #
 # Host: localhost (MySQL 5.1.56)
 # Database: bz-owl
-# Generation Time: 2011-04-21 19:12:12 +0200
+# Generation Time: 2011-04-21 19:31:51 +0200
 # ************************************************************
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -248,12 +248,12 @@ CREATE TABLE `players_profile` (
 
 
 
-# Dump of table pmSystem.msg.recipients.teams
+# Dump of table pmsystem.msg.recipients.teams
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `pmSystem.msg.recipients.teams`;
+DROP TABLE IF EXISTS `pmsystem.msg.recipients.teams`;
 
-CREATE TABLE `pmSystem.msg.recipients.teams` (
+CREATE TABLE `pmsystem.msg.recipients.teams` (
   `msgid` int(11) unsigned DEFAULT NULL,
   `teamid` int(11) unsigned DEFAULT NULL,
   KEY `msgid` (`msgid`),
@@ -262,12 +262,12 @@ CREATE TABLE `pmSystem.msg.recipients.teams` (
 
 
 
-# Dump of table pmSystem.msg.recipients.users
+# Dump of table pmsystem.msg.recipients.users
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `pmSystem.msg.recipients.users`;
+DROP TABLE IF EXISTS `pmsystem.msg.recipients.users`;
 
-CREATE TABLE `pmSystem.msg.recipients.users` (
+CREATE TABLE `pmsystem.msg.recipients.users` (
   `msgid` int(11) unsigned DEFAULT NULL,
   `userid` int(11) unsigned DEFAULT NULL,
   KEY `msgid` (`msgid`),
@@ -293,12 +293,12 @@ CREATE TABLE `pmsystem.msg.storage` (
 
 
 
-# Dump of table pmSystem.msg.users
+# Dump of table pmsystem.msg.users
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `pmSystem.msg.users`;
+DROP TABLE IF EXISTS `pmsystem.msg.users`;
 
-CREATE TABLE `pmSystem.msg.users` (
+CREATE TABLE `pmsystem.msg.users` (
   `msgid` int(11) unsigned NOT NULL,
   `userid` int(11) unsigned NOT NULL,
   `folder` set('inbox','outbox') NOT NULL DEFAULT 'inbox',
