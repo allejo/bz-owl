@@ -135,7 +135,7 @@
 				// add all original recipients and author or only original author to default recipients
 				
 				// find out if original message was readable for user
-				$query = $db->prepare('SELECT COUNT(*) FROM `pmSystem.msg.users` WHERE `msgid`=? AND `userid`=?');
+				$query = $db->prepare('SELECT COUNT(*) FROM `pmsystem.msg.users` WHERE `msgid`=? AND `userid`=?');
 				$db->execute($query, array($_GET['id'], $user->getID()));
 				$rows = $db->fetchRow($query);
 				$db->free($query);
@@ -158,12 +158,12 @@
 					{
 						// prepare recipients queries
 						$usersQuery = $db->prepare('SELECT `name`'
-												   . ' FROM `pmSystem.Msg.Recipients.Users` LEFT JOIN `players`'
-												   . ' ON `pmSystem.Msg.Recipients.Users`.`userid`=`players`.`id`'
+												   . ' FROM `pmsystem.Msg.Recipients.Users` LEFT JOIN `players`'
+												   . ' ON `pmsystem.Msg.Recipients.Users`.`userid`=`players`.`id`'
 												   . ' WHERE `msgid`=?');
 						$teamsQuery = $db->prepare('SELECT `name`'
-												   . ' FROM `pmSystem.msg.recipients.teams` LEFT JOIN `teams`'
-												   . ' ON `pmSystem.msg.recipients.teams`.`teamid`=`teams`.`id`'
+												   . ' FROM `pmsystem.msg.recipients.teams` LEFT JOIN `teams`'
+												   . ' ON `pmsystem.msg.recipients.teams`.`teamid`=`teams`.`id`'
 												   . ' WHERE `msgid`=?');
 						
 						// add users to recipients

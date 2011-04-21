@@ -257,7 +257,7 @@
 			
 			
 			// add teams as visible recipients
-			$query = $db->prepare('INSERT INTO `pmSystem.msg.recipients.teams`'
+			$query = $db->prepare('INSERT INTO `pmsystem.msg.recipients.teams`'
 								  . '(`msgid`, `teamid`)'
 								  . 'VALUES (?, ?)');
 			foreach ($this->teams as $team)
@@ -269,7 +269,7 @@
 			
 			// add users as visible recipients
 			// be careful to not overwrite global variable $user
-			$query = $db->prepare('INSERT INTO `pmSystem.msg.recipients.users`'
+			$query = $db->prepare('INSERT INTO `pmsystem.msg.recipients.users`'
 								  . '(`msgid`, `userid`)'
 								  . 'VALUES (?, ?)');
 			$userIDs = $this->getUserIDs();
@@ -290,7 +290,7 @@
 				if ($ReplyToMSGID > 0)
 				{
 					// this is a reply
-					$query = $db->prepare('INSERT INTO `pmSystem.msg.users`'
+					$query = $db->prepare('INSERT INTO `pmsystem.msg.users`'
 										  . '(`msgid`, `userid`, `folder`, `msg_replied_to_msgid)'
 										  . 'VALUES (?, ?, ?, ?)');
 					$db->execute($query, array($rowId, $recipient, 'inbox', $ReplyToMSGID));
@@ -298,7 +298,7 @@
 				} else
 				{
 					// this is a new message
-					$query = $db->prepare('INSERT INTO `pmSystem.msg.users`'
+					$query = $db->prepare('INSERT INTO `pmsystem.msg.users`'
 										  . ' (`msgid`, `userid`, `folder`)'
 										  . ' VALUES (?, ?, ?)');
 					$db->execute($query, array($rowId, $recipient, 'inbox'));
@@ -309,7 +309,7 @@
 				if ($author_id > 0)
 				{
 					// system did not send the message but a human
-					$query = $db->prepare('INSERT INTO `pmSystem.msg.users`'
+					$query = $db->prepare('INSERT INTO `pmsystem.msg.users`'
 										  . ' (`msgid`, `userid`, `folder`, `msg_status`)'
 										  . ' VALUES (?, ?, ?, ?)');
 					$db->execute($query, array($rowId, $author_id, 'outbox', 'read'));
