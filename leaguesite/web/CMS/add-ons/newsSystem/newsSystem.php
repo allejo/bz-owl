@@ -247,19 +247,25 @@
 					$offset = intval($_GET['i']);	// FIXME: use better validation than intval()
 				}
 				
+				// It is arguably a PDO bug, but LIMIT and OFFSET values require named
+				// parameters rather than the simple use of '?' in the SQL statement.
 				// TODO: id only needed if user can edit or delete
 				// TODO: meaning room for optimisation
 				$query = $db->prepare('SELECT `id`,`title`,`timestamp`,`author`,`msg`'
-								  . ' FROM `newsSystem` WHERE `page`=?'
+								  . ' FROM `newsSystem` WHERE `page`=:page'
 								  . ' ORDER BY `timestamp` DESC'
-								  . ' LIMIT ' . $offset . ', ' . strval($max_per_page+1));	// FIXME: parameterize
-				$db->execute($query, $path);
+								  . ' LIMIT :limit OFFSET :offset');
+				$params = array();
+				$params[':page'] = array($path, PDO::PARAM_STR);
+				$params[':limit'] = array($max_per_page+1, PDO::PARAM_INT);
+				$params[':offset'] = array($offset, PDO::PARAM_INT);
 			} else
 			{
 				$query = $db->prepare('SELECT `title`,`timestamp`,`author`,`raw_msg`'
 								  . ' FROM `newsSystem` WHERE `id`=?');
-				$db->execute($query, (isset($this->edit_id) ? $this->edit_id : -1));
+				$params = isset($this->edit_id) ? $this->edit_id : -1;
 			}
+			$db->execute($query, $params);
 			$rows = $db->fetchAll($query);
 			$db->free($query);
 			

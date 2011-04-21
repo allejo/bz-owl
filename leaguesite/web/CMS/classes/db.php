@@ -158,6 +158,22 @@
 			if (!is_array($inputParameters))
 			{
 				$inputParameters = array($inputParameters);
+			} else
+			{
+				foreach ($inputParameters as $param => $value)
+				{
+					// example: $inputParameters[':limit'] = array(1, PDO::PARAM_INT);
+					// mixing '?' and named parameters in the same SQL statement probably does not work
+					if (is_array($value) and preg_match('/^:[a-z]\w*$/i', $param))
+					{
+						$query->bindValue($param, $value[0], $value[1]);
+						unset($inputParameters[$param]);	// works correctly with foreach
+					}
+				}
+				if (empty($inputParameters))
+				{
+					$inputParameters = NULL;
+				}
 			}
 			
 			$result = $query->execute($inputParameters);
