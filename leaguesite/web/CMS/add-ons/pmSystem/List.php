@@ -61,14 +61,14 @@
 			
 			// collect the necessary data
 			$query = $db->prepare('SELECT `id`,`author_id`,`subject`,`timestamp`,`message`,`msg_status`,'
-								  . ' IF(`pmSystem.Msg.Storage`.`author_id`<>0,'
+								  . ' IF(`pmsystem.msg.storage`.`author_id`<>0,'
 								  . ' (SELECT `name` FROM `players` WHERE `id`=`author_id`),?) AS `author`'
-								  . ' FROM `pmSystem.Msg.Storage`, `pmSystem.Msg.Users`'
-								  . ' WHERE `pmSystem.Msg.Users`.`userid`=?'
-								  . ' AND `pmSystem.Msg.Storage`.`id`=`pmSystem.Msg.Users`.`msgid`'
+								  . ' FROM `pmsystem.msg.storage`, `pmSystem.msg.users`'
+								  . ' WHERE `pmSystem.msg.users`.`userid`=?'
+								  . ' AND `pmsystem.msg.storage`.`id`=`pmSystem.msg.users`.`msgid`'
 								  . ' AND `folder`=?'
-								  . ' AND `pmSystem.Msg.Storage`.`id`=?'
-								  . ' ORDER BY `pmSystem.Msg.Storage`.`id` DESC'
+								  . ' AND `pmsystem.msg.storage`.`id`=?'
+								  . ' ORDER BY `pmsystem.msg.storage`.`id` DESC'
 								  . ' LIMIT 1');
 			$db->execute($query, array($config->value('displayedSystemUsername'), $user->getID(), $folder, $id));
 			
@@ -76,7 +76,7 @@
 			$db->free($query);
 			
 			// create PM navigation
-			$query = $db->prepare('SELECT `msgid` FROM `pmSystem.Msg.Users`'
+			$query = $db->prepare('SELECT `msgid` FROM `pmSystem.msg.users`'
 								  . ' WHERE `userid`=? AND `msgid`<?'
 								  . ' AND `folder`=?'
 								  . ' ORDER BY `msgid` DESC LIMIT 1');
@@ -91,7 +91,7 @@
 			}
 			unset($prevMSG);
 			
-			$query = $db->prepare('SELECT `msgid` FROM `pmSystem.Msg.Users`'
+			$query = $db->prepare('SELECT `msgid` FROM `pmSystem.msg.users`'
 								  . ' WHERE `userid`=? AND `msgid`>?'
 								  . ' AND `folder`=?'
 								  . ' ORDER BY `msgid` LIMIT 1');
@@ -125,12 +125,12 @@
 			
 			// prepare recipients queries
 			$usersQuery = $db->prepare('SELECT `userid`,`name`'
-									   . ' FROM `pmSystem.Msg.Recipients.Users` LEFT JOIN `players`'
-									   . ' ON `pmSystem.Msg.Recipients.Users`.`userid`=`players`.`id`'
+									   . ' FROM `pmSystem.msg.users` LEFT JOIN `players`'
+									   . ' ON `pmSystem.msg.users`.`userid`=`players`.`id`'
 									   . ' WHERE `msgid`=?');
 			$teamsQuery = $db->prepare('SELECT `teamid`,`name`'
-									   . ' FROM `pmSystem.Msg.Recipients.Teams` LEFT JOIN `teams`'
-									   . ' ON `pmSystem.Msg.Recipients.Teams`.`teamid`=`teams`.`id`'
+									   . ' FROM `pmSystem.msg.recipients.teams` LEFT JOIN `teams`'
+									   . ' ON `pmSystem.msg.recipients.teams`.`teamid`=`teams`.`id`'
 									   . ' WHERE `msgid`=?');
 			
 			// find out users in recipient list
@@ -181,7 +181,7 @@
 			$tmpl->assign('msgID', $id);
 			
 			// mark the message as read for the current user
-			$query = $db->prepare('UPDATE LOW_PRIORITY `pmSystem.Msg.Users`'
+			$query = $db->prepare('UPDATE LOW_PRIORITY `pmSystem.msg.users`'
 								  . 'SET `msg_status`=?'
 								  . ' WHERE `msgid`=?'
 								  . ' AND `folder`=?'
@@ -218,13 +218,13 @@
 			// get the list of private messages to be displayed (+1 one hidden due to next button)
 			// userid requirement ensures user only sees the messages he's allowed to
 			$query = $db->prepare('SELECT `id`,`author_id`,`subject`,`timestamp`,`folder`,`msg_status`,'
-								  . ' IF(`pmSystem.Msg.Storage`.`author_id`<>0,'
+								  . ' IF(`pmsystem.msg.storage`.`author_id`<>0,'
 								  . ' (SELECT `name` FROM `players` WHERE `id`=`author_id`),?) AS `author`'
-								  . ' FROM `pmSystem.Msg.Storage`, `pmSystem.Msg.Users`'
-								  . ' WHERE `pmSystem.Msg.Users`.`userid`=?'
-								  . ' AND `pmSystem.Msg.Storage`.`id`=`pmSystem.Msg.Users`.`msgid`'
+								  . ' FROM `pmsystem.msg.storage`, `pmSystem.msg.users`'
+								  . ' WHERE `pmSystem.msg.users`.`userid`=?'
+								  . ' AND `pmsystem.msg.storage`.`id`=`pmSystem.msg.users`.`msgid`'
 								  . ' AND `folder`=?'
-								  . ' ORDER BY `pmSystem.Msg.Storage`.`id` DESC'
+								  . ' ORDER BY `pmsystem.msg.storage`.`id` DESC'
 								  . ' LIMIT ' . $offset . ', 201');
 			$db->execute($query, array($config->value('displayedSystemUsername'), $user->getID(), $folder));
 			$rows = $db->fetchAll($query);
@@ -243,12 +243,12 @@
 			
 			// prepare recipients queries outside of the loop
 			$usersQuery = $db->prepare('SELECT `userid`,`name`'
-									   . ' FROM `pmSystem.Msg.Recipients.Users` LEFT JOIN `players`'
-									   . ' ON `pmSystem.Msg.Recipients.Users`.`userid`=`players`.`id`'
+									   . ' FROM `pmSystem.msg.users` LEFT JOIN `players`'
+									   . ' ON `pmSystem.msg.users`.`userid`=`players`.`id`'
 									   . ' WHERE `msgid`=?');
 			$teamsQuery = $db->prepare('SELECT `teamid`,`name`'
-									   . ' FROM `pmSystem.Msg.Recipients.Teams` LEFT JOIN `teams`'
-									   . ' ON `pmSystem.Msg.Recipients.Teams`.`teamid`=`teams`.`id`'
+									   . ' FROM `pmSystem.msg.recipients.teams` LEFT JOIN `teams`'
+									   . ' ON `pmSystem.msg.recipients.teams`.`teamid`=`teams`.`id`'
 									   . ' WHERE `msgid`=?');
 			
 			$messages = array();

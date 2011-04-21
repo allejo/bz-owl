@@ -231,12 +231,12 @@
 			@$this->removeDuplicates($recipients);
 			
 			// put message in database
-			$query = $db->prepare('INSERT INTO `pmSystem.Msg.Storage`'
+			$query = $db->prepare('INSERT INTO `pmsystem.msg.storage`'
 								  . ' (`author_id`, `subject`, `timestamp`, `message`)'
 								  . ' VALUES (?, ?, ?, ?)');
 			
 			// lock tables for critical section
-			$db->SQL('LOCK TABLES `pmSystem.Msg.Storage` WRITE');
+			$db->SQL('LOCK TABLES `pmsystem.msg.storage` WRITE');
 			$db->SQL('SET AUTOCOMMIT = 0');
 			
 			// do the insert
@@ -245,7 +245,7 @@
 			$db->SQL('COMMIT');
 			
 			// find out generated id
-			$queryLastID = $db->SQL('SELECT `id` FROM `pmSystem.Msg.Storage` ORDER BY `id` DESC LIMIT 1');
+			$queryLastID = $db->SQL('SELECT `id` FROM `pmsystem.msg.storage` ORDER BY `id` DESC LIMIT 1');
 			$rowId = $db->fetchRow($queryLastID);
 			$rowId = intval($rowId['id']);
 			$db->free($queryLastID);
@@ -257,7 +257,7 @@
 			
 			
 			// add teams as visible recipients
-			$query = $db->prepare('INSERT INTO `pmSystem.Msg.Recipients.Teams`'
+			$query = $db->prepare('INSERT INTO `pmSystem.msg.recipients.teams`'
 								  . '(`msgid`, `teamid`)'
 								  . 'VALUES (?, ?)');
 			foreach ($this->teams as $team)
@@ -269,7 +269,7 @@
 			
 			// add users as visible recipients
 			// be careful to not overwrite global variable $user
-			$query = $db->prepare('INSERT INTO `pmSystem.Msg.Recipients.Users`'
+			$query = $db->prepare('INSERT INTO `pmSystem.msg.recipients.users`'
 								  . '(`msgid`, `userid`)'
 								  . 'VALUES (?, ?)');
 			$userIDs = $this->getUserIDs();
@@ -290,7 +290,7 @@
 				if ($ReplyToMSGID > 0)
 				{
 					// this is a reply
-					$query = $db->prepare('INSERT INTO `pmSystem.Msg.Users`'
+					$query = $db->prepare('INSERT INTO `pmSystem.msg.users`'
 										  . '(`msgid`, `userid`, `folder`, `msg_replied_to_msgid)'
 										  . 'VALUES (?, ?, ?, ?)');
 					$db->execute($query, array($rowId, $recipient, 'inbox', $ReplyToMSGID));
@@ -298,7 +298,7 @@
 				} else
 				{
 					// this is a new message
-					$query = $db->prepare('INSERT INTO `pmSystem.Msg.Users`'
+					$query = $db->prepare('INSERT INTO `pmSystem.msg.users`'
 										  . ' (`msgid`, `userid`, `folder`)'
 										  . ' VALUES (?, ?, ?)');
 					$db->execute($query, array($rowId, $recipient, 'inbox'));
@@ -309,7 +309,7 @@
 				if ($author_id > 0)
 				{
 					// system did not send the message but a human
-					$query = $db->prepare('INSERT INTO `pmSystem.Msg.Users`'
+					$query = $db->prepare('INSERT INTO `pmSystem.msg.users`'
 										  . ' (`msgid`, `userid`, `folder`, `msg_status`)'
 										  . ' VALUES (?, ?, ?, ?)');
 					$db->execute($query, array($rowId, $author_id, 'outbox', 'read'));

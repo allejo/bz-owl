@@ -31,7 +31,7 @@ Note that in this example commands it is assumed you would use the default path 
 Now you need to set up the relational database management system.
 At the moment only using mysql is possible.
 
-A database structure dump can be found in ts-CMS_structure.sql within this directory.
+A database structure dump can be found in bz-owl.sql within this directory.
 To avoid concurrent access and performance issues it is recommended to use a database only for this league software.
 
 It is highly recommended to use a BBCode library. See the CMS/nbbc-wrapper.php example file.

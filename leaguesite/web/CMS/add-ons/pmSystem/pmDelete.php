@@ -32,7 +32,7 @@
 			
 			
 			// just delete it from the user's private message table
-			$query = $db->prepare('DELETE FROM `pmsystem.msg.users`'
+			$query = $db->prepare('DELETE FROM `pmSystem.msg.users`'
 								  . ' WHERE `userid`=:uid AND `msgid`=:msgid LIMIT 1');
 			$params = array(':uid' => array($user->getID(), PDO::PARAM_INT),
 							':msgid' => array($id, PDO::PARAM_INT));
@@ -40,7 +40,7 @@
 			
 			
 			// check for message usage
-			$query = $db->prepare('SELECT `msgid` FROM `pmsystem.msg.users`'
+			$query = $db->prepare('SELECT `msgid` FROM `pmSystem.msg.users`'
 								  . ' WHERE `userid`<>:uid AND `msgid`=:msgid LIMIT 1');
 			$db->execute($query, $params);
 			

@@ -135,7 +135,7 @@
 				// add all original recipients and author or only original author to default recipients
 				
 				// find out if original message was readable for user
-				$query = $db->prepare('SELECT COUNT(*) FROM `pmSystem.Msg.Users` WHERE `msgid`=? AND `userid`=?');
+				$query = $db->prepare('SELECT COUNT(*) FROM `pmSystem.msg.users` WHERE `msgid`=? AND `userid`=?');
 				$db->execute($query, array($_GET['id'], $user->getID()));
 				$rows = $db->fetchRow($query);
 				$db->free($query);
@@ -145,7 +145,7 @@
 				// TODO: output error
 				if (count($rows) > 0 && $rows['COUNT(*)'] > 0)
 				{
-					$query = $db->prepare('SELECT `subject` FROM `pmSystem.Msg.Storage` WHERE `id`=?');
+					$query = $db->prepare('SELECT `subject` FROM `pmsystem.msg.storage` WHERE `id`=?');
 					$db->execute($query, $_GET['id']);
 					$row = $db->fetchRow($query);
 					$db->free($query);
@@ -162,8 +162,8 @@
 												   . ' ON `pmSystem.Msg.Recipients.Users`.`userid`=`players`.`id`'
 												   . ' WHERE `msgid`=?');
 						$teamsQuery = $db->prepare('SELECT `name`'
-												   . ' FROM `pmSystem.Msg.Recipients.Teams` LEFT JOIN `teams`'
-												   . ' ON `pmSystem.Msg.Recipients.Teams`.`teamid`=`teams`.`id`'
+												   . ' FROM `pmSystem.msg.recipients.teams` LEFT JOIN `teams`'
+												   . ' ON `pmSystem.msg.recipients.teams`.`teamid`=`teams`.`id`'
 												   . ' WHERE `msgid`=?');
 						
 						// add users to recipients
@@ -185,7 +185,7 @@
 					{
 						// only 1 author, thus no loop
 						$query = $db->prepare('SELECT `name` FROM `players`'
-											  . ' WHERE `id`=(SELECT `author_id` FROM `pmSystem.Msg.Storage`'
+											  . ' WHERE `id`=(SELECT `author_id` FROM `pmsystem.msg.storage`'
 											  . ' WHERE `id`=? LIMIT 1) LIMIT 1');
 						$db->execute($query, intval($_GET['id']));
 						$row = $db->fetchRow($query);
