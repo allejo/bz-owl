@@ -260,6 +260,21 @@
 			{
 				$compile_id = $config->value('basepath') . ', theme ' . $user->getTheme() . ', lang en';
 			}
+			
+			// serve xhtml with MIME-type application/xhtml+xml to trigger XML parser
+			// caution needed because ie (that can hardly be called a browser)
+			// indicates support for application/xhtml+xml but ie fails to actually provide
+			// nevertheless it's still a good idea for debugging because
+			// an XML parser is a lot simpler and has no error correction  -> speed :)
+			// TODO: needs digging into http://tools.ietf.org/html/rfc2616#section-14.1
+			if ($config->value('useXhtml') && isset($_SERVER['HTTP_ACCEPT'])
+				&& !strstr($_SERVER['HTTP_ACCEPT'], 'application/xhtml+xml,q=0')
+				&& strstr($_SERVER['HTTP_ACCEPT'], 'application/xhtml+xml'))
+			{
+				header('Content-type: application/xhtml+xml; charset=utf-8');
+				header('Cache-Control: private');
+			}
+			
 			parent::display($this->templateFile, $user->getID(), $compile_id, $parent);
 		}
 		

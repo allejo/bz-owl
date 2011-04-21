@@ -116,11 +116,13 @@ No menu found.
 <div><input type="hidden" name="confirmationStep" value="{$confirmationStep}" /></div>
 <p><input type="submit" name="submit" value="{$submitText}" />
 {if isset($showPreview) && $showPreview}<input type="submit" name="editPageAgain" value="Edit again" />{/if}</p>
-</form>
 
 {if !isset($showPreview) || !$showPreview}
 </div>
 {/if}
+
+</form>
+
 
 
 </div>
