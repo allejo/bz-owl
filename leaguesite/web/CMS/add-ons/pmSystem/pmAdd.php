@@ -158,8 +158,8 @@
 					{
 						// prepare recipients queries
 						$usersQuery = $db->prepare('SELECT `name`'
-												   . ' FROM `pmsystem.Msg.Recipients.Users` LEFT JOIN `players`'
-												   . ' ON `pmsystem.Msg.Recipients.Users`.`userid`=`players`.`id`'
+												   . ' FROM `pmsystem.msg.recipients.users` LEFT JOIN `players`'
+												   . ' ON `pmsystem.msg.recipients.users`.`userid`=`players`.`id`'
 												   . ' WHERE `msgid`=?');
 						$teamsQuery = $db->prepare('SELECT `name`'
 												   . ' FROM `pmsystem.msg.recipients.teams` LEFT JOIN `teams`'

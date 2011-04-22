@@ -61,7 +61,7 @@
 		
 		// are there unread messages?
 		// are there unread messages?
-		$query = ('SELECT `msgid` FROM `pmSystem.Msg.Users` WHERE `msg_status`='
+		$query = ('SELECT `msgid` FROM `pmsystem.msg.users` WHERE `msg_status`='
 				  . sqlSafeStringQuotes('new')
 				  . ' AND `userid`=' . sqlSafeStringQuotes(getUserID())
 				  . ' LIMIT 1');
