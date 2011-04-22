@@ -17,7 +17,7 @@
 	$site = new site();
 	
 	// do not run if website is in production mode
-	if (!$config->value('maintenance.now') || !$config->value('maintenance.updateDB'))
+	if (!$config->value('debugSQL') && (!$config->value('maintenance.now') || !$config->value('maintenance.updateDB')))
 	{
 		exit('Can only update DB if live website is down for maintenance.' . "\n");
 	}
@@ -121,14 +121,14 @@
 		
 		// PM DB changes
 		status('Renaming PM tables');
-		$db->SQL('RENAME TABLE `messages_storage` TO `pmSystem.Msg.Storage`');
-		$db->SQL('CREATE TABLE `pmSystem.Msg.Recipients.Teams` (
+		$db->SQL('RENAME TABLE `messages_storage` TO `pmsystem.msg.storage`');
+		$db->SQL('CREATE TABLE `pmsystem.msg.recipients.teams` (
 				 `msgid` int(11) unsigned DEFAULT NULL,
 				 `teamid` int(11) unsigned DEFAULT NULL,
 				 KEY `msgid` (`msgid`),
 				 KEY `teamid` (`teamid`)
 				 ) ENGINE=InnoDB DEFAULT CHARSET=utf8');
-		$db->SQL('CREATE TABLE `pmSystem.Msg.Recipients.Users` (
+		$db->SQL('CREATE TABLE `pmsystem.msg.recipients.users` (
 				 `msgid` int(11) unsigned DEFAULT NULL,
 				 `userid` int(11) unsigned DEFAULT NULL,
 				 KEY `msgid` (`msgid`),
@@ -136,13 +136,13 @@
 				 ) ENGINE=InnoDB DEFAULT CHARSET=utf8');
 		
 		// transform data to new format
-		$convertRecipientTeam=$db->prepare('INSERT INTO `pmSystem.Msg.Recipients.Teams` (`msgid`,`teamid`) VALUES(?,?)');
-		$convertRecipientPlayer=$db->prepare('INSERT INTO `pmSystem.Msg.Recipients.Users` (`msgid`,`userid`) VALUES(?,?)');
+		$convertRecipientTeam=$db->prepare('INSERT INTO `pmsystem.msg.recipients.teams` (`msgid`,`teamid`) VALUES(?,?)');
+		$convertRecipientPlayer=$db->prepare('INSERT INTO `pmsystem.msg.recipients.users` (`msgid`,`userid`) VALUES(?,?)');
 		
-		status('Converting PM recipients to pmSystem.Msg.Recipients.Teams and pmSystem.Msg.Recipients.Users');
+		status('Converting PM recipients to pmsystem.msg.recipients.teams and pmsystem.msg.recipients.users');
 		echo('.');
 		$time = time();
-		$query = $db->SQL('SELECT * FROM `pmSystem.Msg.Storage`');
+		$query = $db->SQL('SELECT * FROM `pmsystem.msg.storage`');
 		while($row = $db->fetchRow($query))
 		{
 			// one progress dot every 5 seconds
@@ -170,36 +170,36 @@
 		$db->free($query);
 		echo("\n");
 		
-		echo('Removing recipients column from pmSystem.Msg.Storage' . "\n" . '...' . "\n");
-		$db->SQL('ALTER TABLE `pmSystem.Msg.Storage` DROP `recipients`');
-		echo('Removing from_team column from pmSystem.Msg.Storage' . "\n" . '...' . "\n");
-		$db->SQL('ALTER TABLE `pmSystem.Msg.Storage` DROP `from_team`');
+		echo('Removing recipients column from pmsystem.msg.storage' . "\n" . '...' . "\n");
+		$db->SQL('ALTER TABLE `pmsystem.msg.storage` DROP `recipients`');
+		echo('Removing from_team column from pmsystem.msg.storage' . "\n" . '...' . "\n");
+		$db->SQL('ALTER TABLE `pmsystem.msg.storage` DROP `from_team`');
 		
 		
 		status('Altering connecting tables between message and users');
 		$db->SQL('ALTER TABLE `messages_users_connection` DROP FOREIGN KEY `messages_users_connection_ibfk_3`');
-		$db->SQL('RENAME TABLE `messages_users_connection` TO `pmSystem.Msg.Users`');
-		$db->SQL('ALTER TABLE `pmSystem.Msg.Users` DROP `id`');
+		$db->SQL('RENAME TABLE `messages_users_connection` TO `pmsystem.msg.users`');
+		$db->SQL('ALTER TABLE `pmsystem.msg.users` DROP `id`');
 		
 		status('Moving mailbox detection from seperate columns to one column of type set');
-		$db->SQL("ALTER TABLE `pmSystem.Msg.Users` ADD `folder` set('inbox','outbox') NOT NULL DEFAULT 'inbox'  AFTER `playerid`");
+		$db->SQL("ALTER TABLE `pmsystem.msg.users` ADD `folder` set('inbox','outbox') NOT NULL DEFAULT 'inbox'  AFTER `playerid`");
 		status('Adding messages to new inbox');
-		$db->SQL("UPDATE `pmSystem.Msg.Users` SET `folder`='inbox' WHERE `in_inbox`='1'");
+		$db->SQL("UPDATE `pmsystem.msg.users` SET `folder`='inbox' WHERE `in_inbox`='1'");
 		status('Adding messages to new outbox');
-		$db->SQL("UPDATE `pmSystem.Msg.Users` SET `folder`='outbox' WHERE `in_outbox`='1'");
+		$db->SQL("UPDATE `pmsystem.msg.users` SET `folder`='outbox' WHERE `in_outbox`='1'");
 		status('Deleting messages from old inbox');
-		$db->SQL('ALTER TABLE `pmSystem.Msg.Users` DROP `in_inbox`');
+		$db->SQL('ALTER TABLE `pmsystem.msg.users` DROP `in_inbox`');
 		status('Deleting messages from old outbox');
-		$db->SQL('ALTER TABLE `pmSystem.Msg.Users` DROP `in_outbox`');
+		$db->SQL('ALTER TABLE `pmsystem.msg.users` DROP `in_outbox`');
 		
-		status('Renaming playerid column in pmSystem.Msg.Users to userid');
-		$db->SQL('ALTER TABLE `pmSystem.Msg.Users` DROP INDEX `playerid`');
-		$db->SQL('ALTER TABLE `pmSystem.Msg.Users` CHANGE `playerid` `userid` int(11) UNSIGNED NOT NULL');
-		$db->SQL('ALTER TABLE `pmSystem.Msg.Users` ADD INDEX  (`userid`)');
-		$db->SQL('ALTER TABLE `pmSystem.Msg.Users` ADD FOREIGN KEY (`userid`) REFERENCES `players` (`id`) ON DELETE CASCADE ON UPDATE CASCADE');
+		status('Renaming playerid column in pmsystem.msg.users to userid');
+		$db->SQL('ALTER TABLE `pmsystem.msg.users` DROP INDEX `playerid`');
+		$db->SQL('ALTER TABLE `pmsystem.msg.users` CHANGE `playerid` `userid` int(11) UNSIGNED NOT NULL');
+		$db->SQL('ALTER TABLE `pmsystem.msg.users` ADD INDEX  (`userid`)');
+		$db->SQL('ALTER TABLE `pmsystem.msg.users` ADD FOREIGN KEY (`userid`) REFERENCES `players` (`id`) ON DELETE CASCADE ON UPDATE CASCADE');
 
-		$db->SQL('ALTER TABLE `pmSystem.Msg.Users` DROP INDEX `msg_status`');
-		$db->SQL('ALTER TABLE `pmSystem.Msg.Users` ADD INDEX  (`msg_status`)');
+		$db->SQL('ALTER TABLE `pmsystem.msg.users` DROP INDEX `msg_status`');
+		$db->SQL('ALTER TABLE `pmsystem.msg.users` ADD INDEX  (`msg_status`)');
 		
 		
 		status('Converting news and bans tables to newsSystem add-on');

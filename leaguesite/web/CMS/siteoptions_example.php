@@ -74,7 +74,7 @@
 	function db_used_custom_name()
 	{
 		// this is the database name this league website will use
-		return 'ts-CMS';
+		return 'bz-owl';
 	}
 	
 	function debug_sql_custom()

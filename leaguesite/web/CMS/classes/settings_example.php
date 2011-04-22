@@ -6,7 +6,7 @@
 					 'dbHost' => '127.0.0.1',
 					 'dbUser' => 'insert database user here',
 					 'dbPw' => 'insert database password here',
-					 'dbName' => 'ts-CMS',
+					 'dbName' => 'bz-owl',
 					 // nl2br needs php newer or equal to 4.0.5 to support xhtml
 					 // if php version is higher or equal to 4.0.5 but lower than 5.3
 					 // then xhtml will be always on
