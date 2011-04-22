@@ -69,6 +69,12 @@
 		{
 			unset($themes[$i]);
 		}
+		
+		// filter unfinished themes if debugSQL is turned off
+		if (isset($themes[$i]) && !$config->value('debugSQL') && file_exists(dirname(dirname(__FILE__)) . '/themes/' . $curFile . '/unfinished'))
+		{
+			unset($themes[$i]);
+		}
 	}
 	unset($curFile);
 	

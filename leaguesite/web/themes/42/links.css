@@ -31,14 +31,7 @@ a.button
 	white-space: nowrap;
 	display: inline-block;
 	margin-bottom: 1px;
-}
-
-a.button
-{
 	color: #ddd;
-	-webkit-border-radius: 1em;
-	-moz-border-radius: 1em;
-	border-radius: 1em;
 	padding-right: 0.5em;
 	padding-left: 0.5em;
 	background-attachment: scroll;
@@ -47,6 +40,9 @@ a.button
 	border-right: 2px solid #74250c;
 	border-bottom: 2px solid #74250c;
 	border-left: 2px solid #c84015;
+	-webkit-border-radius: 1em;
+	-moz-border-radius: 1em;
+	border-radius: 1em;
 }
 
 a.button:hover
