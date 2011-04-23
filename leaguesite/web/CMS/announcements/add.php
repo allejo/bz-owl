@@ -502,39 +502,18 @@
 							// mark it as read because the user already saw the preview when compositing the message
 							// example query: INSERT INTO `messages_users_connection` (`msgid`, `playerid`, `in_inbox`, `in_outbox`, `msg_status`) VALUES ('2', '1194', 0, 1, 'new')
 							$query = 'INSERT INTO `messages_users_connection` (`msgid`, `playerid`, `in_inbox`, `in_outbox`, `msg_status`';
-							if (isset($_GET['reply']))
-							{
-								if (strcmp($_GET['reply'], 'team') === 0)
-								{
-									if (isset($_GET['teamid']) && ((int) $_GET['teamid'] > 0))
-									{
-										$query .=  ',`msg_replied_team`';
-									}
-								}
-							}
 							if (isset($_GET['id']) && ((int) $_GET['id'] > 0))
 							{
 								$query .= ',`msg_replied_to_msgid`';
 							}
 							$query .= ') VALUES (';
 							$query .= sqlSafeStringQuotes($rowId) . ', ' . "'" . $user_id . "'" . ', 0, 1, ' . sqlSafeStringQuotes('read');
-							
-							if (isset($_GET['reply']))
-							{
-								if (strcmp($_GET['reply'], 'team') === 0)
-								{
-									if (isset($_GET['teamid']) && ((int) $_GET['teamid'] > 0))
-									{
-										$query .= ', 1';
-									}
-								}
-								
-							}
 							if (isset($_GET['id']) && ((int) $_GET['id'] > 0))
 							{
 								$query .= ', ' . ((int) $_GET['id']);
 							}
 							$query .= ')';
+							
 							// immediately free the result for performance reasons
 							$result = $site->execute_query('messages_users_connection', $query, $connection);
 							if (!($result))
@@ -542,18 +521,6 @@
 								$message_sent = false;
 							}
 							
-							// set reply status if the user replied to a message
-							if ($message_sent && isset($_GET['reply']) && isset($_GET['id']) && ((int) $_GET['id'] > 0))
-							{
-								$query = ('UPDATE `messages_users_connection` SET `msg_status`=' . sqlSafeStringQuotes('replied')
-										  . ' WHERE `msgid`=' . sqlSafeStringQuotes((int) $_GET['id']));
-								$result = $site->execute_query('messages_users_connection', $query, $connection);
-								if (!($result))
-								{
-									$site->dieAndEndPage('Could not update old message status (msg=' . sqlSafeStringQuotes((int) $_GET['id'])
-														 . ') by user (id=' . sqlSafeStringQuotes(strval(getUserID())) . ') to replied.');
-								}
-							}
 							// reset the pointer to beginning of array
 							reset($known_recipients);
 							if ($message_sent)

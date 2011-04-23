@@ -4,7 +4,7 @@
 #
 # Host: localhost (MySQL 5.1.56)
 # Database: bz-owl
-# Generation Time: 2011-04-21 19:31:51 +0200
+# Generation Time: 2011-04-23 15:35:50 +0200
 # ************************************************************
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -302,8 +302,7 @@ CREATE TABLE `pmsystem.msg.users` (
   `msgid` int(11) unsigned NOT NULL,
   `userid` int(11) unsigned NOT NULL,
   `folder` set('inbox','outbox') NOT NULL DEFAULT 'inbox',
-  `msg_status` set('new','read','replied') NOT NULL DEFAULT 'new',
-  `msg_replied_team` tinyint(1) unsigned DEFAULT '0',
+  `msg_status` set('new','read') NOT NULL DEFAULT 'new',
   `msg_replied_to_msgid` int(11) unsigned DEFAULT NULL,
   KEY `msgid` (`msgid`),
   KEY `userid` (`userid`),
