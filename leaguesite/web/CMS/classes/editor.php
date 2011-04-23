@@ -127,8 +127,14 @@
 					break;
 					
 				case 2:
-					$this->caller->writeContent($content);
-					$tmpl->assign('MSG', 'Changes written successfully.' . $tmpl->linebreaks("\n\n"));	// FIXME: how do we know it was successful?
+					$status = $this->caller->writeContent($content);
+					if ($status === true)
+					{
+						$tmpl->assign('MSG', 'Changes written successfully.' . $tmpl->linebreaks("\n\n"));
+					} else
+					{
+						$tmpl->assign('MSG', 'Failed writing changes. The underlying error message was: ' . $status . $tmpl->linebreaks("\n\n"));
+					}
 					
 				default:
 					$tmpl->assign('USER_NOTE');

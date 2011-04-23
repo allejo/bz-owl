@@ -191,7 +191,7 @@
 		
 		// send private message to players and teams
 		// if an error occurs, $error will contain its description and the function will return false
-		function send($author_id=0, $ReplyToMSGID=0, &$error='')
+		function send($author_id=0, $ReplyToMSGID=0)
 		{
 			global $config;
 			global $db;
@@ -201,14 +201,12 @@
 			if ($this->removeDuplicates($this->users) || $this->removeDuplicates($this->teams))
 			{
 				// back to overview to let them check
-				$error = '<p>Some double entries were removed. Please check your recipients.<p>';
-				return false;
+				return '<p>Some double entries were removed. Please check your recipients.<p>';
 			}
 			
 			if (strlen($this->content) === 0)
 			{
-				$error = '<p>You must specify a message text in order to send a message.</p>';
-				return false;
+				$return = '<p>You must specify a message text in order to send a message.</p>';
 			}
 			
 			$recipients = array();

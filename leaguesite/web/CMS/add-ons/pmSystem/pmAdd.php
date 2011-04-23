@@ -292,7 +292,14 @@
 		{
 			global $user;
 			
-			return $this->PMComposer->send($user->getID());
+			if (isset($_GET['id']) && intval($_GET['id']) > 0)
+			{
+				// TODO: use further reaching validation than just intval
+				return $this->PMComposer->send($user->getID(), intval($_GET['id']));
+			} else
+			{
+				return $this->PMComposer->send($user->getID());
+			}
 		}
 	}
 ?>
