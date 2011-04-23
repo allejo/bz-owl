@@ -298,8 +298,8 @@
 			
 			// init template system
 			parent::setTemplateDir($themeFolder . 'templates');
-			parent::setCompileDir($themeFolder . 'templates_c');
-			parent::setCacheDir($themeFolder . 'cache');
+			parent::setCompileDir($config->value('tmpl.compiled'));
+			parent::setCacheDir($config->value('tmpl.cached'));
 			parent::setConfigDir($themeFolder . 'config');
 			
 			$this->theme = $themeFolder;

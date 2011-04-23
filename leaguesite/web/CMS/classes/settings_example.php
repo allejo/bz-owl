@@ -48,6 +48,9 @@
 					 // specify default themes
 					 'defaultMobileTheme' => 'White',
 					 'defaultTheme' => '6x7',
+					 // template engine paths
+					 'tmpl.compiled' => dirname(__FILE__) . '/themes/compiled/',
+					 'tmpl.cached' => dirname(__FILE__) . '/themes/cached/',
 					 // where errors should be written if db connection is gone
 					 // file must exist in order to be used
 					 // do not forget to give PHP write perms to that file
