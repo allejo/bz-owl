@@ -53,16 +53,16 @@ No menu found.
 		<span class="msg_subject">{$subject}</span>
 		<span class="msg_author"> by {if isset($authorLink)}<a href="{$authorLink}">{$authorName}</a>{else}{$authorName}{/if}</span>
 		<span class="msg_overview_recipients">to 
-		{if isset($playerRecipients)}
-			player{if count($playerRecipients) > 1}s{/if}:
-			{foreach key="id" item="curRecipients" from=$playerRecipients}
+		{if isset($userRecipients)}
+			player{if count($userRecipients) > 1}s{/if}:
+			{foreach key="id" item="curRecipients" from=$userRecipients}
 				<a href="{$curRecipients.link}">{$curRecipients.name}</a>{if !$curRecipients@last},{/if}
-				<input type="hidden" name="playerRecipient{$id}" value="{$curRecipients.name}" />
+				<input type="hidden" name="userRecipient{$id}" value="{$curRecipients.name}" />
 			{/foreach}
 		{/if}
 		
 		{if isset($teamRecipients)}
-			{if isset($playerRecipients)}&amp; {/if}team{if count($teamRecipients) > 1}s{/if}:
+			{if isset($userRecipients)}&amp; {/if}team{if count($teamRecipients) > 1}s{/if}:
 			{foreach key="id" item="curRecipients" from=$teamRecipients}
 				<a href="{$curRecipients.link}">{$curRecipients.name}</a>{if !$curRecipients@last},{/if}
 				<input type="hidden" name="teamRecipient{$id}" value="{$curRecipients.name}" />
