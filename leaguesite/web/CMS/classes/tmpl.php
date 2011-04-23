@@ -128,8 +128,12 @@
 			{
 				$theme = $user->getTheme();
 			}
-			
-			return file_exists(dirname(dirname(dirname(__FILE__))) . '/CMS/themes/'
+			echo(dirname(dirname(__FILE__)) . '/themes/'
+							   . $theme . '/templates/' . $template
+							   . ($config->value('useXhtml') ? '.xhtml.tmpl' : '.html.tmpl'));
+							   
+							   
+			return file_exists(dirname(dirname(__FILE__)) . '/themes/'
 							   . $theme . '/templates/' . $template
 							   . ($config->value('useXhtml') ? '.xhtml.tmpl' : '.html.tmpl'));
 		}

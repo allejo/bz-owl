@@ -23,7 +23,7 @@
 	
 	if (strlen($theme) > 0)
 	{
-		if ($tmpl->existsTemplate($theme, 'Config'))
+		if ($tmpl->existsTemplate('Config', $theme))
 		{
 			$user->saveTheme($theme);
   		}

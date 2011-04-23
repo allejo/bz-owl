@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="content-type" />
+	<link href="{$baseURL}themes/{$curTheme}/{$curTheme}.css" rel="stylesheet" type="text/css" />
+	<link rel="icon" type="image/png" href="{$faviconURL}" />
+<title>Config</title>
+</head>
+<body>
+<div class="logo"></div>
+
+{foreach $menu as $menuItem}{$menuItem}{foreachelse}
+No menu found.
+{/foreach}
+
+
+<div class="userbuttons">
+	<span class="date">{$date}</span>
+	<span class="Servers">Match servers: <a href="{$baseURL}Servertracker/">{$onlinePlayers}</a></span>
+	<span class="onlineUsers">Website: <a href="{$baseURL}Online/">{$onlineUsers}</a></span>
+	{if isset($logoutURL)}<span class="logout"><a href="{$logoutURL}">Logout</a></span>{/if}
+</div>
+
+<div class="content">
+<div class="static_page_box">
+<p class="first_p">This is the user configuration section.</p>
+<p>Special thanks: Upsetter and zaphod for a lot of input, zaphod for the logos and icons; brad for hosting and svn repository and orbit for the favicon.</p>
+<form enctype="application/x-www-form-urlencoded" method="get" action="{$baseURL}Config/"><!-- END MAIN -->
+<p>Theme:
+	<select name="theme">
+{foreach item=value from=$themes}
+		<option value="{$value}"{if $value==$curTheme} selected="selected"{/if}>{$value}</option>
+{/foreach}
+	</select>
+<input type="submit" value="Submit changes" />
+</p>
+</form>
+
+</div>
+<p>SVN revision: {$repositoryVersion}</p>
+</div>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="content-type" />
+	<link href="{$baseURL}themes/{$curTheme}/{$curTheme}.css" rel="stylesheet" type="text/css" />
+	<link rel="icon" type="image/png" href="{$faviconURL}" />
+<title>{$title}</title>
+</head>
+<body>
+<div class="logo"></div>
+
+{foreach $menu as $menuItem}{$menuItem}{foreachelse}
+No menu found.
+{/foreach}
+
+
+<div class="userbuttons">
+	<span class="date">{$date}</span>
+	<span class="Servers">Match servers: <a href="{$baseURL}Servertracker/">{$onlinePlayers}</a></span>
+	<span class="onlineUsers">Website: <a href="{$baseURL}Online/">{$onlineUsers}</a></span>
+	{if isset($logoutURL)}<span class="logout"><a href="{$logoutURL}">Logout</a></span>{/if}
+</div>
+
+<div class="content">
+{if isset($showNewButton)}<a class="button" href="?add">New PM</a>{/if}
+
+<div class="msg_nav">
+<span class="folder_selection">
+{if $curFolder === 'inbox'}
+<a href="./?folder=inbox">inbox!</a> <a href="./?folder=outbox">outbox</a>
+{else}
+<a href="./?folder=inbox">inbox</a> <a href="./?folder=outbox">outbox!</a>
+{/if}
+</span>
+</div>
+
+{if isset($pmDeleted) && ($pmDeleted === true)}
+<p>The private message has been deleted successfully.</p>
+
+<p>Return to <a href="./?folder={$curFolder}">{$curFolder}</a>.</p>
+{else}
+<span class="prev_next_msg_buttons">
+{if isset($prevMsg)}<a class="button" id="prev_msg" href="./?folder=inbox&amp;view={$prevMsg}">Previous message</a>{/if}
+{if isset($prevMsg) && isset($nextMsg)} {/if}
+{if isset($nextMsg)}<a class="button" id="next_msg" href="./?folder=inbox&amp;view={$nextMsg}">Next message</a>{/if}
+</span>
+
+{if isset($showPreview)}
+<p>Do you really want to delete the following message?</p>
+<div class="msg_area"><div class="msg_view_full">
+	<div class="msg_header_full">
+		<span class="msg_subject">{$subject}</span>
+		<span class="msg_author"> by {if isset($authorLink)}<a href="{$authorLink}">{$authorName}</a>{else}{$authorName}{/if}</span>
+		<span class="msg_overview_recipients">to 
+		{if isset($playerRecipients)}
+			player{if count($playerRecipients) > 1}s{/if}:
+			{foreach key="id" item="curRecipients" from=$playerRecipients}
+				<a href="{$curRecipients.link}">{$curRecipients.name}</a>{if !$curRecipients@last},{/if}
+				<input type="hidden" name="playerRecipient{$id}" value="{$curRecipients.name}" />
+			{/foreach}
+		{/if}
+		
+		{if isset($teamRecipients)}
+			{if isset($playerRecipients)}&amp; {/if}team{if count($teamRecipients) > 1}s{/if}:
+			{foreach key="id" item="curRecipients" from=$teamRecipients}
+				<a href="{$curRecipients.link}">{$curRecipients.name}</a>{if !$curRecipients@last},{/if}
+				<input type="hidden" name="teamRecipient{$id}" value="{$curRecipients.name}" />
+			{/foreach}
+		{/if}
+		</span>
+		<span class="msg_timestamp"> at {$time}</span>
+	</div>
+	<div class="msg_contents">
+		{$content}
+	</div>
+</div></div>
+{else}
+{if isset($error)}An error has occurred: {$error}{else}<p>The message has been deleted.</p>
+
+<p><a href="./?folder={$curFolder}">Return to mailbox</a>.</p>{/if}
+{/if}
+
+<div class="msg_view_button_list">
+
+<form class="msg_buttons" action="?delete={$msgID}&amp;folder={$curFolder}" method="post">
+<div><input type="hidden" name="confirmationStep" value="1" /></div>
+<p><input type="submit" value="Delete this message" /></p>
+</form>
+</div>
+{/if}
+
+</div>
+</body>
+</html>

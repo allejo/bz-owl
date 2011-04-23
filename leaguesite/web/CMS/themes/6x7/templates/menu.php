@@ -22,10 +22,10 @@
 			}
 			if (strlen($img) > 0)
 			{
-				$link .= $tmpl->return_self_closing_tag('img src="'
-														. $config->value('baseaddress') . 'styles/'
-														. $user->getStyle() . '/img/'
-														. $img . '" alt="' . $title . '"');
+				$link .= ('<img src="' . $config->value('baseaddress') . 'styles/'
+						  . $user->getTheme() . '/img/'
+						  . $img . '" alt="' . $title . '"');
+				$config->value('useXhtml') ? ' />' : '>';
 			} else
 			{
 				$link .= $title;
@@ -50,7 +50,6 @@
 			// each entry in the array will be a new line
 			$menu = array();
 			$menu[] = '<ul class="navigation">' . "\n";
-			require_once dirname(dirname(dirname(__FILE__))) . '/CMS/Login/permissions.php';
 			
 			$unread_messages = false;
 			

@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="content-type" />
+	<link href="{$baseURL}themes/{$curTheme}/{$curTheme}.css" rel="stylesheet" type="text/css" />
+	<link rel="icon" type="image/png" href="{$faviconURL}" />
+<title>{$title}</title>
+</head>
+<body>
+<div class="logo"></div>
+
+{foreach $menu as $menuItem}{$menuItem}{foreachelse}
+No menu found.
+{/foreach}
+
+
+<div class="userbuttons">
+	<span class="date">{$date}</span>
+	<span class="Servers">Match servers: <a href="{$baseURL}Servertracker/">{$onlinePlayers}</a></span>
+	<span class="onlineUsers">Website: <a href="{$baseURL}Online/">{$onlineUsers}</a></span>
+	{if isset($logoutURL)}<span class="logout"><a href="{$logoutURL}">Logout</a></span>{/if}
+</div>
+
+<div class="content">
+{if isset($MSG)}<div>{$MSG}</div>{/if}
+{if isset($showAddButton) && $showAddButton}
+<a class="button" href="?add">Add {$title|lower}</a>
+{/if}
+
+{foreach item=value from=$entries}
+	{if (isset($showEditButton) && $showEditButton) || (isset($showDeleteButton) && $showDeleteButton)}
+		<div class="newsButtonsGroup">
+			{if isset($showEditButton) && $showEditButton}
+				<a class="button" href="?edit={$value.id}">edit</a>
+			{/if}
+			{if isset($showDeleteButton) && $showDeleteButton}
+				<a class="button" href="?delete={$value.id}">delete</a>
+			{/if}
+
+		</div>
+	{/if}
+<div class="article">
+	<div class="articleHeader">{$value.title} by {$value.author} at {$value.time}</div>
+	<div class="articleContent">{$value.content}</div>
+</div>
+{foreachelse}
+<div class="static_page_box">No {$title|lower} posted yet.</div>
+{/foreach}
+
+<p>
+{if isset($offsetPrev)}
+{if $offsetPrev === 0}
+<a class="button" href="./">Previous news</a>
+{else}
+<a class="button" href="./?i={$offsetPrev}">Previous news</a>
+{/if}
+{/if}
+{if isset($offsetPrev) && isset($offsetNext)} {/if}
+{if isset($offsetNext)}<a class="button" href="./?i={$offsetNext}">Next news</a>{/if}
+</p>
+
+</div>
+</body>
+</html>

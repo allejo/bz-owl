@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="content-type" />
+	<link href="{$baseURL}themes/{$curTheme}/{$curTheme}.css" rel="stylesheet" type="text/css" />
+	<link rel="icon" type="image/png" href="{$faviconURL}" />
+<title>{$title}</title>
+</head>
+<body>
+<div class="logo"></div>
+
+{foreach $menu as $menuItem}{$menuItem}{foreachelse}
+No menu found.
+{/foreach}
+
+
+<div class="userbuttons">
+	<span class="date">{$date}</span>
+	<span class="Servers">Match servers: <a href="{$baseURL}Servertracker/">{$onlinePlayers}</a></span>
+	<span class="onlineUsers">Website: <a href="{$baseURL}Online/">{$onlineUsers}</a></span>
+	{if isset($logoutURL)}<span class="logout"><a href="{$logoutURL}">Logout</a></span>{/if}
+</div>
+
+<div class="content">
+{if isset($showNewButton)}<a class="button" href="?add">New PM</a>{/if}
+
+<div class="msg_nav">
+<span class="folder_selection">
+{if $curFolder === 'inbox'}
+<a href="./?folder=inbox">inbox!</a> <a href="./?folder=outbox">outbox</a>
+{else}
+<a href="./?folder=inbox">inbox</a> <a href="./?folder=outbox">outbox!</a>
+{/if}
+</span>
+</div>
+
+{if !empty($messages)}
+<table id="table_msg_overview" class="big">
+<caption>Messages in {$curFolder}</caption>
+<tr>
+	<th>Author</th>
+	<th>Subject</th>
+	<th>Date</th>
+
+	<th>Recipient(s)</th>
+</tr>
+
+{foreach item="message" from=$messages}
+<tr class="msg_overview">
+	<td class="msg_overview_author">
+	{if isset($message.userProfile)}
+	<a href="{$message.userProfile}">{$message.userName}</a>
+	{else}
+	{$message.userName}
+	{/if}
+	</td>
+	<td class="msg_overview_subject">
+		<a {if isset($message.unread)} class="unread" {/if}href="{$message.link}">{$message.subject}</a></td>
+	<td class="msg_overview_timestamp">{$message.time}</td>
+	<td class="msg_overview_recipients">
+	{if isset($message.recipients.users) && ($message.recipients.users|count) > 0}
+		{foreach item="curRecipients" from=$message.recipients.users}
+		<a href="{$curRecipients.link}">{$curRecipients.name}</a>{if !$curRecipients@last},{/if}
+		
+		{/foreach}
+	{/if}
+	{if isset($message.recipients.teams) && ($message.recipients.teams|count) > 0}
+		{foreach item="curRecipients" from=$message.recipients.teams}
+			<a href="{$curRecipients.link}">{$curRecipients.name}</a>{if !$curRecipients@last},{/if}
+		{/foreach}
+	{/if}
+	
+	</td>
+</tr>
+{/foreach}
+</table>
+{elseif isset($offsetNext) && ($offsetNext-200) > 0}
+<div class="static_page_box">No messages on this page in {$curFolder|escape}.</div>
+{else}
+<div class="static_page_box">No messages in {$curFolder|escape}.</div>
+{/if}
+
+<br />
+
+
+<p>
+{if isset($offsetPrev)}
+{if $offsetPrev === 0}
+<a class="button" href="./?folder={$curFolder}">Previous messages</a>
+{else}
+<a class="button" href="./?folder={$curFolder}&amp;i={$offsetPrev}">Previous messages</a>
+{/if}
+{/if}
+{if isset($offsetPrev) && isset($offsetNext)} {/if}
+{if isset($offsetNext)}<a class="button" href="./?folder={$curFolder}&amp;i={$offsetNext}">Next messages</a>{/if}
+</p>
+
+</div>
+</body>
+</html>
