@@ -344,7 +344,7 @@
 				$query = $db->prepare('DELETE FROM `newsSystem` WHERE `id`=?');
 				$db->execute($query, $this->edit_id);
 				$db->free($query);
-				return;
+				return true;
 			}
 			
 			$query = $db->prepare('SELECT `id` FROM `newsSystem` WHERE `id`=? LIMIT 1');
@@ -400,6 +400,8 @@
 			
 			$db->execute($query, $args);
 			$db->free($query);
+			
+			return true;
 		}
 	}
 ?>
