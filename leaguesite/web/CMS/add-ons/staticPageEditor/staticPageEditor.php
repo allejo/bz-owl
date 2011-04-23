@@ -188,7 +188,7 @@
 				$query = $db->prepare('DELETE FROM `static_pages` WHERE `page`=?');
 				$db->execute($query, $this->path);
 				$db->free($query);
-				return;
+				return true;
 			}
 			
 			$query = $db->prepare('SELECT `id` FROM `static_pages` WHERE `page`=? LIMIT 1');
@@ -229,6 +229,8 @@
 			
 			$db->execute($query, $args);
 			$db->free($query);
+			
+			return true;
 		}
 	}
 ?>
