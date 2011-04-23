@@ -129,7 +129,7 @@
 				$theme = $user->getTheme();
 			}
 			
-			return file_exists(dirname(dirname(dirname(__FILE__))) . '/themes/'
+			return file_exists(dirname(dirname(dirname(__FILE__))) . '/CMS/themes/'
 							   . $theme . '/templates/' . $template
 							   . ($config->value('useXhtml') ? '.xhtml.tmpl' : '.html.tmpl'));
 		}
@@ -293,7 +293,7 @@
 			}
 			
 			// extract possible file paths out of $template and append it to $themeFolder
-			$themeFolder = dirname(dirname(dirname(__FILE__))) .'/themes/' . htmlspecialchars($customTheme);
+			$themeFolder = dirname(dirname(dirname(__FILE__))) .'/CMS/themes/' . htmlspecialchars($customTheme);
 			$this->findTemplate($template, $themeFolder);
 			
 			// init template system
