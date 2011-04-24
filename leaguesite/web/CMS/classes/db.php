@@ -211,7 +211,7 @@
 			
 			if ($result === false)
 			{
-				$error = $this->pdo->errorInfo();
+				$error = $handle->errorInfo();
 	 			$this->logError('SQLSTATE error code: ' . $error[0]
  								. ', driver error code: ' . $error[1]
  								. "\n" . 'driver error message: ' . $error[2]
