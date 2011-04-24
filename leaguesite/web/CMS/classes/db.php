@@ -180,7 +180,7 @@
 			
 			if (!$result)
 			{
-				$error=$query->errorInfo();
+				$error = $query->errorInfo();
 	 			$this->logError('SQLSTATE error code: ' . $error[0]
  								. ', driver error code: ' . $error[1]
  								. "\n" . 'driver error message: ' . $error[2]);
@@ -192,7 +192,17 @@
 		
 		function prepare($query)
 		{
-			return $this->pdo->prepare($query);;
+			$result = $this->pdo->prepare($query);
+			if ($result === false)
+			{
+				$error = $this->pdo->errorInfo();
+	 			$this->logError('SQLSTATE error code: ' . $error[0]
+ 								. ', driver error code: ' . $error[1]
+ 								. "\n" . 'driver error message: ' . $error[2]
+ 								. "\n" . 'preparing query failed, query was ' . $query);
+			}
+			
+			return $result;
 		}
 		
 		function fetchRow(PDOStatement $queryResult)
