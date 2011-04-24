@@ -187,9 +187,9 @@
 		$db->SQL("UPDATE `pmsystem.msg.users` SET `folder`='inbox' WHERE `in_inbox`='1'");
 		status('Adding messages to new outbox');
 		$db->SQL("UPDATE `pmsystem.msg.users` SET `folder`='outbox' WHERE `in_outbox`='1'");
-		status('Deleting replied value from status set as we have `msg_replied_to_msgid`')
+		status('Deleting replied value from status set as we have `msg_replied_to_msgid`');
 		$db->SQL("ALTER TABLE `pmsystem.msg.users` CHANGE `msg_status` `msg_status` set('new','read') NOT NULL DEFAULT 'new'");
-		status('Deleting `msg_replied_team` because it is not used anywhere'):
+		status('Deleting `msg_replied_team` because it is not used anywhere');
 		$db->SQL('ALTER TABLE `pmsystem.msg.users` DROP `msg_replied_team`');
 		status('Deleting messages from old inbox');
 		$db->SQL('ALTER TABLE `pmsystem.msg.users` DROP `in_inbox`');

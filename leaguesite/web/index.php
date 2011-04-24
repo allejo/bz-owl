@@ -17,7 +17,7 @@
 			return $addon;
 		}
 		
-		if (count($row) > 0)
+		if ($row && count($row) > 0)
 		{
 			$addon = $row['addon'];
 			$title = $row['title'];
