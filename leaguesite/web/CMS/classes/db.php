@@ -1,5 +1,33 @@
 <?php
 	// handle database related data and functions
+	class database_result
+	{
+		private $query = '';
+		private $handle;
+		
+		function __construct(PDOStatement $handle, $query)
+		{
+			$this->handle = $handle;
+			$this->query = $query;
+		}
+		
+		function getHandle()
+		{
+			return $this->handle;
+		}
+		
+		function getQuery()
+		{
+			return $query;
+		}
+		
+		function setHandle(PDOStatement $handle)
+		{
+			$this->handle = $handle;
+		}
+	}
+	
+	
 	class database
 	{
 		private $connection;
@@ -91,16 +119,17 @@
 			}
 		}
 		
+		/* deprecated function: use prepared instead */
 		function quote($string)
 		{
 			return $this->pdo->quote($string);
 		}
 		
-		function free(PDOStatement $queryResult)
+		function free(database_result $dbResult)
 		{
 			// might be needed to execute next statement
 			// depending on database driver
-			$queryResult->closeCursor();
+			$dbResult->getHandle()->closeCursor();
 		}
 		
 		function selectDB($db, $connection=false)
@@ -149,12 +178,14 @@
 				$tmpl->display('NoPerm');
 			}
 			
-			return $result;
+			return new database_result($result, $query);
 		}
 		
 		
-		function execute(PDOStatement &$query, $inputParameters)
+		function execute(database_result &$dbResult, $inputParameters)
 		{
+			$handle = $dbResult->getHandle();
+			
 			if (!is_array($inputParameters))
 			{
 				$inputParameters = array($inputParameters);
@@ -166,7 +197,7 @@
 					// mixing '?' and named parameters in the same SQL statement probably does not work
 					if (is_array($value) and preg_match('/^:[a-z]\w*$/i', $param))
 					{
-						$query->bindValue($param, $value[0], $value[1]);
+						$handle->bindValue($param, $value[0], $value[1]);
 						unset($inputParameters[$param]);	// works correctly with foreach
 					}
 				}
@@ -176,16 +207,20 @@
 				}
 			}
 			
-			$result = $query->execute($inputParameters);
+			$result = $handle->execute($inputParameters);
 			
-			if (!$result)
+			if ($result === false)
 			{
 				$error = $query->errorInfo();
 	 			$this->logError('SQLSTATE error code: ' . $error[0]
  								. ', driver error code: ' . $error[1]
- 								. "\n" . 'driver error message: ' . $error[2]);
+ 								. "\n" . 'driver error message: ' . $error[2]
+ 								. "\n\n" . 'executing prepared statement failed,  query was:'
+ 								. "\n" . $dbResult->getQuery());
 			}
 			
+			// write PDOStatement Object to $queryArguments so other functions will work on it
+			$dbResult->setHandle($handle);
 			
 			return $result;
 		}
@@ -193,31 +228,36 @@
 		function prepare($query)
 		{
 			$result = $this->pdo->prepare($query);
+			// this error catching will only work if PDO::ATTR_EMULATE_PREPARES is false
+			// leave it in just in case
 			if ($result === false)
 			{
 				$error = $this->pdo->errorInfo();
 	 			$this->logError('SQLSTATE error code: ' . $error[0]
  								. ', driver error code: ' . $error[1]
  								. "\n" . 'driver error message: ' . $error[2]
- 								. "\n" . 'preparing query failed, query was ' . $query);
+ 								. "\n\n" . 'preparing query failed, query was:'
+ 								. "\n" . $query);
 			}
 			
-			return $result;
+			// keep the original query string to show more accurate error messages
+			// on prepared query execution fail
+			return (new database_result($result, $query));
 		}
 		
-		function fetchRow(PDOStatement $queryResult)
+		function fetchRow(database_result $dbResult)
 		{
-			return $queryResult->fetch();
+			return $dbResult->getHandle()->fetch();
 		}
 		
-		function fetchAll(PDOStatement $queryResult)
+		function fetchAll(database_result $dbResult)
 		{
-			return $queryResult->fetchAll();
+			return $dbResult->getHandle()->fetchAll();
 		}
 		
-		function rowCount(PDOStatement $queryResult)
+		function rowCount(database_result $dbResult)
 		{
-			return $queryResult->rowCount();
+			return $dbResult->getHandle()->rowCount();
 		}
 		
 		function exec($query)
@@ -227,6 +267,7 @@
 			return $this->pdo->exec($query);
 		}
 		
+		/* deprecated function, do only use as last resort */
 		function lastInsertId($name=NULL)
 		{
 			if ($name === NULL)

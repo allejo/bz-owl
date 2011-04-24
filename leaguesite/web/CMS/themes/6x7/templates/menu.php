@@ -68,7 +68,7 @@
 									  . ' LIMIT 1');
 				
 				$result = $db->execute($query, array('new', $user->getID()));;
-				$rows = $query->rowCount();
+				$rows = $db->rowCount($query);
 				if ($rows > 0)
 				{
 					$unread_messages = true;
