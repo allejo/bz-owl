@@ -307,7 +307,7 @@
 				{
 					// this is a reply
 					$query = $db->prepare('INSERT INTO `pmsystem.msg.users`'
-										  . '(`msgid`, `userid`, `folder`, `msg_replied_to_msgid)'
+										  . '(`msgid`, `userid`, `folder`, `msg_replied_to_msgid`)'
 										  . 'VALUES (?, ?, ?, ?)');
 					$db->execute($query, array($rowId, $recipient, 'inbox', $ReplyToMSGID));
 					$db->free($query);
