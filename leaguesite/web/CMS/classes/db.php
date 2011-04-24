@@ -2,7 +2,7 @@
 	// handle database related data and functions
 	class database_result
 	{
-		private $query = '';
+		private $query;
 		private $handle;
 		
 		function __construct(PDOStatement $handle, $query)
@@ -18,7 +18,7 @@
 		
 		function getQuery()
 		{
-			return $query;
+			return $this->query;
 		}
 		
 		function setHandle(PDOStatement $handle)
@@ -211,7 +211,7 @@
 			
 			if ($result === false)
 			{
-				$error = $query->errorInfo();
+				$error = $this->pdo->errorInfo();
 	 			$this->logError('SQLSTATE error code: ' . $error[0]
  								. ', driver error code: ' . $error[1]
  								. "\n" . 'driver error message: ' . $error[2]
