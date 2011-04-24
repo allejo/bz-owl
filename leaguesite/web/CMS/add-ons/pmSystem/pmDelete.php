@@ -32,28 +32,52 @@
 			
 			
 			// just delete it from the user's private message table
-			$query = $db->prepare('DELETE FROM `pmSystem.msg.users`'
-								  . ' WHERE `userid`=:uid AND `msgid`=:msgid LIMIT 1');
-			$params = array(':uid' => array($user->getID(), PDO::PARAM_INT),
-							':msgid' => array($id, PDO::PARAM_INT));
+			$query = $db->prepare('DELETE FROM `pmsystem.msg.users`'
+					. ' WHERE `msgid`=:msgid AND `userid`=:uid AND `folder`=:folder');
+			$params = array(':msgid' => array($id, PDO::PARAM_INT),
+							':uid' => array($user->getID(), PDO::PARAM_INT),
+							':folder' => array($folder, PDO::PARAM_STR));
 			$db->execute($query, $params);
 			
+			$query = $db->prepare('SELECT `msgid` FROM `pmsystem.msg.users`'
+								. ' WHERE `msgid`=:msgid AND `userid`=:uid');
+			$params = array(':msgid' => array($id, PDO::PARAM_INT),
+							':uid' => array($user->getID(), PDO::PARAM_INT));
+			$db->execute($query, $params);
+			$row = $db->fetchRow($query);
+			$db->free($query);
 			
+			// delete message from user's recipients list if it is now gone from both mailboxes
+			if ($row === false)
+			{
+				$query = $db->prepare('DELETE FROM `pmsystem.msg.recipients.users`'
+									. ' WHERE `msgid`=:msgid AND `userid`=:uid');
+				// current value of $params is correct
+				$db->execute($query, $params);
+			}
+			
+			
+			// TODO: do this using cascading constraints in the database
 			// check for message usage
-			$query = $db->prepare('SELECT `msgid` FROM `pmSystem.msg.users`'
-								  . ' WHERE `userid`<>:uid AND `msgid`=:msgid LIMIT 1');
+			$query = $db->prepare('SELECT `msgid` FROM `pmsystem.msg.users`'
+								  . ' WHERE `msgid`=:msgid LIMIT 1');
+			$params = array(':msgid' => array($id, PDO::PARAM_INT));
 			$db->execute($query, $params);
+			$row = $db->fetchRow($query);
+			$db->free($query);
 			
 			// delete message from storage if no one has the message in mailbox anymore
-			if (($row = $db->fetchRow($query)) === false)
+			if ($row === false)
 			{
-				$query = $db->prepare('DELETE FROM `pmsystem.msg.storage` WHERE `msgid`=:msgid');
-				$params = array(':uid' => array($user->getID(), PDO::PARAM_INT));
+				$query = $db->prepare('DELETE FROM `pmsystem.msg.storage` WHERE `id`=:msgid');
+				// current value of $params is correct
 				$db->execute($query, $params);
 			}
 			
 			$tmpl->setTemplate('PMDelete');
-			$tmpl->assign('pmDeleted', true);
+			$tmpl->assign('title', 'Deleted ' . $tmpl->getTemplateVars('title'));
+			$tmpl->assign('curFolder', $folder);
+			$tmpl->assign('pmDeleted', true);	// FIXME: report any failures
 		}
 		
 		
