@@ -21,6 +21,33 @@
 												. ' WHERE `name`=? AND `deleted` < 2 LIMIT 1');
 		}
 		
+		private function lookupUserName(&$userID)
+		{
+			global $db;
+			
+			$query = $db->prepare('SELECT `name` FROM `players` WHERE `id`=? and `status`=? LIMIT 1');
+			$db->execute($query, array($userID, 'active'));
+			
+			$row = $db->fetchRow($query);
+			$db->free($query);
+			
+			return $row ? $row['name'] : false;
+		}
+		
+		private function lookupTeamName(&$teamID)
+		{
+			global $db;
+			
+			$query = $db->prepare('SELECT `name` FROM `teams` LEFT JOIN `teams_overview`'
+								  . ' ON `teams`.`id`=`teams_overview`.`teamid`'
+								  . ' WHERE `teamid`=? AND `deleted` < 2 LIMIT 1');
+			$db->execute($query, $teamID);
+			
+			$row = $db->fetchRow($query);
+			$db->free($query);
+			
+			return $row ? $row['name'] : false;
+		}
 		
 		function getSubject()
 		{
@@ -55,9 +82,18 @@
 		}
 		
 		
-		function addUserID($id)
+		function addUserID($id, $lookupName=false)
 		{
-			$this->users[] = array('id' => $id);
+			if ($lookupName)
+			{
+				if ($name = $this->lookupUserName(intval($id)))
+				{
+					$this->users[] = $name;
+				}
+			} else
+			{
+				$this->users[] = array('id' => $id);
+			}
 		}
 		
 		function addUserName($recipientName, $preview=false)
@@ -95,6 +131,19 @@
 			}
 		}
 		
+		function addTeamID($id, $lookupName=false)
+		{
+			if ($lookupName)
+			{
+				if ($name = $this->lookupTeamName(intval($id)))
+				{
+					$this->teams[] = $name;
+				}
+			} else
+			{
+				$this->teams[] = array('id' => $id);
+			}
+		}
 		
 		function addTeamName($recipientName, $preview=false)
 		{

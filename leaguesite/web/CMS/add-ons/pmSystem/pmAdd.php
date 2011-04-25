@@ -130,25 +130,15 @@
 			}
 			
 			
-			if (isset($_GET['playerid']) && strlen($_GET['playerid']) > 0)
+			if (isset($_GET['userid']) && intval($_GET['userid']) > 0)
 			{
-				$this->PMComposer->addUserName($_GET['playerid']);
+				$this->PMComposer->addUserID($_GET['userid'], true);
 			}
 
 
 			if (isset($_GET['teamid']) && intval($_GET['teamid']) > 0)
 			{
-				// TODO: something like PMComposer->addTeamID() would be more efficient if it existed
-				$query = $db->prepare('SELECT `name` FROM `teams` LEFT JOIN `teams_overview`'
-													. ' ON `teams`.`id`=`teams_overview`.`teamid`'
-													. ' WHERE `teamid`=? AND `deleted` < 2 LIMIT 1');
-				$db->execute($query, intval($_GET['teamid']));
-				$row = $db->fetchRow($query);
-				$db->free($query);
-				if ($row)
-				{
-					$this->PMComposer->addTeamName($row['name']);
-				}
+				$this->PMComposer->addTeamID($_GET['teamid'], true);
 			}
 
 

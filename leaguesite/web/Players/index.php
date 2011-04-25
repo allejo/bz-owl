@@ -810,7 +810,7 @@
 			{
 				echo '<br>' . "\n";
 			}
-			echo '<a class="button" href="../PM/?add&amp;playerid=' . htmlspecialchars(urlencode($player_name)) . '">Send private message to player</a>' . "\n";
+			echo '<a class="button" href="../PM/?add&amp;userid=' . intval($profile) . '">Send private message to player</a>' . "\n";
 			
 			$allow_invite_in_any_team = false;
 			if (isset($_SESSION['allow_invite_in_any_team']))
