@@ -37,7 +37,7 @@
 	
 	// read out installed themes instead of defining a fixed list in source code
 	
-	// first scan the files in the styles directory
+	// first scan the files in the themes directory
 	$themes = scandir(dirname(dirname(__FILE__)) . '/themes/');
 	foreach ($themes as $i => $curFile)
 	{
