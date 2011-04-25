@@ -1628,7 +1628,7 @@
 		// message to team
 		if (($team_leader_id > 0) && ($viewerid > 0))
 		{
-			echo '<a class="button" href="../Messages/?add' . htmlspecialchars('&') . 'teamid=' . htmlspecialchars(urlencode($profile)) . '">Send message to team</a>' . "\n";
+			echo '<a class="button" href="../PM/?add' . htmlspecialchars('&') . 'teamid=' . htmlspecialchars(urlencode($profile)) . '">Send message to team</a>' . "\n";
 		}
 		
 		// edit team
