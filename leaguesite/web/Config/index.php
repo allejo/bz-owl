@@ -9,7 +9,13 @@
 	$theme = '';
 	if (isset($_GET['theme']))
 	{
-		$theme=$_GET['theme'];
+		$theme = $_GET['theme'];
+		
+		// clean theme name
+		$theme = str_replace('.', '', $theme);
+		$theme = str_replace(':', '', $theme);
+		$theme = str_replace('/', '', $theme);
+		$theme = str_replace('\\', '', $theme);
 		
 		// check if theme stylesheet file does exist
 		if (!file_exists(dirname(dirname(__FILE__)) .'/themes/'
