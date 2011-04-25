@@ -167,13 +167,17 @@
 				// TODO: output error
 				if (count($rows) > 0 && $rows['COUNT(*)'] > 0)
 				{
-					$query = $db->prepare('SELECT `subject` FROM `pmsystem.msg.storage` WHERE `id`=?');
+					$query = $db->prepare('SELECT `subject`, `message` FROM `pmsystem.msg.storage`'
+										  . ' WHERE `id`=? LIMIT 1');
 					$db->execute($query, $_GET['id']);
 					$row = $db->fetchRow($query);
 					$db->free($query);
 					if (count($row) > 0)
 					{
 						$this->PMComposer->setSubject($row['subject']);
+						// quote old message
+						$this->PMComposer->setContent(rtrim('> ' . str_replace("\n","\n> ",
+													  htmlent_decode($row['message'])), "\n") . "\n\n");
 					}
 					
 					if (strcmp($_GET['reply'], 'all') === 0)
