@@ -109,7 +109,7 @@
 		// webleague imported passwords have unknown length limitations 
 		if (!$password_md5_encoded)
 		{
-			if (($lenPw < 10) || ($lenPw > 32))
+			if (($lenPw < 10) || ($lenPw > 32) && (strlen($password_database) !== 0))
 			{
 				$helper->done('<p class="first_p">Passwords must be using less than 32 but more than 9 <abbr title="characters">chars</abbr>.'
 					  . ' You may want to <a href="./">try logging in again</a>.</p>' . "\n");
@@ -120,7 +120,7 @@
 			$pw = md5($pw);
 		}
 		
-		if (!(strcmp($password_database, $pw) === 0))
+		if (!(strcmp($password_database, $pw) === 0) && strlen($password_database) > 0)
 		{
 			// TODO: automatically log these cases and lock account for some hours after several unsuccessful tries
 			$helper->done('Your password does not match the stored password.'
@@ -135,8 +135,8 @@
 		$internal_login_id = $playerid;
 		
 		// permissions for private messages
-		allow_add_messages();
-		allow_delete_messages();
+		$user->setPermission('allow_add_messages');
+		$user->setPermission('allow_delete_messages');
 		
 		// username and password did match but there might be circumstances
 		// where the caller script decides the login was not successful, though
