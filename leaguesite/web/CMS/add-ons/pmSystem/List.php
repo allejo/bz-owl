@@ -153,7 +153,7 @@
 			$teamRecipients = array();
 			while ($row = $db->fetchRow($teamsQuery))
 			{
-				$teamRecipients[] = array('link' => '../Players/?profile=' . intval($row['teamid']),
+				$teamRecipients[] = array('link' => '../Teams/?profile=' . intval($row['teamid']),
 										  'name' => $row['name']);
 			}
 			$db->free($teamsQuery);
@@ -197,6 +197,8 @@
 			global $user;
 			global $db;
 			
+			$max_per_page = 200;	// FIXME: move to settings.php (or define per theme)
+			
 			// set the template
 			$tmpl->setTemplate('PMList');
 			
@@ -215,18 +217,26 @@
 				$offset = intval($_GET['i']);
 			}
 			
+			// It is arguably a PDO bug, but LIMIT and OFFSET values require named
+			// parameters rather than the simple use of '?' in the SQL statement.
 			// get the list of private messages to be displayed (+1 one hidden due to next button)
 			// userid requirement ensures user only sees the messages he's allowed to
 			$query = $db->prepare('SELECT `id`,`author_id`,`subject`,`timestamp`,`folder`,`msg_status`,'
 								  . ' IF(`pmsystem.msg.storage`.`author_id`<>0,'
-								  . ' (SELECT `name` FROM `players` WHERE `id`=`author_id`),?) AS `author`'
+								  . ' (SELECT `name` FROM `players` WHERE `id`=`author_id`),:author) AS `author`'
 								  . ' FROM `pmsystem.msg.storage`, `pmsystem.msg.users`'
-								  . ' WHERE `pmsystem.msg.users`.`userid`=?'
+								  . ' WHERE `pmsystem.msg.users`.`userid`=:userid'
 								  . ' AND `pmsystem.msg.storage`.`id`=`pmsystem.msg.users`.`msgid`'
-								  . ' AND `folder`=?'
+								  . ' AND `folder`=:folder'
 								  . ' ORDER BY `pmsystem.msg.storage`.`id` DESC'
-								  . ' LIMIT ' . $offset . ', 201');
-			$db->execute($query, array($config->value('displayedSystemUsername'), $user->getID(), $folder));
+								  . ' LIMIT :limit OFFSET :offset');
+			$params = array();
+			$params[':author'] = array($config->value('displayedSystemUsername'), PDO::PARAM_STR);
+			$params[':userid'] = array($user->getID(), PDO::PARAM_INT);
+			$params[':folder'] = array($folder, PDO::PARAM_STR);
+			$params[':limit'] = array($max_per_page+1, PDO::PARAM_INT);
+			$params[':offset'] = array($offset, PDO::PARAM_INT);
+			$db->execute($query, $params);
 			$rows = $db->fetchAll($query);
 			$db->free($query);
 			$n = count($rows);
@@ -234,9 +244,9 @@
 			// last row is only a lookup row
 			// to find out whether to display next messages button
 			$showNextMSGButton = false;
-			if ($n > 200)
+			if ($n > $max_per_page)
 			{
-				$n = 200;
+				$n = $max_per_page;
 				$showNextMSGButton = true;
 			}
 			
@@ -306,12 +316,12 @@
 				if ($offset > 0)
 				{
 					// show previous messages
-					$tmpl->assign('offsetPrev', intval($offset-200));
+					$tmpl->assign('offsetPrev', $offset-$max_per_page);
 				}
 				if ($showNextMSGButton)
 				{
 					// show next messages
-					$tmpl->assign('offsetNext', strval($offset+200));
+					$tmpl->assign('offsetNext', $offset+$max_per_page);
 				}
 			}
 		}
