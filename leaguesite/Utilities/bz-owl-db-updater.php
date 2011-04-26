@@ -241,6 +241,9 @@
 		$db->SQL('TRUNCATE `online_users`');
 		$db->SQL('ALTER TABLE `online_users` ADD FOREIGN KEY (`userid`) REFERENCES `players` (`id`) ON DELETE CASCADE ON UPDATE CASCADE');
 		
+		status('Renaming exteral_playerid to external_id in players table');
+		$db->SQL('ALTER TABLE `players` CHANGE `external_playerid` `external_id` varchar(50) NOT NULL');
+		
 		status('Creating ERROR_LOG table');
 		$db->SQL('DROP TABLE IF EXISTS `ERROR_LOG`');
 		$db->SQL("CREATE TABLE `ERROR_LOG` (

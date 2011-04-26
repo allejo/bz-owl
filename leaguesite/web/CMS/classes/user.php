@@ -7,14 +7,18 @@
 		{
 			$userid = 0;
 			
-			if ($this->loggedIn())
+			if ($this->loggedIn() && isset($_SESSION['viewerid']))
 			{
-				if (isset($_SESSION['viewerid']))
-				{
-					$userid = $_SESSION['viewerid'];
-				}
+				$userid = $_SESSION['viewerid'];
 			}
+			
 			return (int) $userid;
+		}
+		
+		function setID($id=0)
+		{
+			$_SESSION['viewerid'] = intval($id);
+			$_SESSION['user_logged_in'] = (intval($id) > 0) ?  true : false;
 		}
 		
 		
@@ -24,13 +28,13 @@
 			
 			if ($this->getMobile())
 			{
-				$default_style = $config->value('defaultMobileTheme');
+				$default_theme = $config->value('defaultMobileTheme');
 			} else
 			{
-				$default_style = $config->value('defaultTheme');
+				$default_theme = $config->value('defaultTheme');
 			}
 			
-			$theme = $default_style;
+			$theme = $default_theme;
 			if (isset($_SESSION['theme']))
 			{
 				// use theme chosen this session
@@ -45,10 +49,16 @@
 				}
 			}
 			
+			// clean theme name
+			if (!preg_match('/^[0-9A-Za-z]+$/', $theme))
+			{
+				$theme = $default_theme;
+			}
+			
 			if (!(file_exists(dirname(dirname(dirname(__FILE__))) . '/themes/' . $theme . '/' . $theme . '.css')))
 			{
 				// stylesheet in question does not exist, go back to default
-				$theme = $default_style;
+				$theme = $default_theme;
 				
 				// save theme
 				$this->saveTheme($theme);

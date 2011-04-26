@@ -2,8 +2,11 @@
 	class bzbb
 	{
 		private $xhtml = true;
+		private $groups = array();
+		private $info = array();
+		private $bzid = 0;
 		
-		function __construct()
+		public function __construct()
 		{
 			global $config;
 			
@@ -12,7 +15,7 @@
 		}
 		
 		
-		function showLoginText()
+		public function showLoginText()
 		{
 			global $config;
 			
@@ -27,7 +30,7 @@
 		}
 		
 		
-		function showForm()
+		public function showForm()
 		{
 			// 3rd party bzflag weblogin shows the form
 			// nothing to see here, move along
@@ -35,7 +38,7 @@
 		}
 		
 		
-		function validateLogin(&$output)
+		public function validateLogin(&$output)
 		{
 			global $config;
 			global $user;
@@ -52,7 +55,7 @@
 			// load module specific auth helper
 			require dirname(__FILE__) . '/checkToken.php';
 			
-			if (($groups = $config->value('login.bzbb.groups')) === false || is_array($groups) === false)
+			if (($this->groups = $config->value('login.bzbb.groups')) === false || is_array($groups) === false)
 			{
 				// no accepted groups in config -> no login
 				$output = 'config error : no login group was specified.';
@@ -70,39 +73,50 @@
 			}
 			unset($group);
 			
-			if (!$info = validate_token($params[0], $params[1], $groupNames, false))
+			if (!$this->info = validate_token($params[0], $params[1], $groupNames, false))
 			{
-				// login did not work, removing permissions not necessary as additional permissions where never granted
-				// after permissions were removed at the beginning of the file
-				
+				// login did not work
 				$output = ('<p class="first_p">Login failed: The returned values could not be validated!'
 						   . ' You may check your username and password and <a href="./">try again</a>.</p>' . "\n");
 				return false;
 			}
 			
+			// set external login id
+			$this->bzid = $info['bzid'];
+			
+			// code ran successfully
+			return true;
+		}
+		
+		public function getID()
+		{
+			return $this->bzid;
+		}
+		
+		public function givePermissions()
+		{
 			// there is no such thing in the reply like the VERIFIED group
 			// just search for the VERIFIED group in $groups and apply the perms manually
-			if (isset($groups['VERIFIED']))
+			if (isset($this->groups['VERIFIED']))
 			{
-				$this->applyPermissions($groups['VERIFIED']);
+				$this->applyPermissions($this->groups['VERIFIED']);
 			}
 			
-			foreach ($groups as $group)
+			foreach ($this->groups as $group)
 			{
-				foreach ($info['groups'] as $memberOfGroup)
+				foreach ($this->info['groups'] as $memberOfGroup)
 				{
-					// case insensitive comparison
+					// case insensitive comparison of group names
 					if (strcmp($memberOfGroup, $group['name']) === 0)
 					{
 						$this->applyPermissions($group);
+						
+						// TODO: consider removing matched entry from array using array_splice
 						break;
 					}
 				}
 				unset($memberOfGroup);
 			}
-			
-			// code ran successfully
-			return true;
 		}
 		
 		private function applyPermissions($group)

@@ -644,7 +644,7 @@
 		echo '<div class="p"></div>' . "\n";
 		
 		// the data we want
-		$query = 'SELECT `players`.`external_playerid`, `players`.`name`,`countries`.`name` AS `country_name`,`countries`.`flagfile`, `players_profile`.`UTC`';
+		$query = 'SELECT `players`.`external_id`, `players`.`name`,`countries`.`name` AS `country_name`,`countries`.`flagfile`, `players_profile`.`UTC`';
 		$query .= ', `players_profile`.`last_login`,`players_profile`.`joined`, `players_profile`.`user_comment`';
 		// optimise query by finding out whether the admin comments are needed at all (no permission to view = unnecessary)
 		if ((isset($_SESSION['allow_view_user_visits'])) && ($_SESSION['allow_view_user_visits'] === true))
@@ -670,7 +670,7 @@
 		{
 			echo 'It seems like the flag specified by this user does not exist.';
 			// the data we want
-			$query = 'SELECT `players`.`external_playerid`, `players`.`name`,' . sqlSafeStringQuotes('') . ' AS `country_name`,' . sqlSafeStringQuotes('') . ' AS `flagfile`';
+			$query = 'SELECT `players`.`external_id`, `players`.`name`,' . sqlSafeStringQuotes('') . ' AS `country_name`,' . sqlSafeStringQuotes('') . ' AS `flagfile`';
 			$query .= ', `players_profile`.`UTC`, `players_profile`.`last_login`, `players_profile`.`joined`, `players_profile`.`user_comment`';
 			// optimise query by finding out whether the admin comments are needed at all (no permission to view = unnecessary)
 			if ((isset($_SESSION['allow_view_user_visits'])) && ($_SESSION['allow_view_user_visits'] === true))
@@ -751,12 +751,12 @@
 			unset($time_format);
 			require_once dirname(dirname(__FILE__)) . '/CMS/add-ons/login/modules/login_module_list.php';
 			$module = active_login_modules();
-			if (isset($module['bzbb']) && ($module['bzbb']) && (!(strcmp($row['external_playerid'], '') === 0)))
+			if (isset($module['bzbb']) && ($module['bzbb']) && (!(strcmp($row['external_id'], '') === 0)))
 			{
 				echo ('		<div class="user_profile_bzbb_description_row"><span class="user_profile_bzbb_description">BZBB id:</span>'
 					  . ' <span class="user_profile_bzbb">'
-					  . '<a href="http://my.bzflag.org/bb/memberlist.php?mode=viewprofile&amp;u=' . htmlent($row['external_playerid']) . '">'
-					  . htmlent($row['external_playerid'])
+					  . '<a href="http://my.bzflag.org/bb/memberlist.php?mode=viewprofile&amp;u=' . htmlent($row['external_id']) . '">'
+					  . htmlent($row['external_id'])
 					  . '</a>'
 					  . '</span></div>' . "\n");
 			}
@@ -1059,7 +1059,7 @@
 			}
 		} elseif ($search_bzid_sort)
 		{
-			$query .= ' AND `players`.`external_playerid` LIKE ' . sqlSafeStringQuotes($search_expression);
+			$query .= ' AND `players`.`external_id` LIKE ' . sqlSafeStringQuotes($search_expression);
 		} else // $search_joined_sort 
 		{
 			$query .= ' AND `players_profile`.`joined` LIKE ' . sqlSafeStringQuotes($search_expression);
@@ -1073,7 +1073,7 @@
 		$query .= ' ORDER BY `players`.`name`, `team_name`';
 	} elseif ($search_bzid_sort)
 	{
-		$query .= ' ORDER BY `players`.`external_playerid`, `players`.`name`, `team_name`';
+		$query .= ' ORDER BY `players`.`external_id`, `players`.`name`, `team_name`';
 	} elseif ($search_joined_sort)
 	{
 		$query .= ' ORDER BY `players_profile`.`joined`, `team_name`, `players`.`name`';

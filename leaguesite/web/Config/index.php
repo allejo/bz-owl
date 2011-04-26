@@ -12,10 +12,10 @@
 		$theme = $_GET['theme'];
 		
 		// clean theme name
-		$theme = str_replace('.', '', $theme);
-		$theme = str_replace(':', '', $theme);
-		$theme = str_replace('/', '', $theme);
-		$theme = str_replace('\\', '', $theme);
+		if (!preg_match('/^[0-9A-Za-z]+$/', $theme))
+		{
+			$theme = '';
+		}
 		
 		// check if theme stylesheet file does exist
 		if (!file_exists(dirname(dirname(__FILE__)) .'/themes/'

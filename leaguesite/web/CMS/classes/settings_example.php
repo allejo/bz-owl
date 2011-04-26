@@ -78,6 +78,13 @@
 																									 'allow_edit_todo' => true,
 																									 // aux permissions
 																									 'is_admin' => true))),
+					 // subject of welcome message
+					 'login.welcome.subject' => 'Welcome',
+					 // content of welcome message
+					 'login.welcome.content' => 	('Welcome and thanks for registering at this website!' . "\n"
+												 . 'In the FAQ you can find the most important informations'
+												 . ' about organising and playing matches.' . "\n\n"
+												 . 'See you on the battlefield.'),
 					 // regenerate session id after x seconds, default 15 minutes (60*15)
 					 // the lower x: safer, higher x faster
 					 'sessionRegenTime' => 60*15,

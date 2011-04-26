@@ -4,7 +4,7 @@
 #
 # Host: localhost (MySQL 5.1.56)
 # Database: bz-owl
-# Generation Time: 2011-04-23 15:35:50 +0200
+# Generation Time: 2011-04-26 15:49:54 +0200
 # ************************************************************
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -195,7 +195,7 @@ DROP TABLE IF EXISTS `players`;
 
 CREATE TABLE `players` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `external_playerid` varchar(50) NOT NULL,
+  `external_id` varchar(50) NOT NULL,
   `teamid` int(11) unsigned NOT NULL DEFAULT '0',
   `name` varchar(50) NOT NULL,
   `last_teamid` int(11) unsigned NOT NULL DEFAULT '0',

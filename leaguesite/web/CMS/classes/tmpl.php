@@ -129,6 +129,12 @@
 				$theme = $user->getTheme();
 			}
 			
+			// clean theme name
+			if (!preg_match('/^[0-9A-Za-z]+$/', $theme))
+			{
+				$theme = '';
+			}
+			
 			return file_exists(dirname(dirname(__FILE__)) . '/themes/'
 							   . $theme . '/templates/' . $template
 							   . ($config->value('useXhtml') ? '.xhtml.tmpl' : '.html.tmpl'));

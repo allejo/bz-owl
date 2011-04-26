@@ -29,7 +29,7 @@
 					case 'login':
 						if ($moduleInstance->validateLogin($message))
 						{
-							$module .= $this->doLogin();
+							$module .= $this->doLogin($moduleInstance, $module);
 						}
 						if (strlen($message) > 0)
 						{
@@ -105,9 +105,72 @@
 		}
 		
 		
-		private function doLogin()
+		private function doLogin($moduleInstance, $moduleName)
 		{
+			global $user;
+			global $db;
 			
+			
+			$externalLogin = strcasecmp($moduleName, 'local') !== 0;
+			$uid = 0;
+			
+			// load operations framework
+			include(dirname(__FILE__) . '/classes/userOperations.php');
+			$userOperations = new userOperations();
+			
+			
+			if ($externalLogin)
+			{
+				// lookup internal id using external id
+				$uid = $userOperations->findIDByExternalLogin($moduleInstance->getID());
+			} else
+			{
+				// local login id is equal to internal login id by definition
+				$uid = $moduleInstance->getID();
+			}
+			
+			
+			if ($uid === 0)
+			{
+				// uid is 0 if it's a user with no external login id
+				// but external login id has been provided
+				// or if it's a new user
+				$newUser = false;
+				
+				if ($newUser)
+				{
+					$userOperations->sendWelcomeMessage($uid);
+				}
+				return '<p>An internal error occurred: $uid === 0.</p>' . "\n";
+			}
+			
+			
+			// re-activate deleted accounts
+			// stop processing disabled/banned or broken accounts
+			$status = $userOperations->getAccountStatus($uid);
+			switch ($status)
+			{
+				case 'active' : break;
+				case 'deleted':	$userOperations->activateAccount($uid); break;
+				case 'login disabled' : return '<p>Your account is disabled: No login possible.</p>'; break;
+				// TODO: implement site wide ban list
+				case 'banned' : return '<p>You have been banned from this website.</p>'; break;
+				default: return '<p>The impossible happened: Account status is' . htmlent($status) . '.</p>' ;
+			}
+			
+			if ($uid > 0)
+			{
+				$user->setID($uid);
+				$moduleInstance->givePermissions();
+				$userOperations->updateLastLogin($uid);
+				
+				return true;
+			} else
+			{
+				$user->logout();
+			}
+			
+			return false;
 		}
 	}
 ?>
