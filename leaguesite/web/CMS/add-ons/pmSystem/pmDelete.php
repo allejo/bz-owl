@@ -31,6 +31,9 @@
 			global $db;
 			
 			
+			// TODO: cascading constraints in the database should make
+			// some of these queries unnecessary
+
 			// just delete it from the user's private message table
 			$query = $db->prepare('DELETE FROM `pmsystem.msg.users`'
 					. ' WHERE `msgid`=:msgid AND `userid`=:uid AND `folder`=:folder');
@@ -57,7 +60,6 @@
 			}
 			
 			
-			// TODO: do this using cascading constraints in the database
 			// check for message usage
 			$query = $db->prepare('SELECT `msgid` FROM `pmsystem.msg.users`'
 								  . ' WHERE `msgid`=:msgid LIMIT 1');
@@ -66,10 +68,14 @@
 			$row = $db->fetchRow($query);
 			$db->free($query);
 			
-			// delete message from storage if no one has the message in mailbox anymore
+			// delete message from storage and teams if no one has the message in mailbox anymore
 			if ($row === false)
 			{
+				// these two queries could be combined if their columns had the same name
 				$query = $db->prepare('DELETE FROM `pmsystem.msg.storage` WHERE `id`=:msgid');
+				// current value of $params is correct
+				$db->execute($query, $params);
+				$query = $db->prepare('DELETE FROM `pmsystem.msg.recipients.teams` WHERE `msgid`=:msgid');
 				// current value of $params is correct
 				$db->execute($query, $params);
 			}
