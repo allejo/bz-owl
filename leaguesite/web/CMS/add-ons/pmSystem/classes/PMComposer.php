@@ -327,7 +327,7 @@
 								  . 'VALUES (?, ?)');
 			foreach ($this->teams as $team)
 			{
-					$db->execute($query, array($rowId, $team));
+					$db->execute($query, array($rowId, $team['id']));
 					$db->free($query);
 			}
 			unset($team);
@@ -345,10 +345,6 @@
 			}
 			unset($userID);
 			
-			
-			// prepare recipients for SQL statement
-			$recipientsSQL = is_array($recipients) ? implode(' ', $recipients) : $recipients;
-			
 			foreach ($recipients as $recipient)
 			{
 				// put message in people's inbox
@@ -356,10 +352,9 @@
 				{
 					// this is a reply
 					$query = $db->prepare('INSERT INTO `pmsystem.msg.users`'
-										  . '(`msgid`, `userid`, `folder`, `msg_replied_to_msgid`)'
-										  . 'VALUES (?, ?, ?, ?)');
+										  . ' (`msgid`, `userid`, `folder`, `msg_replied_to_msgid`)'
+										  . ' VALUES (?, ?, ?, ?)');
 					$db->execute($query, array($rowId, $recipient, 'inbox', $ReplyToMSGID));
-					$db->free($query);
 				} else
 				{
 					// this is a new message
@@ -367,8 +362,8 @@
 										  . ' (`msgid`, `userid`, `folder`)'
 										  . ' VALUES (?, ?, ?)');
 					$db->execute($query, array($rowId, $recipient, 'inbox'));
-					$db->free($query);
 				}
+				$db->free($query);
 				
 				// put message in sender's outbox
 				if ($author_id > 0)
