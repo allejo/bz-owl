@@ -25,6 +25,59 @@
 					 'maintenance.msg' => 'This site has been shut down due to maintenance' . "\n",
 					 // enable updating db from previous version
 					 'maintenance.updateDB' => false,
+					 // display local login on front login page
+					 'login.local.showLoginText' => false,
+					 // accepted bzbb login groups
+					 'login.bzbb.groups' => array('VERIFIED' => array('name' => 'VERIFIED',
+																	  'permissions' => array('allow_add_messages' => true,
+																							 'allow_delete_messages' => true,
+																							 'allow_watch_servertracker' => true)),
+												  'GU-LEAGUE.REFEREES' => array('name' => 'GU-LEAGUE.REFEREES',
+																				'permissions' => array('allow_add_messages' => true,
+																									   'allow_delete_messages' => true,
+																									   'allow_watch_servertracker' => true,
+																									   'allow_add_match' => true,
+																									   'allow_edit_match' => true)),
+												  'GU-LEAGUE.ADMINS' => array('name' => 'GU-LEAGUE.ADMINS',
+																			  'permissions' => array('allow_add_messages' => true,
+																									 'allow_delete_messages' => true,
+																									 'allow_watch_servertracker' => true,
+																									 'allow_add_match' => true,
+																									 'allow_edit_match' => true,
+																									 // permissions for news page
+																									 'allow_add_news' => true,
+																									 'allow_edit_news' => true,
+																									 'allow_delete_news' => true,
+																									 // permissions for all static pages
+																									 'allow_edit_static_pages' => true,
+																									 // permissions for bans page
+																									 'allow_add_bans' => true,
+																									 'allow_edit_bans' => true,
+																									 'allow_delete_bans' => true,
+																									 'allow_edit_bans' => true,
+																									 // permissions for team page
+																									 'allow_kick_any_team_members' => true,
+																									 'allow_edit_any_team_profile' => true,
+																									 'allow_invite_in_any_team' => true,
+																									 'allow_delete_any_team' => true,
+																									 'allow_reactivate_teams' => true,
+																									 // user permissions
+																									 'allow_edit_any_user_profile' => true,
+																									 'allow_add_admin_comments_to_user_profile' => true,
+																									 'allow_ban_any_user' => true,
+																									 // visits log permissions
+																									 'allow_view_user_visits' => true,
+																									 // match permissions
+																									 'allow_add_match' => true,
+																									 'allow_edit_match' => true,
+																									 'allow_delete_match' => true,
+																									 // server tracker permissions
+																									 'allow_watch_servertracker' => true,
+																									 // TODO permissions
+																									 'allow_view_todo' => true,
+																									 'allow_edit_todo' => true,
+																									 // aux permissions
+																									 'is_admin' => true))),
 					 // regenerate session id after x seconds, default 15 minutes (60*15)
 					 // the lower x: safer, higher x faster
 					 'sessionRegenTime' => 60*15,

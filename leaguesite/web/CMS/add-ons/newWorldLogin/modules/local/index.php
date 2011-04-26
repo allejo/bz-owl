@@ -11,14 +11,29 @@
 			$this->xhtml = $config->value('useXhtml');
 		}
 		
+		
 		function showLoginText()
 		{
-			return ('local login');
+			global $config;
+			
+			
+			// show login text only if configured to do so
+			if ($config->value('login.local.showLoginText'))
+			{
+				return ('local login form text');
+			}
 		}
+		
 		
 		function showForm()
 		{
 			return 'bgoojikfodl';
+		}
+		
+		
+		function validateLogin(&$output)
+		{
+			
 		}
 	}
 ?>

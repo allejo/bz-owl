@@ -7,23 +7,42 @@
 			
 			
 			$modules = array();
-			
-			if (!isset($_GET['module'])
-				|| ($module = $this->getRequestedModule($_GET['module'])) === false)
+						
+			if (isset($_GET['module']) === false)
 			{
-				$this->showLoginText($modules);
+				$this->getLoginText($modules);
+			} elseif (($module = $this->getRequestedModule($_GET['module'])) === false)
+			{
+				$module = '<p>An error occurred, module name not accepted.</p>';
+			} elseif (isset($_GET['action']) === false)
+			{
+				$module = '<p>An error occurred, module action not specified.</p>';
 			} else
 			{
-			echo('module request:' . $_GET[$module]);
-				if (strcasecmp($_GET[$module], 'form') === 0)
+				include_once(dirname(__FILE__) . '/modules/' . $module . '/index.php');
+				$moduleInstance = new $module;
+				switch($_GET['action'])
 				{
-					$this->showForm($module);
-				} else
-				{
-					$this->doLogin($module);
+					case 'form':
+						$module = $moduleInstance->showForm();
+						break;
+					case 'login':
+						if ($moduleInstance->validateLogin($message))
+						{
+							$module .= $this->doLogin();
+						}
+						if (strlen($message) > 0)
+						{
+							$module .= '<p> returned a message: ' . $message . '</p>' . "\n";
+						}
+						break;
+					default: 
+						$module = '<p>Unknown module action requested, request not accepted.</p>';
 				}
-				
-				// add known module to modules list
+			}
+			
+			if (isset($module))
+			{
 				$modules[] = $module;
 			}
 			
@@ -46,7 +65,7 @@
 		}
 		
 		
-		private function showLoginText(&$modules)
+		private function getLoginText(&$modules)
 		{
 			// first scan the files in the modules directory
 			$modules = scandir(dirname(__FILE__) . '/modules/');
@@ -86,15 +105,7 @@
 		}
 		
 		
-		private function showForm(&$module)
-		{
-			include_once(dirname(__FILE__) . '/modules/' . $module . '/index.php');
-			$class = new $module;
-			$module = $class->showForm();
-		}
-		
-		
-		private function doLogin(&$module)
+		private function doLogin()
 		{
 			
 		}
