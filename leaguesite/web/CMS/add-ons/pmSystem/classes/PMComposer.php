@@ -381,12 +381,12 @@
 		
 		function removeDuplicates(array &$someArray)
 		{
-			$dup_check = count($someArray);
 			// array_unique is case sensitive, thus the loading of name from database
-			$players = array_unique($someArray);
-			if (!($dup_check === (count($someArray))))
+			$filtered = array_unique($someArray);
+			if (count($someArray) !== count($filtered))
 			{
 				// duplicates were removed
+				$someArray = $filtered;
 				return true;
 			}
 			
