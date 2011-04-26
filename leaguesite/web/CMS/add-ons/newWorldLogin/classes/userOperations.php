@@ -74,14 +74,15 @@
 									. 'In the FAQ you can find the most important informations'
 									. ' about organising and playing matches.' . "\n\n"
 									. 'See you on the battlefield.');
-			// send the welcome message
+			// prepare welcome message
 			include(dirname(dirname(__FILE__)) . '/pmSystem/classes/PMComposer.php');
 			$pmComposer = new pmComposer();
 			$pmComposer->setSubject($subject);
 			$pmComposer->setContent($content);
 			$pmComposer->setTimestamp(date('Y-m-d H:i:s'));
-			$pmComposer->addUserID($_SESSION['viewerid']);
+			$pmComposer->addUserID($id);
 			
+			// send it
 			$pmComposer->send();
 		}
 	}
