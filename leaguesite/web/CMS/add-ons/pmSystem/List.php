@@ -221,7 +221,7 @@
 			// parameters rather than the simple use of '?' in the SQL statement.
 			// get the list of private messages to be displayed (+1 one hidden due to next button)
 			// userid requirement ensures user only sees the messages he's allowed to
-			$query = $db->prepare('SELECT `id`,`author_id`,`subject`,`timestamp`,`folder`,`msg_status`,'
+			$query = $db->prepare('SELECT DISTINCT `id`,`author_id`,`subject`,`timestamp`,`folder`,`msg_status`,'
 								  . ' IF(`pmsystem.msg.storage`.`author_id`<>0,'
 								  . ' (SELECT `name` FROM `players` WHERE `id`=`author_id`),:author) AS `author`'
 								  . ' FROM `pmsystem.msg.storage`, `pmsystem.msg.users`'
