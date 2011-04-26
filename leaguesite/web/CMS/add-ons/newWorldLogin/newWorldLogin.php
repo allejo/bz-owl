@@ -8,18 +8,23 @@
 			
 			$modules = array();
 			
-			if ($this->getRequestedModule($_GET['module']) === false)
+			if (!isset($_GET['module'])
+				|| ($module = $this->getRequestedModule($_GET['module'])) === false)
 			{
 				$this->showLoginText($modules);
 			} else
 			{
-				if (strcasecmp($_GET['module'], 'form') === 0)
+			echo('module request:' . $_GET[$module]);
+				if (strcasecmp($_GET[$module], 'form') === 0)
 				{
-					$this->showForm($_GET['module']);
+					$this->showForm($module);
+				} else
+				{
+					$this->doLogin($module);
 				}
 				
 				// add known module to modules list
-				$modules[] = $_GET['module'];
+				$modules[] = $module;
 			}
 			
 			
@@ -32,11 +37,12 @@
 		}
 		
 		
-		private function getRequestedModule($module_name)
+		private function getRequestedModule($moduleName)
 		{
-			return (isset($module_name)
-				and preg_match('^[0-9A-Za-z]+$', $module_name)
-				and file_exists(dirname(__FILE__) . '/modules/' . $module_name));
+			return (isset($moduleName)
+					&& preg_match('/^[0-9A-Za-z]+$/', $moduleName)
+					&& file_exists(dirname(__FILE__) . '/modules/' . $moduleName))
+					? $moduleName : false;
 		}
 		
 		
@@ -79,11 +85,18 @@
 			}
 		}
 		
-		private function showForm($module)
+		
+		private function showForm(&$module)
 		{
 			include_once(dirname(__FILE__) . '/modules/' . $module . '/index.php');
 			$class = new $module;
-			$class->showForm();
+			$module = $class->showForm();
+		}
+		
+		
+		private function doLogin(&$module)
+		{
+			
 		}
 	}
 ?>
