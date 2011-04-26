@@ -8,18 +8,18 @@
 			
 			$modules = array();
 			
-			if ($this->getRequestedModule() === false)
+			if ($this->getRequestedModule($_GET['module']) === false)
 			{
 				$this->showLoginText($modules);
 			} else
 			{
-				if (strcasecmp($_GET[$module], 'form') === 0)
+				if (strcasecmp($_GET['module'], 'form') === 0)
 				{
 					$this->showForm($_GET['module']);
 				}
 				
 				// add known module to modules list
-				$modules[] = $module;
+				$modules[] = $_GET['module'];
 			}
 			
 			
@@ -32,26 +32,11 @@
 		}
 		
 		
-		private function getRequestedModule()
+		private function getRequestedModule($module_name)
 		{
-			if (!isset($_GET['module']))
-			{
-				return false;
-			}
-			
-			$module = $_GET['module'];
-			
-			// clean module name
-			str_replace('.', '', $module);
-			str_replace(':', '', $module);
-			str_replace('/', '', $module);
-			str_replace('\\', '', $module);
-			
-			// check if file exists
-			if (!file_exists(dirname(__FILE__) . $module))
-			{
-				return false;
-			}
+			return (isset($module_name)
+				and preg_match('^[0-9A-Za-z]+$', $module_name)
+				and file_exists(dirname(__FILE__) . '/modules/' . $module_name));
 		}
 		
 		
