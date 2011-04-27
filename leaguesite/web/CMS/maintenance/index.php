@@ -19,42 +19,7 @@
 		$connection = $site->connect_to_db();
 	}
 	
-	function unlock_tables_maint()
-	{
-		global $site;
-		global $connection;
-		
-		$query = 'UNLOCK TABLES';
-		if (!($site->execute_query('all!', $query, $connection)))
-		{
-			$site->dieAndEndPage('Unfortunately unlocking tables failed. This likely leads to an access problem to database!');
-		}
-		$query = 'COMMIT';
-		if (!($site->execute_query('all!', $query, $connection)))
-		{
-			$site->dieAndEndPage('Unfortunately committing changes failed!');
-		}
-		$query = 'SET AUTOCOMMIT = 1';
-		if (!($result = @$site->execute_query('all!', $query, $connection)))
-		{
-			$site->dieAndEndPage('Trying to activate autocommit failed.');
-		}
-	}
 	
-	$query = 'LOCK TABLES `misc_data` WRITE, `teams` WRITE, `teams_overview` WRITE, `teams_permissions` WRITE, `teams_profile` WRITE';
-	$query .= ', `players` WRITE, `players_profile` WRITE, `visits` WRITE';
-	$query .= ', `matches` WRITE';
-	if (!($result = @$site->execute_query('all!', $query, $connection)))
-	{
-		unlock_tables_maint();
-		$site->dieAndEndPage('Unfortunately locking the matches table failed and thus entering the match was cancelled.');
-	}
-	$query = 'SET AUTOCOMMIT = 0';
-	if (!($result = @$site->execute_query('all!', $query, $connection)))
-	{
-		unlock_tables_maint();
-		$site->dieAndEndPage('Trying to deactivate autocommit failed.');
-	}
 	
 	// find out when last maintenance happened
 	$last_maintenance = '0000-00-00';
@@ -62,7 +27,6 @@
 	// execute query
 	if (!($result = @$site->execute_query('misc_data', $query, $connection)))
 	{
-		unlock_tables_maint();
 		$site->dieAndEndPage('MAINTENANCE ERROR: Can not get last maintenance data from database.');
 	}
 	
@@ -87,7 +51,6 @@
 		
 		// nothing else to do
 		// stop silently
-		unlock_tables_maint();
 		die();
 	}
 	
@@ -118,12 +81,6 @@
 	// set up a class to have a unique namespace
 	class maintenance_old
 	{
-		function __destruct()
-		{
-			unlock_tables_maint();
-		}
-		
-		
 		function cleanup_teams($two_months_in_past)
 		{
 			global $settings;
@@ -145,7 +102,6 @@
 			// execute query
 			if (!($result = @$site->execute_query('teams_overview', $query, $connection)))
 			{
-				unlock_tables_maint();
 				$site->dieAndEndPage('MAINTENANCE ERROR: getting list of teams with deleted not equal 2 (2 means deleted team) failed.');
 			}
 			
@@ -180,7 +136,6 @@
 				// execute query
 				if (!($result_matches = @$site->execute_query('matches', $query, $connection)))
 				{
-					unlock_tables_maint();
 					$site->dieAndEndPage('MAINTENANCE ERROR: getting list of recent matches from teams failed.');
 				}
 				
@@ -206,7 +161,6 @@
 					// execute query
 					if (!($result_active_players = @$site->execute_query('matches', $query, $connection)))
 					{
-						unlock_tables_maint();
 						$site->dieAndEndPage('MAINTENANCE ERROR: getting list of recent logged in player from team'
 											 . sqlSafeStringQuotes($curTeam)
 											 . ' failed.');
@@ -273,7 +227,6 @@
 					$query .= ' WHERE `teamid`=' . sqlSafeStringQuotes($curTeam);
 					if (!($result_update = @$site->execute_query('players', $query, $connection)))
 					{
-						unlock_tables_maint();
 						$site->dieAndEndPage();
 					}
 				}
@@ -310,7 +263,6 @@
 			// execute query
 			if (!($result = @$site->execute_query('players, players_profile', $query, $connection)))
 			{
-				unlock_tables_maint();
 				$site->dieAndEndPage('MAINTENANCE ERROR: getting list of 3 months long inactive players failed.');
 			}
 			
@@ -354,7 +306,6 @@
 				// execute query
 				if (!($result = @$site->execute_query('teams', $query, $connection)))
 				{
-					unlock_tables_maint();
 					$site->dieAndEndPage('MAINTENANCE ERROR: finding out if inactive player was leader of a team failed.');
 				}
 				
@@ -390,7 +341,6 @@
 			}
 						
 			// do not update maintenance date, assume the new maintenance add-on does the job
-			unlock_tables_maint();
 		}
 	}
 ?>

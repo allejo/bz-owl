@@ -25,6 +25,8 @@
 			global $config;
 			global $db;
 			
+			
+			// TODO: remove this loading after legacy maintenance code has been deleted
 			if (!isset($db))
 			{
 				require_once dirname(dirname(dirname(__FILE__))) . '/classes/config.php';
@@ -93,6 +95,7 @@
 		{
 			global $db;
 			
+			
 			$db->SQL('LOCK TABLES `' . $tableName . '` ' . ($write ? 'WRITE' : 'READ'));
 			$db->SQL('SET AUTOCOMMIT = 0');
 		}
@@ -115,14 +118,6 @@
 			
 			
 			// delete no more used PMs
-			
-			// lock PM tables
-			$this->lockTable('pmsystem.msg.users');
-			$this->lockTable('pmsystem.msg.storage');
-			$this->lockTable('pmsystem.msg.recipients.teams');
-			$this->lockTable('pmsystem.msg.recipients.users');
-			
-			
 			$queryInMailboxOfUserid = $db->prepare('SELECT `msgid` FROM `pmsystem.msg.users` WHERE `userid`=?');
 			$queryInMailboxOfOthers = $db->prepare('SELECT `msgid` FROM `pmsystem.msg.users` WHERE `msgid`<>? LIMIT 1');
 			$queryDeletePMNoOwner = $db->prepare('DELETE FROM `pmsystem.msg.storage` WHERE `id`=? LIMIT 1');
@@ -165,9 +160,6 @@
 			{
 				$db->free($queryDeletePMNoOwner);
 			}
-			
-			// unlock these tables and write atomic changes back
-			$this->unlockTables();
 		}
 		
 		
@@ -175,9 +167,6 @@
 		{
 			global $db;
 			
-			
-			$this->lockTable('matches', false);
-			$this->lockTable('teams_overview');
 			
 			// update team activity
 			if ($teamid === false)
@@ -256,8 +245,6 @@
 			unset($teamid);
 			unset($team_activity45);
 			unset($team_activity90);
-			
-			$this->unlockTables();
 		}
 		
 		
@@ -265,8 +252,6 @@
 		{
 			global $db;
 			
-			
-			$this->lockTable('countries');
 			
 			$query = $db->prepare('SELECT `id` FROM `countries` WHERE `id`=? LIMIT 1');
 			$db->execute($query, '1');
@@ -332,8 +317,6 @@
 					}
 				}
 			}
-			
-			$this->unlockTables();
 		}
 	}
 ?>
