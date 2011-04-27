@@ -177,7 +177,6 @@
 			$recipients = explode(' ', $row['recipients']);
 			
 			//print_r($recipients);
-			// TODO: implement class msg_overview_recipients in stylesheets
 			if (strcmp('0', $row['from_team']) == 0)
 			{
 				// message has one or more players as recipient(s)

@@ -318,7 +318,7 @@ span.msg_subject
 	color: black;
 }
 
-span.msg_author
+span.msg_author, span.msg_overview_recipients
 {
 	font-style: normal;
 	padding-left: 1em;

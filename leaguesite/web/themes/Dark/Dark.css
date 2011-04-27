@@ -224,7 +224,7 @@ div.folder_selection {
 margin-bottom:2em;
 }
 
-span.msg_author {
+span.msg_author, span.msg_overview_recipients {
 font-weight:400;
 }
 

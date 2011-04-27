@@ -478,7 +478,7 @@ span.msg_subject
 	font-weight: bold;
 }
 
-span.msg_author
+span.msg_author, span.msg_overview_recipients
 {
 	font-style: normal;
 	padding-left: 1em;
