@@ -30,7 +30,7 @@
 		$query = 'SELECT `id`';
 		if ($config->value('forceExternalLoginOnly'))
 		{
-			$query .= ', `external_playerid` ';
+			$query .= ', `external_id` ';
 		}
 		$query .= ' FROM `players` WHERE `name`=?';
 		// only one player tries to login so only fetch one entry, speeds up login a lot
@@ -46,7 +46,7 @@
 		while($row = $db->fetchRow($query))
 		{
 			$playerid = $row['id'];
-			if ($config->value('forceExternalLoginOnly') && !(strcmp(($row['external_playerid']), '') === 0))
+			if ($config->value('forceExternalLoginOnly') && !(strcmp(($row['external_id']), '') === 0))
 			{
 				$convert_to_external_login = false;
 			}
