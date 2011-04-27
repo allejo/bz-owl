@@ -117,7 +117,13 @@
 	
 	// set up a class to have a unique namespace
 	class maintenance_old
-	{		
+	{
+		function __destruct()
+		{
+			unlock_tables_maint();
+		}
+		
+		
 		function cleanup_teams($two_months_in_past)
 		{
 			global $settings;

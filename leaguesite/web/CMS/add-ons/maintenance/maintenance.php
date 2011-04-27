@@ -14,6 +14,11 @@
 			}
 		}
 		
+		function __destruct()
+		{
+			$this->unlockTables();
+		}
+		
 		
 		function isMaintenanceNeeded()
 		{
