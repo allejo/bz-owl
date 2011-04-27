@@ -1,0 +1,40 @@
+
+bz-owl release notes
+====================
+
+1.2 (current development trunk)
+---
+* overall code re-organisation, concentrating on readability
+* new login add-on (in progress)
+* new maintenance add-on (partially done)
+* serve xhtml using MIME type application/xhtml+xml on production environment
+* fix some markup problems
+* db class error reporting with fallback to text file
+* add example teamStats add-on
+* downgrade web/CMS/announcements to keep compatibility with ducati code
+* implement new pm system as add-on
+* implement new static page editor as add-on
+* implement new news system as add-on
+* drop Login, News, Rules, FAQ, Links, Contact and Bans folders
+* add 6x7 prototype theme (partially done)
+* add example .htaccess file to use with new add-on loader
+* implement add-on loader script, using new lookup table in db
+* switch to smarty template engine
+* rename web/styles to web/themes
+
+1.1 (2011-02-25)
+--
+* display of private messages using new code, otherwise use old code
+* drop web/CMS/navi.inc and replace it by the new Layout.php and the templates
+* add php.template in styles dir and per theme for old world pages
+* new code does no longer use web/CMS/siteinfo.hp
+* add web/CMS/classes to be used by new web/CMS/site.php
+* new site config settings using settings.php
+* new code uses integrated template library
+
+1.0 (2010-10-06)
+--
+* initial stable release
+
+
+

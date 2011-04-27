@@ -47,6 +47,6 @@ Updates
 -----------
 
 By using svn up you should get a new version of the source code, if available.
-However the database structure may has changed. It is planned to provide an updater between major stable versions.
+However the database structure may has changed. We provide an updater between major stable versions in Utilities/bz-owl-db-updater.php (requires command line php installation).
 
 If you upgrade your BBCode library it is recommended to run the bbcode-library-updater.php (requires the website to be in the web dir) but keep in mind this will break legacy data in the database.

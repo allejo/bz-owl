@@ -1,7 +1,7 @@
 You are required to have a permit from the current maintainer (see DEVINFO) if you want to use this software for commercial purposes.
 Commercial purposes include having advertisements on the website.
 
-All the source code (exceptions: CMS/bzbb_login/checkToken.php, Servertracker/bzfquery.php and styles/GUlogo.png are LGPL v2 and ) is licensed under the LGPL version 3 (see the lgpl-3.0.txt file in the same directory) with the following  addition to that license:
+All the source code (exceptions: CMS/bzbb_login/checkToken.php, Servertracker/bzfquery.php and styles/GUlogo.png are LGPL v2 and ) is licensed under the LGPL version 3 (see the lgpl-3.0.txt file in the same directory) with the following addition to that license:
 
 Remote Network Interaction:
 
