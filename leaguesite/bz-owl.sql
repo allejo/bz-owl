@@ -4,7 +4,7 @@
 #
 # Host: localhost (MySQL 5.1.56)
 # Database: bz-owl
-# Generation Time: 2011-04-26 15:49:54 +0200
+# Generation Time: 2011-04-27 14:57:24 +0200
 # ************************************************************
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -146,7 +146,7 @@ CREATE TABLE `matches_edit_stats` (
 DROP TABLE IF EXISTS `misc_data`;
 
 CREATE TABLE `misc_data` (
-  `last_maintenance` varchar(10) DEFAULT '00.00.0000',
+  `last_maintenance` varchar(10) DEFAULT '0000-00-00',
   `last_servertracker_query` int(11) unsigned NOT NULL DEFAULT '0',
   `db.version` int(11) unsigned NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

@@ -275,6 +275,8 @@
 				 (7, 'Contact/', 'Contact', 'staticPageEditor'),
 				 (8, 'Bans/', 'Bans', 'newsSystem')");
 		
+		status('Updating last_maintenance column of misc_data to YYYY-MM-DD format');
+		$db->SQL("ALTER TABLE `misc_data` CHANGE `last_maintenance` `last_maintenance` varchar(10) NULL DEFAULT '0000-00-00'");
 		
 		status('Adding DB version column (db.version) to misc_data');
 		$db->SQL("ALTER TABLE `misc_data` ADD `db.version` int(11) NOT NULL DEFAULT '0'  AFTER `last_servertracker_query`");

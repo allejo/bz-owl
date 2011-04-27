@@ -480,8 +480,17 @@
 							$db->execute($query, $collisionID);
 							if ($collisionID > 0 && $row = $db->fetchRow($query))
 							{
+								// do the error recovery
 								$updateAccountQuery = $db->prepare('UPDATE `players` SET `external_id`=? WHERE `id`=? LIMIT 1');
 								$db->execute($updateAccountQuery, array($_SESSION['external_id'], $collisionID));
+								$db->free($updateAccountQuery);
+								
+								// fix the problem so next login will not run into the same error recovery code
+								$deleteEmptyPWQuery = $db->prepare('DELETE FROM `players_passwords` WHERE `playerid`=? LIMIT 1');
+								$db->execute($deleteEmptyPWQuery, $collisionID);
+								$db->free($deleteEmptyPWQuery);
+								
+								// give a message to user who might wonder but it could be helpful for troubleshooting
 								$msg .= '<p>Your account has been updated (empty password case detected).</p>';
 								
 								// recovered from collision

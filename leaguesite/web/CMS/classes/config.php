@@ -7,9 +7,10 @@
 		function __construct()
 		{
 			include dirname(__FILE__) . '/settings_path.php';
+			$settings = new settings();
 			
 			// load the settings
-			$this->options = settings();
+			$this->options = $settings->settings();
 		}
 		
 		function value($setting)

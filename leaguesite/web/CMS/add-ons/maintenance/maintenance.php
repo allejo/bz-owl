@@ -1,10 +1,10 @@
 <?php
 	class maintenance
 	{
-		function __autoload($class_name)
-		{
-			require_once dirname(dirname(dirname(__FILE__))) . '/classes/' . $class_name . '.php';
-		}
+//		function __autoload($class_name)
+//		{
+//			require_once dirname(dirname(dirname(__FILE__))) . '/classes/' . $class_name . '.php';
+//		}
 		
 		function __construct()
 		{
@@ -14,13 +14,24 @@
 			}
 		}
 		
+		
 		function isMaintenanceNeeded()
 		{
+			global $config;
 			global $db;
 			
+			if (!isset($db))
+			{
+				require_once dirname(dirname(dirname(__FILE__))) . '/classes/config.php';
+				$config = new config();
+				require_once dirname(dirname(dirname(__FILE__))) . '/classes/db.php';
+				$db = new database();
+			}
 			
-			$today = date('d.m.Y');
-			$last_maintenance = '00.00.0000';
+			$this->lockTable('misc_data');
+			
+			$today = date('Y-m-d');
+			$last_maintenance = '0000-00-0000';
 			
 			// check last time where maintenance was performed
 			$query = $db->SQL('SELECT `last_maintenance` FROM `misc_data` LIMIT 1');
@@ -48,10 +59,12 @@
 				$db->execute($query, $today);
 				$db->free($query);
 			}
+			$this->unlockTables();
 			
 			// daily maintenance
 			return (strcasecmp($today, $last_maintenance) !== 0);
 		}
+		
 		
 		function doMaintaince()
 		{
@@ -59,8 +72,26 @@
 			$this->maintainTeams();
 			$this->updateCountries();
 			$this->updateTeamActivity();
-			echo '<p>Maintenance performed successfully.</p>';
+			echo '<p>Performed maintenance.</p>';
 		}
+		
+		function unlockTables()
+		{
+			global $db;
+			
+			$db->SQL('UNLOCK TABLES');
+			$db->SQL('COMMIT');
+			$db->SQL('SET AUTOCOMMIT = 1');
+		}
+		
+		function lockTable($tableName, $write=true)
+		{
+			global $db;
+			
+			$db->SQL('LOCK TABLES `' . $tableName . '` ' . ($write ? 'WRITE' : 'READ'));
+			$db->SQL('SET AUTOCOMMIT = 0');
+		}
+		
 		
 		function maintainPlayers()
 		{
@@ -79,9 +110,19 @@
 			
 			
 			// delete no more used PMs
+			
+			// lock PM tables
+			$this->lockTable('pmsystem.msg.users');
+			$this->lockTable('pmsystem.msg.storage');
+			$this->lockTable('pmsystem.msg.recipients.teams');
+			$this->lockTable('pmsystem.msg.recipients.users');
+			
+			
 			$queryInMailboxOfUserid = $db->prepare('SELECT `msgid` FROM `pmsystem.msg.users` WHERE `userid`=?');
 			$queryInMailboxOfOthers = $db->prepare('SELECT `msgid` FROM `pmsystem.msg.users` WHERE `msgid`<>? LIMIT 1');
 			$queryDeletePMNoOwner = $db->prepare('DELETE FROM `pmsystem.msg.storage` WHERE `id`=? LIMIT 1');
+			$queryDeletePMTeamRecipients = $db->prepare('DELETE FROM `pmsystem.msg.recipients.teams` WHERE `msgid`=? LIMIT 1');
+			$queryDeletePMUserRecipients = $db->prepare('DELETE FROM `pmsystem.msg.recipients.users` WHERE `msgid`=? LIMIT 1');
 			
 			$db->execute($queryInMailboxOfUserid, $userid);
 			
@@ -102,6 +143,10 @@
 					// delete in global PM storage
 					$db->execute($queryDeletePMNoOwner, $row['msgid']);
 					$db->free($queryDeletePMNoOwner);
+					$db->execute($queryDeletePMTeamRecipients, $row['msgid']);
+					$db->free($queryDeletePMTeamRecipients);
+					$db->execute($queryDeletePMUserRecipients, $row['msgid']);
+					$db->free($queryDeletePMUserRecipients);
 				}
 			}
 			$db->free($queryInMailboxOfUserid);
@@ -115,6 +160,9 @@
 			{
 				$db->free($queryDeletePMNoOwner);
 			}
+			
+			// unlock these tables and write atomic changes back
+			$this->unlockTables();
 		}
 		
 		
@@ -122,6 +170,9 @@
 		{
 			global $db;
 			
+			
+			$this->lockTable('matches', false);
+			$this->lockTable('teams_overview');
 			
 			// update team activity
 			if ($teamid === false)
@@ -200,6 +251,8 @@
 			unset($teamid);
 			unset($team_activity45);
 			unset($team_activity90);
+			
+			$this->unlockTables();
 		}
 		
 		
@@ -207,6 +260,8 @@
 		{
 			global $db;
 			
+			
+			$this->lockTable('countries');
 			
 			$query = $db->prepare('SELECT `id` FROM `countries` WHERE `id`=? LIMIT 1');
 			$db->execute($query, '1');
@@ -242,27 +297,22 @@
 				$flag_name_stripped = str_replace('.png', '', $flag_name_stripped);
 				$flag_name_stripped = str_replace('_', ' ', $flag_name_stripped);
 				
+				$update_country = false;
+				$insert_entry = true;
+				
+				
 				// check if flag exists in database
 				$db->execute($queryFlag, $flag_name_stripped);
-				
-				$update_country = false;
-				$insert_entry = false;
-				if (!(mysql_num_rows($result) > 0))
+				while ($row = $db->fetchRow($queryFlag))
 				{
-					$update_country = true;
-					$insert_entry = true;
-				}
-				if (!$update_country)
-				{
-					while ($row = mysql_fetch_array($result))
+					if (!(strcmp($row['flagfile'], $one_country) === 0))
 					{
-						if (!(strcmp($row['flagfile'], $one_country) === 0))
-						{
-							$update_country = true;
-						}
+						$update_country = true;
+						$insert_entry = false;
 					}
 				}
-				mysql_free_result($result);
+				$db->free($queryFlag);
+				
 				
 				if ($update_country)
 				{
@@ -277,6 +327,8 @@
 					}
 				}
 			}
+			
+			$this->unlockTables();
 		}
 	}
 ?>
