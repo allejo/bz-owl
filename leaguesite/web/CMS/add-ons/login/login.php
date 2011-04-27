@@ -213,14 +213,14 @@
 				if (!$db->execute($query, date('Y-m-d H:i:s')))
 				{
 					$msg .= 'Could not delete expired invitations.';
-					logoutAndAbort($msg);
+					$this->logoutAndAbort($msg);
 				}
 			}
 			
 			// in no case an empty username is allowed
 			if (isset($_SESSION['username']) && (strlen($_SESSION['username']) < 2))
 			{
-				logoutAndAbort('<p>Any username is required to be at least 2 chars long</p>');
+				$this->logoutAndAbort('<p>Any username is required to be at least 2 chars long</p>');
 			}
 			
 			if ((isset($_SESSION['user_logged_in'])) && ($_SESSION['user_logged_in']))
@@ -230,14 +230,14 @@
 									  // only need an external login id in case an external login was performed by the viewing player
 									  // but look it up to find out if user is global login enabled
 									  // NOTE: this is only done as fallback in case the login module does not already handle it
-									  . ' `external_playerid`, '
+									  . ' `external_id`, '
 									  . '`status` FROM `players` WHERE `name`=?'
 									  // only one player tries to login so only fetch one entry, speeds up login a lot
 									  . ' LIMIT 1');
 				if (!$db->execute($query, $_SESSION['username']))
 				{
-					$msg = ('Could not get account data for external_playerid ' . $db->quote($_SESSION['external_id']) . '.');
-					logoutAndAbort($msg);
+					$msg = ('Could not get account data for external_id ' . $db->quote($_SESSION['external_id']) . '.');
+					$this->logoutAndAbort($msg);
 				}
 				
 				$rows = $db->fetchAll($query);
@@ -255,7 +255,7 @@
 					{
 						$_SESSION['viewerid'] = (int) $row['id'];
 						$suspended_mode = $row['status'];
-						if (strcmp(($row['external_playerid']), '') === 0)
+						if (strcmp(($row['external_id']), '') === 0)
 						{
 							$convert_to_external_login = $config->value('convertUsersToExternalLogin');
 						}
@@ -264,13 +264,13 @@
 				{
 					// name is not known, check if id is already in the database
 					// $rows_num_accounts === 0
-					$query = 'SELECT `id`, `status` FROM `players` WHERE `external_playerid`=? LIMIT 1';
+					$query = 'SELECT `id`, `status` FROM `players` WHERE `external_id`=? LIMIT 1';
 					$query = $db->prepare($query);
 					if (!$db->execute($query, $_SESSION['external_id']))
 					{
 						$msg .= ('Could not find out if player already has an account with id '
 								 . $db->quote($_SESSION['external_id']) . ' (renamed user?).');
-						logoutAndAbort($msg);
+						$this->logoutAndAbort($msg);
 					}
 					
 					$rows_num_accounts = 0;
@@ -295,7 +295,7 @@
 					{
 						$msg = ('Could not find out if password is set for local account with id '
 								. $db->quote($_SESSION['external_id']) . '.');
-						logoutAndAbort($msg);
+						$this->logoutAndAbort($msg);
 					}
 					
 					$rows_num_accounts = 0;
@@ -339,7 +339,7 @@
 					$msg .= '</form>' . "\n";
 					//				include_once(dirname(__FILE__) . '/local/login_text.php');
 					
-					logoutAndAbort($msg);
+					$this->logoutAndAbort($msg);
 				}
 				
 				if (isset($_SESSION['viewerid']) && ((int) $_SESSION['viewerid'] === (int) 0)
@@ -347,7 +347,7 @@
 				{
 					$msg .= ('There is a user that got banned/disabled by admins with the same username'
 							 . ' in the database already. Please choose a different username!');
-					logoutAndAbort($msg);
+					$this->logoutAndAbort($msg);
 				}
 				// dealing only with the current player from this point on
 				
@@ -364,21 +364,21 @@
 					if (!$db->execute($query, array($suspended_mode, $user_id)))
 					{
 						$msg .= 'Could not reactivate deleted account with id ' . $db->quote($user_id) . '.';
-						logoutAndAbort($msg);
+						$this->logoutAndAbort($msg);
 					}
 				}
 				if (strcmp($suspended_mode, 'login disabled') === 0)
 				{
 					$msg .= 'Login for this account was disabled by admins.';
 					// skip updates if the user has a disabled login (inappropriate callsign for instance)
-					logoutAndAbort($msg);
+					$this->logoutAndAbort($msg);
 				}
 				if (strcmp($suspended_mode, 'banned') === 0)
 				{
 					$msg .=  'Admins specified you should be banned from the entire site.';
 					// FIXME: BAN FOR REAL!!!!
 					// skip updates if the user is banned (inappropriate callsign for instance)
-					logoutAndAbort($msg);
+					$this->logoutAndAbort($msg);
 				}
 				unset($suspended_mode);
 				
@@ -387,12 +387,12 @@
 					if ($rows_num_accounts === 0)
 					{
 						$msg .= '<p class="first_p">Adding user to database…</p>' . "\n";
-						// example query: INSERT INTO `players` (`external_playerid`, `teamid`, `name`) VALUES ('1194', '0', 'ts')
-						$query = $db->prepare('INSERT INTO `players` (`external_playerid`, `teamid`, `name`)'
+						// example query: INSERT INTO `players` (`external_id`, `teamid`, `name`) VALUES ('1194', '0', 'ts')
+						$query = $db->prepare('INSERT INTO `players` (`external_id`, `teamid`, `name`)'
 											  . ' VALUES (?, ?, ?)');
 						if ($db->execute($query, array($_SESSION['external_id'], 0, htmlent($_SESSION['username']))))
 						{
-							$query = $db->prepare('SELECT `id` FROM `players` WHERE `external_playerid`=?');
+							$query = $db->prepare('SELECT `id` FROM `players` WHERE `external_id`=?');
 							if ($db->execute($query, $_SESSION['external_id']))
 							{
 								$rows = intval($db->rowCount($query));
@@ -424,7 +424,7 @@
 									$msg .= ('Unfortunately there seems to be a database problem and thus a unique id can not be retrieved for your account. '
 											 . ' Please try again later.</p>' . "\n"
 											 . '<p>If the problem persists please tell an admin');
-									logoutAndAbort($msg);
+									$this->logoutAndAbort($msg);
 								}
 							}
 						} else
@@ -435,7 +435,7 @@
 									 . ') can not be added to the list of players at this site. '
 									 . 'Please try again later.</p>' . "\n"
 									 . '<p>If the problem persists please report it to an admin');
-							logoutAndAbort($msg);
+							$this->logoutAndAbort($msg);
 						}
 						
 						// adding player profile entry
@@ -446,41 +446,59 @@
 							$msg .= ('Unfortunately there seems to be a database problem and thus creating your profile page (id='
 									 . htmlent($user_id)
 									 . ') failed. Please report this to admins.');
-							logoutAndAbort($msg);
+							$this->logoutAndAbort($msg);
 						}
 					} else
 					{
 						// user is not new, update his callsign with new callsign supplied from external login
 						
 						// check for collisions with all local accounts
-						$query = $db->prepare('SELECT `external_playerid` FROM `players` WHERE `name`=?');
+						$query = $db->prepare('SELECT `id`, `external_id` FROM `players` WHERE `name`=?');
 						if (!$db->execute($query, htmlent($_SESSION['username'])))
 						{
-							$msg = ('Could not find out if external_playerid is set for all accounts having name '
+							$msg = ('Could not find out if external_id is set for all accounts having name '
 									. $db->quote(htmlent($_SESSION['username'])) . '.');
-							logoutAndAbort($msg);
+							$this->logoutAndAbort($msg);
 						}
 						
 						$local_name_collisions = false;
 						while ($row = $db->fetchRow($query))
 						{
-							if (strcmp(($row['external_playerid']), '') === 0)
+							if (strcmp(($row['external_id']), '') === 0)
 							{
 								// yes, it was indeed a false positive
 								$local_name_collisions = true;
 							}
+							$collisionID = intval($row['id']);
 						}
 						$db->free($query);
+						
+						if (isset($_SESSION['external_login']) && $_SESSION['external_login'])
+						{
+							// see if error can be recovered (empty password set)
+							$query = $db->prepare('SELECT `password` FROM `players_passwords` WHERE `playerid`=? LIMIT 1');
+							$db->execute($query, $collisionID);
+							if ($collisionID > 0 && $row = $db->fetchRow($query))
+							{
+								$updateAccountQuery = $db->prepare('UPDATE `players` SET `external_id`=? WHERE `id`=? LIMIT 1');
+								$db->execute($updateAccountQuery, array($_SESSION['external_id'], $collisionID));
+								$msg .= '<p>Your account has been updated (empty password case detected).</p>';
+								
+								// recovered from collision
+								$local_name_collisions = false;
+							}
+						}
+						
 						
 						if ($local_name_collisions)
 						{
 							// non-resolvable collisions found, reset username of current user
-							$query = $db->prepare('SELECT `name` FROM `players` WHERE `external_playerid`=? LIMIT 1');
+							$query = $db->prepare('SELECT `name` FROM `players` WHERE `external_id`=? LIMIT 1');
 							if (!$db->execute($query, $_SESSION['external_id']))
 							{
-								$msg = ('Could not find out if external_playerid is set for all accounts having name '
+								$msg = ('Could not find out if external_id is set for all accounts having name '
 										. $db->quote(htmlent($_SESSION['username'])) . '.');
-								logoutAndAbort($msg);
+								$this->logoutAndAbort($msg);
 							}
 							while ($row = $db->fetchRow($query))
 							{
@@ -489,6 +507,7 @@
 							$db->free($query);
 							// print out a warning to the user, mentioning the non-updated callsign
 							$msg .= '<p>Your callsign was not updated because there is already another local account in the database with the same callsign.</p>';
+							$this->logoutAndAbort($msg);
 						} else
 						{
 							// update name in case there is no collision
@@ -496,7 +515,7 @@
 							$args = array(htmlent($_SESSION['username']));
 							if (isset($_SESSION['external_login']) && ($_SESSION['external_login']))
 							{
-								$query .= ' WHERE `external_playerid`=?';
+								$query .= ' WHERE `external_id`=?';
 								$args[] = $_SESSION['external_id'];
 							} else
 							{
@@ -510,7 +529,7 @@
 								$msg .= ('Unfortunately there seems to be a database problem which prevents the system from updating your callsign (id='
 										 . htmlent($user_id)
 										 . '). Please report this to an admin.</p>');
-								logoutAndAbort($msg);
+								$this->logoutAndAbort($msg);
 							}
 						}
 						unset($local_name_collisions);
@@ -524,7 +543,7 @@
 						{
 							// user is not new, update his callsign with new external playerid supplied from login
 							
-							// external_playerid was empty, set it to the external value obtained by bzidtools
+							// external_id was empty, set it to the external value obtained by bzidtools
 							// create a new cURL resource
 							$ch = curl_init();
 							
@@ -543,8 +562,8 @@
 							// update the entry with the result from the bzidtools2.php script
 							if ((strlen($output) > 9) && (strcmp(substr($output, 0, 9), 'SUCCESS: ') === 0))
 							{
-								// example query: UPDATE `players` SET `external_playerid`='$external_id' WHERE `id`='$internal_id' LIMIT 1;
-								$query = $db->prepare('UPDATE `players` SET `external_playerid`=?'
+								// example query: UPDATE `players` SET `external_id`='$external_id' WHERE `id`='$internal_id' LIMIT 1;
+								$query = $db->prepare('UPDATE `players` SET `external_id`=?'
 													  // each user has only one entry in the database
 													  . ' WHERE `id`=? LIMIT 1');
 								if (!$db->execute($query, array(htmlent(substr($output, 9)), $internal_login_id)))
@@ -553,7 +572,7 @@
 											. ' which prevents the system from setting your external playerid (id='
 											. htmlent($user_id)
 											. '). Please report this to an admin.');
-									logoutAndAbort($msg);
+									$this->logoutAndAbort($msg);
 								}
 								$msg = 'Congratulations, you enabled ';
 								if (isset($module['bzbb']) && ($module['bzbb']))
@@ -576,14 +595,14 @@
 								// log the problem
 								$db->logError($db->quote($msg));
 								
-								logoutAndAbort($msg);
+								$this->logoutAndAbort($msg);
 							}
 						}
 						
 						$this->helper->addMsg($msg);
 						if ($config->value('forceExternalLoginOnly'))
 						{
-							logoutAndAbort('');
+							$this->logoutAndAbort('');
 						}
 					}
 				}
@@ -593,13 +612,13 @@
 				{
 					// find out if someone else once used the same callsign
 					// update the callsign from the other player in case he did
-					// example query: SELECT `external_playerid` FROM `players` WHERE (`name`='ts') AND (`external_playerid` <> '1194')
-					// AND (`external_playerid` <> '') AND (`status`='active' OR `status`='deleted')
+					// example query: SELECT `external_id` FROM `players` WHERE (`name`='ts') AND (`external_id` <> '1194')
+					// AND (`external_id` <> '') AND (`status`='active' OR `status`='deleted')
 					// FIXME: sql query should be case insensitive (SELECT COLLATION(VERSION()) returns utf8_general_ci)
-					$query = ('SELECT `external_playerid` FROM `players` WHERE (`name`=?)'
-							  . ' AND (`external_playerid` <> ?)'
+					$query = ('SELECT `external_id` FROM `players` WHERE (`name`=?)'
+							  . ' AND (`external_id` <> ?)'
 							  // do not update users with local login
-							  . ' AND (`external_playerid` <> ' . "''" . ')'
+							  . ' AND (`external_id` <> ' . "''" . ')'
 							  // skip updates for banned or disabled accounts (inappropriate callsign for instance)
 							  . ' AND (`status`=? OR `status`=?)');
 					$query = $db->prepare($query);
@@ -609,7 +628,7 @@
 						$msg = ('Finding other members who had the same name '
 								. $db->quote(htmlent($_SESSION['username']))
 								. 'failed. This is a database problem. Please report this to an admin!');
-						logoutAndAbort($msg);
+						$this->logoutAndAbort($msg);
 					}
 					
 					$errno = 0;
@@ -624,7 +643,7 @@
 						
 						// set URL and other appropriate options
 						curl_setopt($ch, CURLOPT_URL, 'http://my.bzflag.org/bzidtools2.php?action=name&value='
-									. "'" . (intval($row['external_playerid'])) . "'");
+									. "'" . (intval($row['external_id'])) . "'");
 						curl_setopt($ch, CURLOPT_HEADER, 0);
 						curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 						
@@ -635,16 +654,16 @@
 						curl_close($ch);
 						
 						// update the entry with the result from the bzidtools2.php script
-						$query = $db->prepare('UPDATE `players` SET `name`=? WHERE `external_playerid`=?');
+						$query = $db->prepare('UPDATE `players` SET `name`=? WHERE `external_id`=?');
 						if ((strlen($output) > 10) && (strcmp(substr($output, 0, 9), 'SUCCESS: ') === 0))
 						{
-							// example query: UPDATE `players` SET `name`='moep' WHERE `external_playerid`='external_id';
+							// example query: UPDATE `players` SET `name`='moep' WHERE `external_id`='external_id';
 							$args = array(htmlent(substr($output, 9)), intval($rows[$i]['bzid']));
 						} else
 						{
 							// example query: UPDATE `players` SET `name`=
 							// 'moep ERROR: SELECT username_clean FROM bzbb3_users WHERE user_id=uidhere'
-							// WHERE `external_playerid`='external_id';
+							// WHERE `external_id`='external_id';
 							$args = array(htmlent($_SESSION['username']) . ' ' . htmlent($output), intval($rows[$i]['bzid']));
 						}
 						
@@ -657,7 +676,7 @@
 									. ' users with the callsign in the table and people will'
 									. 'have problems to distinguish you two!</p>'
 									. '<p>Please report this to an admin.');
-							logoutAndAbort($msg);
+							$this->logoutAndAbort($msg);
 						}
 					}
 				}
@@ -717,7 +736,7 @@
 						if (!$db->execute($query, $user_id))
 						{
 							$msg .= 'Could not remove already logged in user from online user table. Database broken?';
-							logoutAndAbort($msg);
+							$this->logoutAndAbort($msg);
 						}
 					}
 					
