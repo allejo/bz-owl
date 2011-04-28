@@ -2,16 +2,10 @@ until next release:
 
 * Private messages, news and static pages must work as good as in the last release.
 
-* Maintenance code was specific to old DB version, must be updated.
-
-* DB updater script must work flawless.
-
 * Be able to edit a news entry without changing timestamp of the news.
 
-* Verify PM send (welcome message) to new user at login.
+* Test, test, test
 
-* Make sure users with empty password entry in players_passwords get updated
-  to new accounts upon using bzbb login automatically
 
 short term:
 

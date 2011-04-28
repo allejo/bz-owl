@@ -5,9 +5,9 @@
 		{
 			// this add-on generates graphics for team activity
 			// TODO: engine to generate the images not chosen yet
-/*
-			include_once('yearly.php');
-			include_once('teams.php');
+
+			include_once(dirname(__FILE__) . '/yearly.php');
+/*			include_once('teams.php');
 			include_once('teams_ez.php');
 			include_once('schoenes.php');
 			include_once('VerticalBarChartTest.php');

@@ -26,8 +26,8 @@
 	{
 		die('this file is not meant to be called directly');
 	}
-
-	include "../CMS/libchart-1.2.1/libchart/classes/libchart.php";
+	
+	include dirname(dirname(dirname(__FILE))) . '/libchart-1.2.1/libchart/classes/libchart.php';
 
 	// get stats from database
 	$query = 'SELECT `timestamp` FROM `matches` ORDER BY `timestamp`';

@@ -5,10 +5,13 @@ bz-owl release notes
 1.2 (current development trunk)
 ---
 * overall code re-organisation, concentrating on readability
+* several database structure changes to fit new add-on system
+* rename player to user at new code
 * new login add-on (in progress)
 * new maintenance add-on (partially done)
-* serve xhtml using MIME type application/xhtml+xml on production environment
 * fix some markup problems
+* serve xhtml using MIME type application/xhtml+xml on production environment
+* implement database update script
 * db class error reporting with fallback to text file
 * add example teamStats add-on
 * downgrade web/CMS/announcements to keep compatibility with ducati code

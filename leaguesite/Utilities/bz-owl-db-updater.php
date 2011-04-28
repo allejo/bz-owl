@@ -12,8 +12,18 @@
 	}
 	
 	// use the simple site.php as it's quite convenient to use
-	// TODO: need to be able to specify a path to the installation
-	require_once (dirname(dirname(__FILE__)) . '/web/CMS/site.php');
+	
+	// default to path within repository
+	$path = dirname(dirname(__FILE__)) . '/web/';
+	
+	// use custom installation path info if available
+	$installationPathFile = dirname(__FILE__) . '/installationPath.txt';
+	if (file_exists($installationPathFile) && is_readable($installationPathFile))
+	{
+		$path = dirname(__FILE__) . '/' . file_get_contents($installationPathFile);
+	}
+	// load site.php
+	require_once $path . 'CMS/site.php';
 	$site = new site();
 	
 	// do not run if website is in production mode
