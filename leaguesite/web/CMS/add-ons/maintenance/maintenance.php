@@ -86,9 +86,12 @@
 		{
 			global $db;
 			
-			$db->SQL('UNLOCK TABLES');
-			$db->SQL('COMMIT');
-			$db->SQL('SET AUTOCOMMIT = 1');
+			if (isset($db))
+			{
+				$db->SQL('UNLOCK TABLES');
+				$db->SQL('COMMIT');
+				$db->SQL('SET AUTOCOMMIT = 1');
+			}
 		}
 		
 		function lockTable($tableName, $write=true)
@@ -192,6 +195,7 @@
 				$num_active_teams = count($teamid) -1;
 			}
 			
+			// TODO: merge the two activity calculations into a single loop
 			$team_activity45 = array();
 			$timestamp = strtotime('-45 days');
 			$timestamp = strftime('%Y-%m-%d %H:%M:%S', $timestamp);
@@ -232,7 +236,7 @@
 				$team_activity90[$i] = number_format(round($team_activity90[$i], 2), 2, '.', '');
 			}
 			
-			$db->prepare('Update `teams_overview` SET `activity`=? WHERE `teamid`=?');
+			$query = $db->prepare('UPDATE `teams_overview` SET `activity`=? WHERE `teamid`=?');
 
 			for ($i = 0; $i <= $num_active_teams; $i++)
 			{
