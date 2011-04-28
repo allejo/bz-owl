@@ -193,23 +193,32 @@
 			} else
 			{
 				$num_active_teams = count($teamid) -1;
+				
+				// wrap $teamid into an array if it is no array already
+				if (!is_array($teamid))
+				{
+					$teamid = array($teamid);
+				}
 			}
 			
 			// TODO: merge the two activity calculations into a single loop
 			$team_activity45 = array();
 			$timestamp = strtotime('-45 days');
 			$timestamp = strftime('%Y-%m-%d %H:%M:%S', $timestamp);
-			$query = $db->prepare('SELECT COUNT(*) as `num_matches` FROM `matches` WHERE `timestamp`>?'
+			
+			// find out how many matches each team did play
+			$matchCountQuery = $db->prepare('SELECT COUNT(*) as `num_matches` FROM `matches` WHERE `timestamp`>?'
 								  . ' AND (`team1_teamid`=? OR `team2_teamid`=?)');
+								  print_r($teamid);
 			// find out how many matches each team did play
 			for ($i = 0; $i <= $num_active_teams; $i++)
 			{
-				$db->execute($query, array($timestamp, $teamid[$i], $teamid[$i]));
-				while ($row = $db->fetchRow($query))
+				$db->execute($matchCountQuery, array($timestamp, $teamid[$i], $teamid[$i]));
+				while ($row = $db->fetchRow($matchCountQuery))
 				{
 					$team_activity45[$i] = intval($row['num_matches']);
 				}
-				$db->free($query);
+				$db->free($matchCountQuery);
 				
 				$team_activity45[$i] = ($team_activity45[$i] / 45);
 				// number_format may round but it is not documented (behaviour may change), force doing it
@@ -219,25 +228,22 @@
 			$team_activity90 = array();
 			$timestamp = strtotime('-90 days');
 			$timestamp = strftime('%Y-%m-%d %H:%M:%S', $timestamp);
-			// find out how many matches each team did play
-			$query = $db->prepare('SELECT COUNT(*) as `num_matches` FROM `matches` WHERE `timestamp`>?'
-								  .' AND (`team1_teamid`=? OR `team2_teamid`=?)');
 			for ($i = 0; $i <= $num_active_teams; $i++)
 			{
-				$db->execute($query, array($timestamp, $teamid[$i], $teamid[$i]));
-				while ($row = $db->fetchRow($query))
+				$db->execute($matchCountQuery, array($timestamp, $teamid[$i], $teamid[$i]));
+				while ($row = $db->fetchRow($matchCountQuery))
 				{
 					$team_activity90[$i] = intval($row['num_matches']);
 				}
-				$db->free($query);
+				$db->free($matchCountQuery);
 				
 				$team_activity90[$i] = ($team_activity90[$i] / 90);
 				// number_format may round but it is not documented (behaviour may change), force doing it
 				$team_activity90[$i] = number_format(round($team_activity90[$i], 2), 2, '.', '');
 			}
 			
+			
 			$query = $db->prepare('UPDATE `teams_overview` SET `activity`=? WHERE `teamid`=?');
-
 			for ($i = 0; $i <= $num_active_teams; $i++)
 			{
 				$team_activity45[$i] .= ' (' . $team_activity90[$i] . ')';
