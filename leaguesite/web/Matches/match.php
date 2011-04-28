@@ -62,7 +62,8 @@
 		require_once ('../CMS/maintenance/index.php');
 		
 		echo '<p>The match was entered successfully.</p>' . "\n";
-		echo '<a class="button" href="./">Enter another match</a>' . "\n";
+		echo "</div><div>\n";	// move button out of the static page box
+		echo '<a class="button" href="./?enter">Enter another match</a>' . "\n";
 		
 		$site->dieAndEndPage();
 	}
@@ -204,7 +205,7 @@
 		
 		show_score_changes($team_stats_changes, array_keys($team_stats_changes));
 		
-		// done with entering that match
+		// done with editing that match
 		unlock_tables();
 		
 		require_once ('../CMS/maintenance/index.php');
@@ -341,7 +342,7 @@
 		
 		
 		
-		// done with entering that match
+		// done with deleting that match
 		unlock_tables();
 		
 		require_once ('../CMS/maintenance/index.php');
