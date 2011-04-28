@@ -139,6 +139,10 @@
 		// logout the user
 		function logout()
 		{
+			// reset all session variables of this session
+			session_unset();
+			
+			// fill login related session variables with default data
 			$_SESSION['user_logged_in'] = false;
 			$_SESSION['viewerid'] = -1;
 		}
