@@ -31,6 +31,7 @@ bz-owl release notes
 * add web/CMS/classes to be used by new web/CMS/site.php
 * new site config settings using settings.php
 * new code uses integrated template library
+* new code uses PDO
 
 1.0 (2010-10-06)
 --
