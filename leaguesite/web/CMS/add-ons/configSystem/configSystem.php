@@ -1,13 +1,16 @@
 <?php
-	class config
+	class configSystem
 	{
-		function __construct()
+		function __construct($title, $path)
 		{
+			global $config;
+			global $tmpl;
+			global $user;
+			
 			// set a cookie to test if client accepts cookies
 			$output_buffer = '';
 			ob_start();
-			require dirname(dirname(__FILE__)) . '/CMS/site.php';
-			$site = new site();
+			
 			@setcookie('cookies', 'allowed', 0, $config->value('basepath') . 'Config/', $config->value('domain'), 0);
 			
 			$theme = '';
@@ -22,7 +25,7 @@
 				}
 				
 				// check if theme stylesheet file does exist
-				if (!file_exists(dirname(dirname(__FILE__)) .'/themes/'
+				if (!file_exists(dirname(dirname(dirname(dirname(__FILE__)))) .'/themes/'
 								 . str_replace(' ', '%20', htmlspecialchars($theme) . '/')
 								 . str_replace(' ', '%20', htmlspecialchars($theme) . '.css')))
 				{
@@ -48,11 +51,11 @@
 			// read out installed themes instead of defining a fixed list in source code
 			
 			// first scan the files in the themes directory
-			$themes = scandir(dirname(dirname(__FILE__)) . '/themes/');
+			$themes = scandir(dirname(dirname(dirname(__FILE__))) . '/themes/');
 			foreach ($themes as $i => $curFile)
 			{
 				// remove entry from array if it's no folder
-				if (!is_dir(dirname(dirname(__FILE__)) . '/themes/' . $curFile))
+				if (!is_dir(dirname(dirname(dirname(__FILE__))) . '/themes/' . $curFile))
 				{
 					unset($themes[$i]);
 					continue;
@@ -75,13 +78,16 @@
 				}
 				
 				// filter themes with no stylesheet
-				if (isset($themes[$i]) && !file_exists(dirname(dirname(__FILE__)) . '/themes/' . $curFile . '/' . $curFile . '.css'))
+				if (isset($themes[$i])
+					&& !file_exists(dirname(dirname(dirname(dirname(__FILE__)))) . '/themes/' . $curFile . '/' . $curFile . '.css'))
 				{
+					echo dirname(dirname(dirname(__FILE__))) . '/themes/' . $curFile . '/' . $curFile . '.css' . '<br>';
 					unset($themes[$i]);
 				}
 				
 				// filter unfinished themes if debugSQL is turned off
-				if (isset($themes[$i]) && !$config->value('debugSQL') && file_exists(dirname(dirname(__FILE__)) . '/themes/' . $curFile . '/unfinished'))
+				if (isset($themes[$i]) && !$config->value('debugSQL')
+					&& file_exists(dirname(dirname(dirname(__FILE__))) . '/themes/' . $curFile . '/unfinished'))
 				{
 					unset($themes[$i]);
 				}
