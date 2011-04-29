@@ -1,9 +1,5 @@
 until next release:
 
-* Private messages, news and static pages must work as good as in the last release.
-
-* Be able to edit a news entry without changing timestamp of the news.
-
 * Test, test, test
 
 
