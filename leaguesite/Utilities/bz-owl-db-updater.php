@@ -283,7 +283,8 @@
 				 (5, 'FAQ/', 'FAQ', 'staticPageEditor'),
 				 (6, 'Links/', 'Links', 'staticPageEditor'),
 				 (7, 'Contact/', 'Contact', 'staticPageEditor'),
-				 (8, 'Bans/', 'Bans', 'newsSystem')");
+				 (8, 'Bans/', 'Bans', 'newsSystem')
+				 (9, 'Config/','Config','config')");
 		
 		status('Updating last_maintenance column of misc_data to YYYY-MM-DD format');
 		$db->SQL("ALTER TABLE `misc_data` CHANGE `last_maintenance` `last_maintenance` varchar(10) NULL DEFAULT '0000-00-00'");
