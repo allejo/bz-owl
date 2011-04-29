@@ -5,6 +5,16 @@
 		{
 			global $config;
 			
+			if (!$current && isset($_GET['path']))
+			{
+				if (strcmp($folder, $_GET['path']) === 0)
+				{
+					$current = true;
+				}
+			}
+			
+			$showCurNavLink = ((!isset($_GET['path']) && count($_GET) > 0) || (isset($_GET['path']) && count($_GET) > 1));
+			
 			$link = '<li>';
 			if (!$current)
 			{
@@ -14,12 +24,12 @@
 					$link .= 'class="unread" ';
 				}
 				$link .= 'href="' . ($config->value('baseaddress') . $folder) . '">';
-			} elseif (count($_GET) > 0)
+			} elseif ($showCurNavLink)
 			{
 				$link .= '<a class="current_nav_entry" href="' . ($config->value('baseaddress') . $folder) . '">';
 			}
 			$link .= $title;
-			if (!$current || (count($_GET) > 0))
+			if (!$current || $showCurNavLink)
 			{
 				$link .= '</a>';
 			}
@@ -69,18 +79,9 @@
 			
 			$name = $site->basename();
 			
-			// public_html on FreeBSD or Sites on Mac OS X
-			$topDir = 'public_html';
-			// top level dir depends on siteconfig
-			
-			$pos = strrpos(dirname(dirname(dirname(__FILE__))), '/');
-			
-			if ($pos !== false)
-			{
-				$topDir = substr(dirname(dirname(dirname(__FILE__))), $pos+1);;
-			}
-			
-			$topDir = strcmp($name, $topDir) === 0;
+
+			// top level dir has either no path set or it's /
+			$topDir = !isset($_GET['path']) || (strcmp($_GET['path'], '/') === 0);
 			
 			if (!$logged_in)
 			{
@@ -88,13 +89,7 @@
 			}
 			if ($topDir)
 			{
-				if (count($_GET) === 0)
-				{
-					$menu[] = '<li>Home</li>' . "\n";
-				} else
-				{
-					$menu[] = '<li><a class="current_nav_entry" href="' . ($config->value('baseaddress')) . '">Home</a></li>' . "\n";
-				}
+				$menu[] = $this->writeLink('', 'Home' , !isset($_GET['path']));
 			} else
 			{
 				$menu[] = '<li><a href="' . $config->value('baseaddress') . '">Home</a></li>' . "\n";

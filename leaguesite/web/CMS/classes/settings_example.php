@@ -117,8 +117,7 @@
 						 // where errors should be written if db connection is gone
 						 // file must exist in order to be used
 						 // do not forget to give PHP write perms to that file
-						 'errorLogFile' => dirname(__FILE__) . '/errorlog.txt',
-						 'test' => true
+						 'errorLogFile' => dirname(__FILE__) . '/errorlog.txt'
 						 );
 		}
 		
