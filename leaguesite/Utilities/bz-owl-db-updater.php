@@ -217,20 +217,20 @@
 		
 		
 		status('Converting news and bans tables to newsSystem add-on');
-		$db->SQL('RENAME TABLE `news` TO `newsSystem`');
+		$db->SQL('RENAME TABLE `news` TO `newssystem`');
 		
 		status('Inserting title and page column to newsSystem table and renaming all announcements to msgs');
-		$db->SQL("ALTER TABLE `newsSystem` ADD `title` varchar(256) NOT NULL DEFAULT 'News'  AFTER `id`");
-		$db->SQL('ALTER TABLE `newsSystem` CHANGE `announcement` `msg` text NULL DEFAULT NULL');
-		$db->SQL('ALTER TABLE `newsSystem` CHANGE `raw_announcement` `raw_msg` text NULL DEFAULT NULL');
-		$db->SQL("ALTER TABLE `newsSystem` ADD `page` varchar(1000) NOT NULL DEFAULT 'news'  AFTER `raw_msg`");
+		$db->SQL("ALTER TABLE `newssystem` ADD `title` varchar(256) NOT NULL DEFAULT 'News'  AFTER `id`");
+		$db->SQL('ALTER TABLE `newssystem` CHANGE `announcement` `msg` text NULL DEFAULT NULL');
+		$db->SQL('ALTER TABLE `newssystem` CHANGE `raw_announcement` `raw_msg` text NULL DEFAULT NULL');
+		$db->SQL("ALTER TABLE `newssystem` ADD `page` varchar(1000) NOT NULL DEFAULT 'news'  AFTER `raw_msg`");
 		
 		status('Force update page column to news just in case DBMS does not do that automatically');
-		$db->SQL("UPDATE `newsSystem` SET `page`='News/'");
+		$db->SQL("UPDATE `newssystem` SET `page`='News/'");
 		
 		status('Inserting ban entries to newsSystem');
 		$query = $db->SQL('SELECT * FROM `bans`');
-		$bansInsertQuery = $db->prepare('INSERT INTO `newsSystem` (`title`, `timestamp`, `author`, `msg`, `raw_msg`, `page`)'
+		$bansInsertQuery = $db->prepare('INSERT INTO `newssystem` (`title`, `timestamp`, `author`, `msg`, `raw_msg`, `page`)'
 										. ' VALUES (?, ?, ?, ?, ?, ?)');
 		while ($row = $db->fetchRow($query))
 		{

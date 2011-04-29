@@ -86,6 +86,8 @@
 													 . 'In the FAQ you can find the most important informations'
 													 . ' about organising and playing matches.' . "\n\n"
 													 . 'See you on the battlefield.'),
+						 // allow authors to change timestamp of original message
+						 'newsSystem.permissions.allowChangeTimestampOnEdit' => false,
 						 // regenerate session id after x seconds, default 15 minutes (60*15)
 						 // the lower x: safer, higher x faster
 						 'sessionRegenTime' => 60*15,

@@ -255,6 +255,8 @@
 			return $dbResult->getHandle()->fetchAll();
 		}
 		
+		// do not use on SELECT statements as result may vary there,
+		// depending on db engine
 		function rowCount(database_result $dbResult)
 		{
 			return $dbResult->getHandle()->rowCount();

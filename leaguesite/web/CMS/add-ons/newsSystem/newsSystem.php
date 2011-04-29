@@ -100,6 +100,22 @@
 		}
 		
 		
+		// returns old timestamp if possible, false on failure
+		private function getOriginalTimestamp()
+		{
+			global $db;
+			
+			
+			$query = $db->prepare('SELECT `timestamp` FROM `newssystem` WHERE `id`=? LIMIT 1');
+			$db->execute($query, $this->edit_id);
+			
+			$row = $db->fetchRow($query);
+			$db->free($query);
+			
+			return $row['timestamp'];
+		}
+		
+		
 		function delete()
 		{
 			global $db;
@@ -107,7 +123,7 @@
 			
 			if (isset($_GET['delete']))
 			{
-				$query = $db->prepare('DELETE FROM `newsSystem` WHERE `id`=?');
+				$query = $db->prepare('DELETE FROM `newssystem` WHERE `id`=?');
 				if ($db->execute($query, intval($_GET['delete'])))	// FIXME: use better validation than intval()
 				{
 					$tmpl->assign('MSG', 'Article deleted.' . $tmpl->linebreaks("\n\n"));
@@ -177,6 +193,18 @@
 				$content = array();
 				$content['raw_msg'] = '';
 				$content['title'] = '';
+			}
+			
+			// let authors change timestamp, if allowed in config
+			if ($config->value('newsSystem.permissions.allowChangeTimestampOnEdit'))
+			{
+				if ($readonly || isset($_POST['confirmationStep']) && isset($_POST['time']))
+				{
+					$tmpl->assign('timestamp', htmlspecialchars($_POST['time']));
+				} else
+				{
+					$tmpl->assign('timestamp', $this->getOriginalTimestamp());
+				}
 			}
 			
 			
@@ -252,7 +280,7 @@
 				// TODO: id only needed if user can edit or delete
 				// TODO: meaning room for optimisation
 				$query = $db->prepare('SELECT `id`,`title`,`timestamp`,`author`,`msg`'
-								  . ' FROM `newsSystem` WHERE `page`=:page'
+								  . ' FROM `newssystem` WHERE `page`=:page'
 								  . ' ORDER BY `timestamp` DESC'
 								  . ' LIMIT :limit OFFSET :offset');
 				$params = array();
@@ -262,7 +290,7 @@
 			} else
 			{
 				$query = $db->prepare('SELECT `title`,`timestamp`,`author`,`raw_msg`'
-								  . ' FROM `newsSystem` WHERE `id`=?');
+								  . ' FROM `newssystem` WHERE `id`=?');
 				$params = isset($this->edit_id) ? $this->edit_id : -1;
 			}
 			$db->execute($query, $params);
@@ -341,19 +369,54 @@
 			if (strcmp($content, '') === 0)
 			{
 				// empty content
-				$query = $db->prepare('DELETE FROM `newsSystem` WHERE `id`=?');
+				$query = $db->prepare('DELETE FROM `newssystem` WHERE `id`=?');
 				$db->execute($query, $this->edit_id);
 				$db->free($query);
 				return true;
 			}
 			
-			$query = $db->prepare('SELECT `id` FROM `newsSystem` WHERE `id`=? LIMIT 1');
-			$db->execute($query, $this->edit_id);
+			// check if there is an existing news entry that corresponds to the request
+			$udateEntry = $this->getOriginalTimestamp();
 			
-			// number of rows
-			$rows = $db->rowCount($query);
-			$db->free($query);
-			$date_format = date('Y-m-d H:i:s');
+			switch(isset($_POST['time']))
+			{
+				case false:
+					if ($udateEntry === false)
+					{
+						$date_format = date('Y-m-d H:i:s');
+					} else
+					{
+						$date_format = $udateEntry;
+					}
+					break;
+				
+				
+				default:
+					if (isset($_POST['time']))
+					{
+						if ($config->value('newsSystem.permissions.allowChangeTimestampOnEdit'))
+						{
+							if (strtotime($_POST['time']) === false)
+							{
+								// timestamp submitted was invalid
+								if ($date_format = $this->getOriginalTimestamp() === false)
+								{
+									// could not get original timestamp, either
+									// fall back to current time
+									$date_format = date('Y-m-d H:i:s');
+								}
+							} else
+							{
+								// timestamp was a valid timestamp
+								// so use it
+								$date_format = $_POST['time'];
+							}
+						} else
+						{
+							$date_format = date('Y-m-d H:i:s');
+						}
+					}
+			}
 			
 			$query = $db->prepare('SELECT `name` FROM `players` WHERE `id`=? LIMIT 1');
 			$db->execute($query, $user->getID());
@@ -377,18 +440,19 @@
 				$args[] = $content;
 			}
 			
-			if ($rows < ((int) 1))
+			
+			if ($udateEntry === false)
 			{
 				// no entry in table regarding current page
 				// thus insert new data
-				$query = $db->prepare('INSERT INTO `newsSystem`'
+				$query = $db->prepare('INSERT INTO `newssystem`'
 					. ' (`author`, `title`, `timestamp`, `raw_msg`, `msg`, `page`)'
 					. ' VALUES (?, ?, ?, ?, ?, ?)');
 				$args[] = $this->page_path;
 			} else
 			{
 				// either 1 or more entries found, just assume there is only one
-				$query = $db->prepare('UPDATE `newsSystem` SET `author`=?'
+				$query = $db->prepare('UPDATE `newssystem` SET `author`=?'
 									  . ', `title`=?'
 									  . ', `timestamp`=?'
 									  . ', `raw_msg`=?'
