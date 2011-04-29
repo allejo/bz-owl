@@ -19,7 +19,7 @@
 		$connection = $site->connect_to_db();
 	}
 	
-	
+	$maintenanceNeeded = true;
 	
 	// find out when last maintenance happened
 	$last_maintenance = '0000-00-00';
@@ -51,16 +51,19 @@
 		
 		// nothing else to do
 		// stop silently
-		die();
+		$maintenanceNeeded = false;
 	}
 	
-	// do the maintenance
-	$maint = new maintenance_old();
-	$maint->do_maintenance($site, $connection);
-	// call the new maintenance add-on directly to do the job
-	require_once(dirname(dirname(__FILE__)) . '/add-ons/maintenance/maintenance.php');
-	$maintenance = new maintenance();
-	// done
+	if ($maintenanceNeeded)
+	{
+		// do the maintenance
+		$maint = new maintenance_old();
+		$maint->do_maintenance($site, $connection);
+		// call the new maintenance add-on directly to do the job
+		require_once(dirname(dirname(__FILE__)) . '/add-ons/maintenance/maintenance.php');
+		$maintenance = new maintenance();
+		// done
+	}
 	
 	function update_activity($teamid=false)
 	{

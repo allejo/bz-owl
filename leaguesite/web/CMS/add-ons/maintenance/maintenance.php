@@ -209,7 +209,7 @@
 			// find out how many matches each team did play
 			$matchCountQuery = $db->prepare('SELECT COUNT(*) as `num_matches` FROM `matches` WHERE `timestamp`>?'
 								  . ' AND (`team1_teamid`=? OR `team2_teamid`=?)');
-								  print_r($teamid);
+			
 			// find out how many matches each team did play
 			for ($i = 0; $i <= $num_active_teams; $i++)
 			{
