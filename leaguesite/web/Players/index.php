@@ -306,49 +306,24 @@
 			}
 			mysql_free_result($result);
 			
-			// lock messages_storage because of mysql_insert_id() usage
-			$query = 'LOCK TABLES `messages_storage` WRITE';
-			if (!($result = @$site->execute_query('messages_storage', $query, $connection)))
-			{
-				// query was bad, error message was already given in $site->execute_query(...)
-				$site->dieAndEndPage('');
-			}
-			
-			
-			// create invitation message in database
-			$query = 'INSERT INTO `messages_storage` (`author_id`, `subject`, `timestamp`, `message`, `from_team`, `recipients`) VALUES ';
-			$query .= '(' . sqlSafeStringQuotes ('0');
-			$query .= ', ' . sqlSafeStringQuotes(('Invitation to team ' . $team_name)) . ', ' . sqlSafeStringQuotes(date('Y-m-d H:i:s'));
-			$query .= ', ' . sqlSafeStringQuotes(('Congratulations, you were invited by ' . $player_name . ' to the team ' . htmlent_decode($team_name) . '!' . "\n\n" . 
-			"[URL=\"".basepath()."Teams/?join=$invited_to_team\"]Click here to accept the invitation.[/URL]\n\nYou must leave your current team before accepting an invitation to a new team.\n\nThe invitation will expire in 7 days."));
-			$query .= ', ' . sqlSafeStringQuotes('0') . ', ' . sqlSafeStringQuotes($profile) . ')';
-			if (!($result = @$site->execute_query('messages_storage', $query, $connection)))
-			{
-				// query was bad, error message was already given in $site->execute_query(...)
-				$site->dieAndEndPage('');
-			}
-			
-			// get the msgid generated from database
-			$msgid = mysql_insert_id($connection);
-			
-			// unlock messages_storage because mysql_insert_id() was used and is no longer needed
-			$query = 'UNLOCK TABLES';
-			if (!($result = @$site->execute_query('messages_storage', $query, $connection)))
-			{
-				// query was bad, error message was already given in $site->execute_query(...)
-				$site->dieAndEndPage('');
-			}
-			
-			// send the invitation message to user
-			$query = 'INSERT INTO `messages_users_connection` (`msgid`, `playerid`, `in_inbox`, `in_outbox`) VALUES ';
-			$query .= '(' . sqlSafeStringQuotes($msgid) . ', ' . sqlSafeStringQuotes($profile);
-			$query .= ', ' . sqlSafeStringQuotes('1');
-			$query .= ', ' . sqlSafeStringQuotes('0') . ')';
-			if (!($result = @$site->execute_query('messages_users_connection', $query, $connection)))
-			{
-				// query was bad, error message was already given in $site->execute_query(...)
-				$site->dieAndEndPage('');
-			}
+			// PMComposer needs some classes to be already set up.
+			// It will be easier when this file is replaced with an add-on.
+			require(dirname(dirname(__FILE__)) . '/CMS/classes/config.php');
+			global $config;
+			$config = new config();
+			require(dirname(dirname(__FILE__)) . '/CMS/classes/db.php');
+			global $db;
+			$db = new database();
+			require(dirname(dirname(__FILE__)) . '/CMS/add-ons/pmSystem/classes/PMComposer.php');
+			$pmComposer = new pmComposer();
+			$pmComposer->setSubject("Invitation to team $team_name");
+			// TODO: do not assume that BBCode is enabled
+			$pmComposer->setContent("Congratulations, you were invited by $player_name to join team "
+				. htmlent_decode($team_name) . "!\n\n[URL=\"" . basepath()
+				. "Teams/?join=$invited_to_team\"]Click here to accept the invitation.[/URL]\n\nYou must leave your current team before accepting an invitation to a new team.\n\nThe invitation will expire in 7 days.");
+			$pmComposer->setTimestamp(date('Y-m-d H:i:s'));
+			$pmComposer->addUserID($profile);
+			$pmComposer->send();
 			
 			echo '<div class="static_page_box">' . "\n";
 			echo '<p>The player was invited successfully.</p>' . "\n";
