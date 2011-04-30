@@ -61,7 +61,7 @@ No menu found.
 	<td class="msg_overview_recipients">
 	{if isset($message.recipients.users) && ($message.recipients.users|count) > 0}
 		{foreach item="curRecipients" from=$message.recipients.users}
-		<a href="{$curRecipients.link}">{$curRecipients.name}</a>{if !$curRecipients@last},{/if}
+		<a href="{$curRecipients.link}">{$curRecipients.name}</a>{if !$curRecipients@last || (isset($message.recipients.teams) && ($message.recipients.teams|count) > 0)},{/if}
 		
 		{/foreach}
 	{/if}
