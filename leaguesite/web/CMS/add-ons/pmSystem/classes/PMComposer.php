@@ -142,7 +142,7 @@
 				}
 			}
 			$teamID['link'] = "../Teams/$id";
-			$this->teams[] = $userID;
+			$this->teams[] = $teamID;
 		}
 		
 		function addTeamName($recipientName, $preview=false)
