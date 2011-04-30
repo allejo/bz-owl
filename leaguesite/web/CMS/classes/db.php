@@ -83,10 +83,13 @@
 			if (isset($this->pdo))
 			{
 				// database connection available
-				$query = $this->prepare('INSERT INTO `ERROR_LOG` (`msg`) VALUES (?)');
-				$this->execute($query, $error);
-				
-				return;
+				if ($query = $this->prepare('INSERT INTO `ERROR_LOG` (`msg`) VALUES (?)'))
+				{
+					if ($this->execute($query, $error))
+					{
+						return;
+					}
+				}
 			}
 			
 			
