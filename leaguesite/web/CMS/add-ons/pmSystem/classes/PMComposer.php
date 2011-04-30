@@ -84,16 +84,17 @@
 		
 		function addUserID($id, $lookupName=false)
 		{
+			$id = intval($id);
+			$userID = array('id' => $id);
 			if ($lookupName)
 			{
-				if ($name = $this->lookupUserName(intval($id)))
+				if ($name = $this->lookupUserName($id))
 				{
-					$this->users[] = $name;
+					$userID['name'] = $name;
 				}
-			} else
-			{
-				$this->users[] = array('id' => $id);
 			}
+			$userID['link'] = "../Players/$id";
+			$this->users[] = $userID;
 		}
 		
 		function addUserName($recipientName, $preview=false)
@@ -108,8 +109,7 @@
 			foreach ($this->users as $oneRecipient)
 			{
 				// assume case insensitive usernames
-				if (strcasecmp(($preview) ? $oneRecipient['name'] : $oneRecipient,
-						$recipientName) === 0)
+				if (strcasecmp($oneRecipient['name'], $recipientName) === 0)
 				{
 					$alreadyAdded = true;
 				}
@@ -121,10 +121,9 @@
 				if ($row = $db->fetchRow($this->usernameQuery))
 				{
 					// assume case preserving usernames
-					$this->users[] = ($preview) ? array('id'=>$row['id'],
+					$this->users[] = array('id'=>$row['id'],
 						'name'=>$row['name'],
-						'link' => '../Players/?profile=' . $row['id'])
-					: $row['name'];
+						'link' => '../Players/?profile=' . $row['id']);
 					unset($row);
 				}
 				$db->free($this->usernameQuery);
@@ -133,16 +132,17 @@
 		
 		function addTeamID($id, $lookupName=false)
 		{
+			$id = intval($id);
+			$teamID = array('id' => $id);
 			if ($lookupName)
 			{
-				if ($name = $this->lookupTeamName(intval($id)))
+				if ($name = $this->lookupTeamName($id))
 				{
-					$this->teams[] = $name;
+					$teamID['name'] = $name;
 				}
-			} else
-			{
-				$this->teams[] = array('id' => $id);
 			}
+			$teamID['link'] = "../Teams/$id";
+			$this->teams[] = $userID;
 		}
 		
 		function addTeamName($recipientName, $preview=false)
@@ -157,8 +157,7 @@
 			foreach ($this->teams as $oneRecipient)
 			{
 				// assume case insensitive usernames
-				if (strcasecmp(($preview) ? $oneRecipient['name'] : $oneRecipient,
-						$recipientName) === 0)
+				if (strcasecmp($oneRecipient['name'], $recipientName) === 0)
 				{
 					$alreadyAdded = true;
 				}
@@ -170,10 +169,9 @@
 				if ($row = $db->fetchRow($this->teamnameQuery))
 				{
 					// assume case preserving usernames
-					$this->teams[] = ($preview) ? array('id'=>$row['id'],
+					$this->teams[] = array('id'=>$row['id'],
 						'name'=>$row['name'],
-						'link' => '../Teams/?profile=' . $row['id'])
-					: $row['name'];
+						'link' => '../Teams/?profile=' . $row['id']);
 					unset($row);
 				}
 				$db->free($this->teamnameQuery);
@@ -292,9 +290,6 @@
 				}
 			}
 			
-			// remove possible duplicates
-			@$this->removeDuplicates($recipients);
-			
 			// put message in database
 			$query = $db->prepare('INSERT INTO `pmsystem.msg.storage`'
 								  . ' (`author_id`, `subject`, `timestamp`, `message`)'
@@ -345,7 +340,7 @@
 			}
 			unset($userID);
 			
-			foreach ($recipients as $recipient)
+			foreach (array_unique($recipients, SORT_NUMERIC) as $recipient)
 			{
 				// put message in people's inbox
 				if ($ReplyToMSGID > 0)
@@ -364,16 +359,15 @@
 					$db->execute($query, array($rowId, $recipient, 'inbox'));
 				}
 				$db->free($query);
-				
-				// put message in sender's outbox
-				if ($author_id > 0)
-				{
-					// system did not send the message but a human
-					$query = $db->prepare('INSERT INTO `pmsystem.msg.users`'
-										  . ' (`msgid`, `userid`, `folder`, `msg_status`)'
-										  . ' VALUES (?, ?, ?, ?)');
-					$db->execute($query, array($rowId, $author_id, 'outbox', 'read'));
-				}
+			}
+			
+			// put message in sender's outbox if sent by a human
+			if ($author_id > 0)
+			{
+				$query = $db->prepare('INSERT INTO `pmsystem.msg.users`'
+									  . ' (`msgid`, `userid`, `folder`, `msg_status`)'
+									  . ' VALUES (?, ?, ?, ?)');
+				$db->execute($query, array($rowId, $author_id, 'outbox', 'read'));
 			}
 			
 			return true;
@@ -381,8 +375,17 @@
 		
 		function removeDuplicates(array &$someArray)
 		{
-			// array_unique is case sensitive, thus the loading of name from database
-			$filtered = array_unique($someArray);
+			$filtered = array();
+			$seen = array();
+			foreach ($someArray as $element)
+			{
+				if (!isset($seen[$element['id']]))
+				{
+					$seen[$element['id']] = true;
+					$filtered[] = $element;
+				}
+			}
+
 			if (count($someArray) !== count($filtered))
 			{
 				// duplicates were removed

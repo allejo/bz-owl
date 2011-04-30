@@ -75,7 +75,7 @@ No menu found.
 
 {foreach key="id" item="teamRecipient" from=$teamRecipients}
 <div>
-	<input type="text" name="teamRecipient{$id}" readonly="readonly" value="{$teamRecipient}" />
+	<input type="text" name="teamRecipient{$id}" readonly="readonly" value="{$teamRecipient.name}" />
 	<input type="submit" name="removeTeamRecipient{$id}" value="-" />
 </div>
 {/foreach}
@@ -88,7 +88,7 @@ No menu found.
 
 {foreach key="id" item="playerRecipient" from=$playerRecipients}
 <div>
-	<input type="text" name="playerRecipient{$id}" readonly="readonly" value="{$playerRecipient}" />
+	<input type="text" name="playerRecipient{$id}" readonly="readonly" value="{$playerRecipient.name}" />
 	<input type="submit" name="removePlayerRecipient{$id}" value="-" />
 </div>
 {/foreach}
