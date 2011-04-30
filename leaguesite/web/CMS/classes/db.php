@@ -79,13 +79,14 @@
 		{
 			global $config;
 			
-			
+			// is database connection available?
 			if (isset($this->pdo))
 			{
-				// database connection available
-				if ($query = $this->prepare('INSERT INTO `ERROR_LOG` (`msg`) VALUES (?)'))
+				// use PDO directly to avoid an infinite error reporting loop
+				// in case logError contains invalid SQL
+				if ($query = $this->pdo->prepare('INSERT INTO `ERROR_LOG` (`msg`) VALUES (?)'))
 				{
-					if ($this->execute($query, $error))
+					if ($query->execute(array($error)))
 					{
 						return;
 					}
