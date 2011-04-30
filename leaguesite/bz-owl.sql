@@ -4,7 +4,7 @@
 #
 # Host: localhost (MySQL 5.1.56)
 # Database: bz-owl
-# Generation Time: 2011-04-27 14:57:24 +0200
+# Generation Time: 2011-04-29 22:37:00 -0700
 # ************************************************************
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -42,7 +42,8 @@ VALUES
 	(5,'FAQ/','FAQ','staticPageEditor'),
 	(6,'Links/','Links','staticPageEditor'),
 	(7,'Contact/','Contact','staticPageEditor'),
-	(8,'Bans/','Bans','newsSystem');
+	(8,'Bans/','Bans','newsSystem'),
+	(9, 'Config/','Config','configSystem');
 
 /*!40000 ALTER TABLE `CMS` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -153,12 +154,12 @@ CREATE TABLE `misc_data` (
 
 
 
-# Dump of table newsSystem
+# Dump of table newssystem
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `newsSystem`;
+DROP TABLE IF EXISTS `newssystem`;
 
-CREATE TABLE `newsSystem` (
+CREATE TABLE `newssystem` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `title` varchar(256) NOT NULL DEFAULT 'News',
   `timestamp` varchar(20) NOT NULL DEFAULT '0000-00-00 00:00:00',
