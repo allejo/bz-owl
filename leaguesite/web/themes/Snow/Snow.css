@@ -262,7 +262,13 @@ div.article
 	border-radius: 1em;
 }
 
-div.article_header
+div.article + div.article
+{
+	margin-bottom: 1em;
+	margin-top: 1em;
+}
+
+div.articleHeader
 {
 	background: rgba(210,211,235,0.54) -3px;
 	overflow: auto;
@@ -273,10 +279,7 @@ div.article_header
 	-moz-border-radius: 1em 1em 0em 0em;
 	/* Don't know what the final CSS 3 spec will be */
 	border-radius: 1em 1em 0em 0em;
-	padding-top: 0.5em;
-	padding-bottom: 0.2em;
-	padding-right: 1em;
-	margin-bottom: -0.5em;
+	padding: 0.5em 1em 0.2em;
 }
 
 div.timestamp
@@ -292,10 +295,34 @@ div.author
 	text-align: right;
 }
 
-div.article p
+div.articleContent
 {
-	margin-left: 1em;
+	margin: 0.5em;
 }
+
+
+/* news buttons */
+a.button + div.article
+{
+	margin-top: 1em;
+}
+
+div.article + *
+{
+	margin-top: 1.5em;
+}
+
+*.newsButtonsGroup
+{
+	text-align: right;
+	padding-bottom: 0.5em;
+}
+
+a.button + *.newsButtonsGroup
+{
+	margin-top: -1.45em;
+}
+
 
 /* this  is only a theoretical case but handle it because a new message
  might get an id previously used by a deleted message */
