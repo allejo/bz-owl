@@ -20,7 +20,14 @@
 	$installationPathFile = dirname(__FILE__) . '/installationPath.txt';
 	if (file_exists($installationPathFile) && is_readable($installationPathFile))
 	{
-		$path = dirname(__FILE__) . '/' . file_get_contents($installationPathFile);
+		// remove newlines from end of file, if there is one
+		$path = rtrim(file_get_contents($installationPathFile), "\n");
+		
+		// if relative path -> if path does not begin with /
+		if (strcasecmp(substr($path, 0, 1), '/') !== 0)
+		{
+			$path = dirname(__FILE__) . '/' . $path;
+		}
 	}
 	// load site.php
 	require_once $path . 'CMS/site.php';
