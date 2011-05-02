@@ -105,14 +105,20 @@
 		{
 			global $db;
 			
-			
-			$query = $db->prepare('SELECT `timestamp` FROM `newssystem` WHERE `id`=? LIMIT 1');
-			$db->execute($query, $this->edit_id);
-			
-			$row = $db->fetchRow($query);
-			$db->free($query);
-			
-			return $row['timestamp'];
+			if (isset($this->edit_id))
+			{
+				$query = $db->prepare('SELECT `timestamp` FROM `newssystem` WHERE `id`=? LIMIT 1');
+				$db->execute($query, $this->edit_id);
+				
+				$row = $db->fetchRow($query);
+				$db->free($query);
+				
+				if (isset($row) && is_array($row) && isset($row['timestamp']))
+				{
+					return $row['timestamp'];
+				}
+			}
+			return false;
 		}
 		
 		
