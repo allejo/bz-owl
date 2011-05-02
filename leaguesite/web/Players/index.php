@@ -700,7 +700,7 @@
 			}
 			if ((strcmp($suspended_status, 'login disabled') === 0) || (strcmp($suspended_status, 'banned') === 0))
 			{
-				echo '<span class="user_description_banned">(banned)</span>' . "\n";
+				echo "<span class=\"user_description_banned\">($suspended_status)</span>\n";
 			}
 			if ((int) $row['teamid'] !== 0)
 			{
