@@ -290,7 +290,7 @@
 				 (5, 'FAQ/', 'FAQ', 'staticPageEditor'),
 				 (6, 'Links/', 'Links', 'staticPageEditor'),
 				 (7, 'Contact/', 'Contact', 'staticPageEditor'),
-				 (8, 'Bans/', 'Bans', 'newsSystem')
+				 (8, 'Bans/', 'Bans', 'newsSystem'),
 				 (9, 'Config/','Config','configSystem')");
 		
 		status('Updating last_maintenance column of misc_data to YYYY-MM-DD format');

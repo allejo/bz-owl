@@ -180,6 +180,12 @@
 				
 				$tmpl->assign('errorMsg', 'Error: Could not process query.');
 				$tmpl->display('NoPerm');
+				
+				// $result was a weak typed false
+				// set return value to a strong typed false
+				// in any case, it would not be of type PDOStatement
+				// which is required for database_result's construct function
+				return false;
 			}
 			
 			return new database_result($result, $query);
@@ -221,6 +227,7 @@
  								. "\n" . 'driver error message: ' . $error[2]
  								. "\n\n" . 'executing prepared statement failed,  query was:'
  								. "\n" . $dbResult->getQuery());
+				
 			}
 			
 			// write PDOStatement Object to $queryArguments so other functions will work on it
