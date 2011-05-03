@@ -113,8 +113,12 @@
 			$tmpl->assign('themes', $themes);
 			
 			
+			// find out installed repository version
+			// return false on failure
 			function repositoryVersion()
 			{
+				$svn_rev = false;
+				
 				if (file_exists('../.svn/entries'))
 				{
 					$handle = fopen('../.svn/entries', 'rb');
@@ -125,7 +129,7 @@
 						
 						if ($counter > 4)
 						{
-							// Listing some of them
+							// listing some of them
 							list($svn_rev) = $rev;
 							break;
 						}
@@ -137,7 +141,10 @@
 				return $svn_rev;
 			}
 			
-			$tmpl->assign('repositoryVersion', repositoryVersion());
+			if ($rev = repositoryVersion())
+			{
+				$tmpl->assign('repositoryVersion', $rev);
+			}
 			
 			$tmpl->display();
 		}
