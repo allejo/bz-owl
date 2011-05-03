@@ -491,7 +491,8 @@
 								$db->free($deleteEmptyPWQuery);
 								
 								// give a message to user who might wonder but it could be helpful for troubleshooting
-								$msg .= '<p>Your account has been updated (empty password case detected).</p>';
+								$msg .= ('<p>Your account has been updated (empty password case for id '
+										 . htmlent($collisionID) . ' detected).</p>');
 								
 								// recovered from collision
 								$local_name_collisions = false;
