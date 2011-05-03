@@ -473,7 +473,7 @@
 						}
 						$db->free($query);
 						
-						if (isset($_SESSION['external_login']) && $_SESSION['external_login'])
+						if ($local_name_collisions && isset($_SESSION['external_login']) && $_SESSION['external_login'])
 						{
 							// see if error can be recovered (empty password set)
 							$query = $db->prepare('SELECT `password` FROM `players_passwords` WHERE `playerid`=? LIMIT 1');
