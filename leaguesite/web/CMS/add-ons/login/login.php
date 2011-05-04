@@ -202,9 +202,6 @@
 			// init message
 			$msg = '';
 			
-			// set the date and time
-			date_default_timezone_set($config->value('timezone'));
-			
 			// only perform the operation if user logs in and not on reload
 			if ($user->loggedIn())
 			{
@@ -222,6 +219,7 @@
 			{
 				$this->logoutAndAbort('<p>Any username is required to be at least 2 chars long</p>');
 			}
+			
 			
 			if ((isset($_SESSION['user_logged_in'])) && ($_SESSION['user_logged_in']))
 			{
