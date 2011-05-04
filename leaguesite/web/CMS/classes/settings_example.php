@@ -19,6 +19,7 @@
 						 // set the timezone used
 						 // look at http://www.php.net/manual/en/timezones.php
 						 // for a complete list of supported timezones
+						 // site will use UTC as fallback if timezone has an invalid value
 						 'timezone' => 'UTC',
 						 // shut entire site down (e.g. during install or update)
 						 'maintenance.now' => false,

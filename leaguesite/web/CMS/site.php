@@ -21,7 +21,12 @@
 			$config = new config();
 			
 			// set the date and time
-			date_default_timezone_set($config->value('timezone'));
+			// suppress warning on invalid value to keep output well-formed
+			if (@date_default_timezone_set($config->value('timezone')) === false)
+			{
+				// fallback to UTC if supplied config value is invalid
+				date_default_timezone_set('UTC');
+			}
 			
 			// database connectivity
 			include dirname(__FILE__) . '/classes/db.php';
