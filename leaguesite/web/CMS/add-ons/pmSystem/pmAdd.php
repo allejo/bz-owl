@@ -312,18 +312,36 @@
 			return true;
 		}
 		
+		
+		private function successMessage()
+		{
+			global $tmpl;
+			
+			$tmpl->assign('MSG', 'Message sent successfully.' . $tmpl->linebreaks("\n\n"));
+		}
+		
+		
 		function writeContent()
 		{
 			global $user;
 			
+			
+			$result = false;
 			if (isset($_GET['id']) && intval($_GET['id']) > 0)
 			{
 				// TODO: use further reaching validation than just intval
-				return $this->PMComposer->send($user->getID(), intval($_GET['id']));
+				$result = $this->PMComposer->send($user->getID(), intval($_GET['id']));
 			} else
 			{
-				return $this->PMComposer->send($user->getID());
+				$result = $this->PMComposer->send($user->getID());
 			}
+			
+			if ($result === true)
+			{
+				$this->successMessage();
+			}
+			
+			return $result;
 		}
 	}
 ?>

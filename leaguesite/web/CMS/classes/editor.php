@@ -130,7 +130,10 @@
 					$status = $this->caller->writeContent($content);
 					if ($status === true)
 					{
-						$tmpl->assign('MSG', 'Changes written successfully.' . $tmpl->linebreaks("\n\n"));
+						if ($tmpl->getTemplateVars('MSG') === null)
+						{
+							$tmpl->assign('MSG', 'Changes written successfully.' . $tmpl->linebreaks("\n\n"));
+						}
 					} else
 					{
 						$tmpl->assign('MSG', 'Failed writing changes. The underlying error message was: ' . $status . $tmpl->linebreaks("\n\n"));
