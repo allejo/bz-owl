@@ -118,7 +118,9 @@
 			if (!$alreadyAdded)
 			{
 				$db->execute($this->usernameQuery, array(htmlent($recipientName), 'active'));
-				if ($row = $db->fetchRow($this->usernameQuery))
+				if (($row = $db->fetchRow($this->usernameQuery))
+					&& isset($row['name'])
+					&& (strcasecmp($recipientName, $row['name']) === 0))
 				{
 					// assume case preserving usernames
 					$this->users[] = array('id'=>$row['id'],
@@ -166,7 +168,9 @@
 			if (!$alreadyAdded)
 			{
 				$db->execute($this->teamnameQuery, htmlent($recipientName));
-				if ($row = $db->fetchRow($this->teamnameQuery))
+				if (($row = $db->fetchRow($this->teamnameQuery))
+					&& isset($row['name'])
+					&& (strcasecmp($recipientName, $row['name']) === 0))
 				{
 					// assume case preserving usernames
 					$this->teams[] = array('id'=>$row['id'],
