@@ -532,7 +532,8 @@
 							}
 							// each user has only one entry in the database
 							$query .= ' LIMIT 1';
-							if (!$db->execute($db->prepare($query), $args))
+							$query = $db->prepare($query);
+							if (!$db->execute($query, $args))
 							{
 								$msg .= ('Unfortunately there seems to be a database problem which prevents the system from updating your callsign (id='
 										 . htmlent($user_id)
