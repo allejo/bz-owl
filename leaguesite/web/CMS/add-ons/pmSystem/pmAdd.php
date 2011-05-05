@@ -257,11 +257,15 @@
 					$i++;
 				}
 				
-				// add new team recipient if requested and do not send the message
-				if (isset($_POST['teamRecipient']) && isset($_POST['addTeamRecipient']))
+				// add new team recipient if requested explicitly or implicitly
+				if (isset($_POST['teamRecipient']))
+				{
+					$this->PMComposer->addTeamName($_POST['teamRecipient'], $confirmed > 0);
+				}
+				// do not send the message if adding team was explicitly requested
+				if (isset($_POST['addTeamRecipient']))
 				{
 					$confirmed = 0;
-					$this->PMComposer->addTeamName($_POST['teamRecipient'], $confirmed > 0);
 				}
 				
 				
@@ -286,11 +290,15 @@
 					$i++;
 				}
 				
-				// add new player recipient if requested and do not send the message
-				if (isset($_POST['playerRecipient']) && isset($_POST['addPlayerRecipient']))
+				// add new player recipient if requested explicitly or implicitly
+				if (isset($_POST['playerRecipient']))
+				{
+					$this->PMComposer->addUserName($_POST['playerRecipient'], $confirmed > 0);
+				}
+				// do not send the message if adding player was explicitly requested
+				if (isset($_POST['addPlayerRecipient']))
 				{
 					$confirmed = 0;
-					$this->PMComposer->addUserName($_POST['playerRecipient'], $confirmed > 0);
 				}
 			}
 			
