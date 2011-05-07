@@ -283,6 +283,8 @@
 			}
 			
 			parent::display($this->templateFile, $user->getID(), $compile_id, $parent);
+			
+			return true;
 		}
 		
 		function setTemplate($template, $customTheme='')

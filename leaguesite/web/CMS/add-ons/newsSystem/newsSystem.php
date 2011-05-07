@@ -53,7 +53,8 @@
 				}
 				if (!$tmpl->setTemplate($templateToUse . '.edit'))
 				{
-					$tmpl->noTemplateFound();	// does not return
+					$tmpl->noTemplateFound();
+					die();
 				}
 				$this->edit_id = intval($_GET['edit']);	// FIXME: use better validation than intval()
 				$tmpl->assign('formAction', './?edit=' . $this->edit_id);
@@ -70,7 +71,8 @@
 				// user has permission to add news to the page and requests it
 				if (!$tmpl->setTemplate($templateToUse . '.edit'))
 				{
-					$tmpl->noTemplateFound();	// does not return
+					$tmpl->noTemplateFound();
+					die();
 				}
 				$tmpl->assign('formAction', './?add');
 				$this->editor = new editor($this);
@@ -84,8 +86,23 @@
 			if ($user->getPermission($entry_delete_permission) && isset($_GET['delete']))
 			{
 				// user has permission to delete news from the page and requests it
-				$this->delete();
-				// fall through to read-only display
+				if (!$tmpl->setTemplate($templateToUse . '.delete'))
+				{
+					$tmpl->noTemplateFound();
+					die();
+				}
+				
+				$confirmed = isset($_POST['submit']) ? 1 : 0;
+				$confirmed = $this->sanityCheck($confirmed);
+				if ($confirmed === true)
+				{
+					$this->delete();
+					$tmpl->display();
+				} else
+				{
+					$tmpl->display('NoPerm') || $tmpl->noTemplateFound();
+				}
+				die();
 			}
 			
 			// user looks at page in read mode
@@ -124,10 +141,43 @@
 		
 		function delete()
 		{
-			global $db;
+			global $site;
 			global $tmpl;
+			global $db;
 			
-			if (isset($_GET['delete']))
+			
+			if (!isset($_POST['submit']))
+			{
+				$tmpl->assign('formAction', './?delete=' . intval($_GET['delete']));
+				
+				$query = $db->prepare('SELECT `title`, `timestamp`, `author`, `msg`'
+									  . ' FROM `newssystem` WHERE `id`=:id LIMIT 1');
+				$db->execute($query, array(':id' => array(intval($_GET['delete']), PDO::PARAM_INT)));
+				
+				$row = $db->fetchRow($query);
+				if (!$row)
+				{
+					$tmpl->setTemplate('NoPerm') || $tmpl->noTemplateFound();
+					$tmpl->assign('errorMsg', 'Query failed, request aborted.');
+				}
+				
+				$tmpl->assign('titlePreview', $row['title']);
+				$tmpl->assign('authorPreview', $row['author']);
+				$tmpl->assign('timestamp', $row['timestamp']);
+				$tmpl->assign('content', $row['msg']);
+				
+				
+				$tmpl->assign('contentPreview', true);
+				$randomKeyName = $this->randomKeyName . microtime();
+				// convert some special chars to underscores
+				$randomKeyName = strtr($randomKeyName, array(' ' => '_', '.' => '_'));
+				$randomkeyValue = $site->setKey($randomKeyName);
+				$tmpl->assign('keyName', $randomKeyName);
+				$tmpl->assign('keyValue', htmlent($randomkeyValue));
+				
+				// tell template to ask before deletion is executed
+				$tmpl->assign('askForConfirmation', true);
+			} else
 			{
 				$query = $db->prepare('DELETE FROM `newssystem` WHERE `id`=?');
 				if ($db->execute($query, intval($_GET['delete'])))	// FIXME: use better validation than intval()
@@ -138,25 +188,29 @@
 					$tmpl->assign('MSG', 'No such article.' . $tmpl->linebreaks("\n\n"));
 				}
 				$db->free($query);
-			} else
-			{
-				$tmpl->assign('MSG', 'No article specified.' . $tmpl->linebreaks("\n\n"));
 			}
 		}
 		
 		
 		function sanityCheck(&$confirmed)
 		{
+			global $entry_add_permission;
 			global $entry_edit_permission;
+			global $entry_delete_permission;
 			global $user;
 			global $tmpl;
+			global $db;
 			
-			if (!$user->getPermission($entry_edit_permission))
+			
+			if ((!$user->getPermission($entry_add_permission) && isset($_GET['add']))
+				|| (!$user->getPermission($entry_edit_permission) && isset($_GET['edit']))
+				|| (!$user->getPermission($entry_delete_permission) && isset($_GET['delete'])))
 			{			
 				// editing cancelled due to missing user permission
 				$confirmed = 0;
 				return 'noperm';
 			}
+			
 			
 			// no need to check for a key match if no content was supplied
 			if (($confirmed > 0) && !$this->randomKeyMatch($confirmed))
@@ -166,6 +220,29 @@
 				return 'nokeymatch';
 			}
 			
+			
+			// get id value
+			$id = 0;
+			if (isset($_GET['edit']))
+			{
+				$id = intval($_GET['edit']);
+			} elseif (isset($_GET['delete']))
+			{
+				$id = intval($_GET['delete']);
+			}
+			
+			// lookup value in db
+			$query = $db->prepare('SELECT `id` FROM `newsSystem` WHERE `id`=:id LIMIT 1');
+			$db->execute($query, array(':id' => array($id, PDO::PARAM_INT)));
+			
+			// check if specified id does exist in db result
+			if (!$db->fetchRow($query))
+			{
+				// entry does not exist
+				return 'noperm';
+			}
+			
+			// all tests passed
 			return true;
 		}
 		
