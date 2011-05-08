@@ -192,7 +192,7 @@
 		}
 		
 		
-		function sanityCheck(&$confirmed)
+		public function sanityCheck(&$confirmed)
 		{
 			global $entry_add_permission;
 			global $entry_edit_permission;
@@ -239,6 +239,7 @@
 			if (!$db->fetchRow($query))
 			{
 				// entry does not exist
+				$confirmed = 0;
 				return 'noperm';
 			}
 			
@@ -247,7 +248,7 @@
 		}
 		
 		
-		function insertEditText($readonly=false)
+		public function insertEditText($readonly=false)
 		{
 			global $tmpl;
 			global $author;
