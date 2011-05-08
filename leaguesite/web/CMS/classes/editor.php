@@ -75,7 +75,7 @@
 			}
 			if (isset($_POST['staticContent']))
 			{
-				$content = htmlspecialchars_decode($_POST['staticContent'], ENT_COMPAT);
+				$content = htmlent_decode(urldecode($_POST['staticContent']));
 			}
 			
 			// sanity check variabless

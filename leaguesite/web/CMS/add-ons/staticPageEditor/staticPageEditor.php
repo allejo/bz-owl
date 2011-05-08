@@ -90,7 +90,7 @@
 			
 			if ($readonly || isset($_POST['confirmationStep']))
 			{
-				$content = $_POST['staticContent'];
+				$content = urldecode($_POST['staticContent']);
 			} elseif (isset($_GET['edit']))
 			{
 				$content = $this->readContent($this->path, $author, $last_modified, true);
@@ -102,19 +102,19 @@
 			switch($readonly)
 			{
 				case true:
-					$tmpl->assign('rawContent', htmlent($content));
+					$tmpl->assign('rawContent', htmlent(urlencode($content)));
 					if ($config->value('bbcodeLibAvailable'))
 					{
 						$tmpl->assign('contentPreview',  $tmpl->encodeBBCode($content));
 					} else
 					{
+						// TODO: only fall back to using raw data if config says so
 						$tmpl->assign('contentPreview',  $content);
 					}
 					break;
 				
 				default:
-					$tmpl->assign('rawContent', htmlspecialchars($content
-																 , ENT_COMPAT, 'UTF-8'));
+					$tmpl->assign('rawContent',htmlent($content));
 					// display the formatting buttons addded by addFormatButtons
 					$this->editor->showFormatButtons();
 					break;

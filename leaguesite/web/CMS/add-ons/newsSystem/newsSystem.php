@@ -261,7 +261,7 @@
 			if ($readonly || isset($_POST['confirmationStep']))
 			{
 				$content = array();
-				$content['raw_msg'] = $_POST['staticContent'];
+				$content['raw_msg'] = urldecode($_POST['staticContent']);
 				
 				$query = $db->prepare('SELECT `name` FROM `players` WHERE `id`=? LIMIT 1');
 				$db->execute($query, $user->getID());
@@ -297,21 +297,20 @@
 				case true:
 					$tmpl->assign('titlePreview',  htmlent($content['title']));
 					$tmpl->assign('authorPreview',  htmlent($content['author']['name']));
-					$tmpl->assign('rawContent', htmlent($content['raw_msg']));
+					$tmpl->assign('rawContent', htmlent(urlencode($content['raw_msg'])));
 					if ($config->value('bbcodeLibAvailable'))
 					{
 						$tmpl->assign('contentPreview',  $tmpl->encodeBBCode($content['raw_msg']));
 					} else
 					{
+						// TODO: only fall back to using raw data if config says so
 						$tmpl->assign('contentPreview',  $content['raw_msg']);
 					}
 					break;
 				
 				default:
-					$tmpl->assign('rawContent', htmlspecialchars($content['raw_msg']
-																 , ENT_COMPAT, 'UTF-8'));
-					$tmpl->assign('msgTitle', htmlspecialchars($content['title']
-															   , ENT_COMPAT, 'UTF-8'));
+					$tmpl->assign('rawContent', htmlent($content['raw_msg']));
+					$tmpl->assign('msgTitle', htmlent($content['title']));
 					// display the formatting buttons addded by addFormatButtons
 					$this->editor->showFormatButtons();
 					break;
