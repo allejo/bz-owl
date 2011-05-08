@@ -232,7 +232,7 @@
 			}
 			
 			// lookup value in db
-			$query = $db->prepare('SELECT `id` FROM `newsSystem` WHERE `id`=:id LIMIT 1');
+			$query = $db->prepare('SELECT `id` FROM `newssystem` WHERE `id`=:id LIMIT 1');
 			$db->execute($query, array(':id' => array($id, PDO::PARAM_INT)));
 			
 			// check if specified id does exist in db result
