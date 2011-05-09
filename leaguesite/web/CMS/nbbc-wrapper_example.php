@@ -4,21 +4,24 @@
 		function Parse($string)
 		{
 			global $config;
-			global $site;
 			
-			require_once((dirname(__FILE__)) . '/nbbc-1.4.4/nbbc.php');
+			
+			require_once((dirname(__FILE__)) . '/nbbc/nbbc.php');
 			$setup = new BBCode;
 			
 			if (!isset($config))
 			{
+				// old compatibility mode
 				$setup->SetSmileyURL(baseaddress() . 'smileys');
 			} else
 			{
 				$setup->SetSmileyURL($config->value('baseaddress') . 'smileys');
 			}
 			// $setup->SetEnableSmileys(false);
+			$setup->SetAllowAmpersand(true);
 			
-			return $setup->Parse($string);
+			// escape (x)html entities
+			return $setup->Parse(htmlent($string));
 		}
     }
 ?>

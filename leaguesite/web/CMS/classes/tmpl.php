@@ -267,6 +267,8 @@
 				$compile_id = $config->value('basepath') . ', theme ' . $user->getTheme() . ', lang en';
 			}
 			
+			// code disabled because multi line problem in input type="hidden" does not work with xhtml header
+/*
 			// serve xhtml with MIME-type application/xhtml+xml to trigger XML parser
 			// caution needed because ie (that can hardly be called a browser)
 			// indicates support for application/xhtml+xml but ie fails to actually provide
@@ -281,6 +283,7 @@
 				header('Content-type: application/xhtml+xml; charset=utf-8');
 				header('Cache-Control: private');
 			}
+*/
 			
 			parent::display($this->templateFile, $user->getID(), $compile_id, $parent);
 			

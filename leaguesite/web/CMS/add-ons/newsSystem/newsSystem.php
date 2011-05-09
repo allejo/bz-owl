@@ -232,15 +232,18 @@
 			}
 			
 			// lookup value in db
-			$query = $db->prepare('SELECT `id` FROM `newssystem` WHERE `id`=:id LIMIT 1');
-			$db->execute($query, array(':id' => array($id, PDO::PARAM_INT)));
-			
-			// check if specified id does exist in db result
-			if (!$db->fetchRow($query))
+			if (isset($_GET['edit']) || isset($_GET['delete']))
 			{
-				// entry does not exist
-				$confirmed = 0;
-				return 'noperm';
+				$query = $db->prepare('SELECT `id` FROM `newssystem` WHERE `id`=:id LIMIT 1');
+				$db->execute($query, array(':id' => array($id, PDO::PARAM_INT)));
+				
+				// check if specified id does exist in db result
+				if (!$db->fetchRow($query))
+				{
+					// entry does not exist
+					$confirmed = 0;
+					return 'noperm';
+				}
 			}
 			
 			// all tests passed
@@ -261,7 +264,7 @@
 			if ($readonly || isset($_POST['confirmationStep']))
 			{
 				$content = array();
-				$content['raw_msg'] = urldecode($_POST['staticContent']);
+				$content['raw_msg'] = $_POST['staticContent'];
 				
 				$query = $db->prepare('SELECT `name` FROM `players` WHERE `id`=? LIMIT 1');
 				$db->execute($query, $user->getID());
@@ -275,8 +278,8 @@
 			} else
 			{
 				$content = array();
-				$content['raw_msg'] = '';
-				$content['title'] = '';
+				$content['raw_msg'] = 'Your message goes here';
+				$content['title'] = 'Your title goes here';
 			}
 			
 			// let authors change timestamp, if allowed in config
@@ -297,7 +300,7 @@
 				case true:
 					$tmpl->assign('titlePreview',  htmlent($content['title']));
 					$tmpl->assign('authorPreview',  htmlent($content['author']['name']));
-					$tmpl->assign('rawContent', htmlent(urlencode($content['raw_msg'])));
+					$tmpl->assign('rawContent', htmlent($content['raw_msg']));
 					if ($config->value('bbcodeLibAvailable'))
 					{
 						$tmpl->assign('contentPreview',  $tmpl->encodeBBCode($content['raw_msg']));

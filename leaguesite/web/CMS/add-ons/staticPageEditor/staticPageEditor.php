@@ -90,7 +90,7 @@
 			
 			if ($readonly || isset($_POST['confirmationStep']))
 			{
-				$content = urldecode($_POST['staticContent']);
+				$content = $_POST['staticContent'];
 			} elseif (isset($_GET['edit']))
 			{
 				$content = $this->readContent($this->path, $author, $last_modified, true);
@@ -102,7 +102,7 @@
 			switch($readonly)
 			{
 				case true:
-					$tmpl->assign('rawContent', htmlent(urlencode($content)));
+					$tmpl->assign('rawContent', htmlent($content));
 					if ($config->value('bbcodeLibAvailable'))
 					{
 						$tmpl->assign('contentPreview',  $tmpl->encodeBBCode($content));
