@@ -279,7 +279,31 @@
 			{
 				$content = array();
 				$content['raw_msg'] = 'Your message goes here';
-				$content['title'] = 'Your title goes here';
+				
+				// clean page name
+				$pageName = $this->page_path;
+				
+				// remove trailing /
+				if ((($i = strrpos($pageName, '/')) !== false) && $i === strlen($pageName) -1)
+				{
+					$pageName = substr($pageName, 0, $i);
+				}
+				
+				// remove last occurrence of / (remove path info from pageName)
+				if (($i = strrpos($pageName, '/')) !== false)
+				{
+					$pageName = substr($pageName, $i);
+				}				
+				
+				// do not remove trailing s if pageName is News, otherwise just do it
+				// set title to cleaned pageName
+				if ((strcmp(substr($pageName, -1), 's') === 0) && strcmp($pageName, 'News') !== 0)
+				{
+					$content['title'] = substr($pageName, 0, strlen($pageName) -1);
+				} else
+				{
+					$content['title'] = $pageName;
+				}
 			}
 			
 			// let authors change timestamp, if allowed in config
