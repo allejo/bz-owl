@@ -1,32 +1,24 @@
 until next release:
 
-* Test, test, test
+* Optimise DB size and design (big wins should be possible)
+
+* Move CMS tree and other files that are not direct URL targets out of
+  the web tree.
+
+* Move leaguesite installation instructions from README to INSTALL.
+
+* Re-implement Matches, Online, Players, Teams and rss as add-ons
 
 
 short term:
 
+* Clean up DB usage in code to allow usage of engines other than mysql
+
 * Convert existing features to use Smarty before adding new features.
-
-* Cached Smarty templates must not contain per-user information, such
-  as PMs.  http://www.smarty.net/docsv2/en/caching.multiple.caches.tpl
-  contains more information about this.  We use the player's user ID
-  where they have $my_cache_id in the examples on that page.
-
-* Thorough testing with multiple accounts should reveal problems.
 
 * Add web interface to manage the database `CMS` table, which controls
   which add-on should be used for which page.
 
-* Move leaguesite installation instructions from README to INSTALL.
-
-* Focus on 42 theme for now and update other themes after the overall
-  framework is set.
- 
-* Move CMS tree and other files that are not direct URL targets out of
-  the web tree.
-
-* Add error handling, especially for database queries.
- 
 * Fix BZFlag external login cookie in upstream weblogin.php so it
   preserves the canonical upper and lower case of callsigns.  Bullet
   Catcher will get this done.
