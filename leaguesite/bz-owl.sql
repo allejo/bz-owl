@@ -2,9 +2,9 @@
 # Version 2492
 # http://code.google.com/p/sequel-pro
 #
-# Host: localhost (MySQL 5.1.56)
+# Host: localhost (MySQL 5.1.57)
 # Database: bz-owl
-# Generation Time: 2011-04-29 22:37:00 -0700
+# Generation Time: 2011-05-17 18:36:36 +0200
 # ************************************************************
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -29,7 +29,7 @@ CREATE TABLE `CMS` (
   `addon` varchar(256) NOT NULL DEFAULT 'staticPageEditor',
   PRIMARY KEY (`id`),
   KEY `requestPath` (`requestPath`(255))
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
 
 LOCK TABLES `CMS` WRITE;
 /*!40000 ALTER TABLE `CMS` DISABLE KEYS */;
@@ -43,7 +43,7 @@ VALUES
 	(6,'Links/','Links','staticPageEditor'),
 	(7,'Contact/','Contact','staticPageEditor'),
 	(8,'Bans/','Bans','newsSystem'),
-	(9, 'Config/','Config','configSystem');
+	(9,'Config/','Config','configSystem');
 
 /*!40000 ALTER TABLE `CMS` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -104,7 +104,7 @@ DROP TABLE IF EXISTS `matches`;
 CREATE TABLE `matches` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `playerid` int(11) unsigned NOT NULL,
-  `timestamp` varchar(20) NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `timestamp` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00',
   `team1_teamid` int(11) unsigned NOT NULL DEFAULT '0',
   `team2_teamid` int(11) unsigned NOT NULL DEFAULT '0',
   `team1_points` int(11) NOT NULL DEFAULT '0',
@@ -128,7 +128,7 @@ CREATE TABLE `matches_edit_stats` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `match_id` int(11) unsigned NOT NULL,
   `playerid` int(11) unsigned NOT NULL,
-  `timestamp` varchar(20) NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `timestamp` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00',
   `team1_teamid` int(11) unsigned NOT NULL DEFAULT '0',
   `team2_teamid` int(11) unsigned NOT NULL DEFAULT '0',
   `team1_points` int(11) NOT NULL DEFAULT '0',
@@ -162,7 +162,7 @@ DROP TABLE IF EXISTS `newssystem`;
 CREATE TABLE `newssystem` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `title` varchar(256) NOT NULL DEFAULT 'News',
-  `timestamp` varchar(20) NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `timestamp` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00',
   `author` varchar(255) DEFAULT NULL,
   `msg` text,
   `raw_msg` text,
@@ -239,8 +239,8 @@ CREATE TABLE `players_profile` (
   `raw_user_comment` varchar(1500) NOT NULL DEFAULT '',
   `admin_comments` mediumtext NOT NULL,
   `raw_admin_comments` mediumtext NOT NULL,
-  `joined` varchar(20) NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `last_login` varchar(20) NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `joined` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `last_login` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00',
   `logo_url` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `playerid` (`playerid`),
@@ -286,7 +286,7 @@ CREATE TABLE `pmsystem.msg.storage` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `author_id` int(11) unsigned NOT NULL,
   `subject` varchar(50) NOT NULL,
-  `timestamp` varchar(20) NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `timestamp` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00',
   `message` text NOT NULL,
   PRIMARY KEY (`id`),
   KEY `author_id` (`author_id`)
@@ -341,7 +341,7 @@ CREATE TABLE `static_pages` (
   `page` varchar(1000) NOT NULL,
   `content` mediumtext NOT NULL,
   `raw_content` mediumtext NOT NULL,
-  `last_modified` varchar(20) NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `last_modified` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -431,7 +431,7 @@ CREATE TABLE `visits` (
   `ip-address` varchar(100) NOT NULL DEFAULT '0.0.0.0.0',
   `host` varchar(100) DEFAULT NULL,
   `forwarded_for` varchar(200) DEFAULT NULL,
-  `timestamp` varchar(20) NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `timestamp` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
   KEY `playerid` (`playerid`),
   KEY `ip-address` (`ip-address`),
