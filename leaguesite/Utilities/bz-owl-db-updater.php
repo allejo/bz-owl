@@ -3,7 +3,10 @@
 	// to the version that this file ships with
 	// NOTE: This does not update tables by add-ons!
 	
-	define('MAX_DB_VERSION', 1);
+	// current db version
+	define('MAX_DB_VERSION', 2);
+	
+	
 	
 	if (!(php_sapi_name() == 'cli' && empty($_SERVER['REMOTE_ADDR'])))
 	{
@@ -299,5 +302,24 @@
 		status('Adding DB version column (db.version) to misc_data');
 		$db->SQL("ALTER TABLE `misc_data` ADD `db.version` int(11) NOT NULL DEFAULT '0'  AFTER `last_servertracker_query`");
 		tagDBVersion(1);
+	}
+	
+	function updateVersion1()
+	{
+		global $db;
+		
+		$this->status('Renaming pmSystem tables: Changing . to _ in table names and cleaning its table contents.');
+		$db->SQL('RENAME TABLE `pmsystem.msg.storage` TO `pmsystem_msg_storage`');
+		$db->SQL('RENAME TABLE `pmsystem.msg.recipients.teams` TO `pmsystem_msg_recipients_teams`');
+		$db->SQL('DROP TABLE `pmsystem.msg.recipients.users`');
+		$db->SQL('RENAME TABLE `pmsystem.msg.users` TO `pmsystem_msg_recipients_users`');
+		
+		$this->status('Changing timestamps from varchar(20) to varchar(19) at least');
+		$db->SQL("ALTER TABLE `pmsystem_msg_storage` CHANGE `timestamp` `timestamp` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00'");
+		$db->SQL("ALTER TABLE `matches` CHANGE `timestamp` `timestamp` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00'");
+		$db->SQL("ALTER TABLE `matches_edit_stats` CHANGE `timestamp` `timestamp` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00'");
+		$db->SQL("ALTER TABLE `newssystem` CHANGE `timestamp` `timestamp` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00'");
+		$db->SQL("ALTER TABLE `players_profile` CHANGE `joined` `joined` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00'");
+		$db->SQL("ALTER TABLE `players_profile` CHANGE `last_login` `last_login` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00'");
 	}
 ?>
