@@ -308,13 +308,13 @@
 	{
 		global $db;
 		
-		$this->status('Renaming pmSystem tables: Changing . to _ in table names and cleaning its table contents.');
+		status('Renaming pmSystem tables: Changing . to _ in table names and cleaning its table contents.');
 		$db->SQL('RENAME TABLE `pmsystem.msg.storage` TO `pmsystem_msg_storage`');
 		$db->SQL('RENAME TABLE `pmsystem.msg.recipients.teams` TO `pmsystem_msg_recipients_teams`');
-		$db->SQL('DROP TABLE `pmsystem.msg.recipients.users`');
-		$db->SQL('RENAME TABLE `pmsystem.msg.users` TO `pmsystem_msg_recipients_users`');
+		$db->SQL('RENAME TABLE `pmsystem.msg.recipients.users` TO `pmsystem_msg_recipients_users`');
+		$db->SQL('RENAME TABLE `pmsystem.msg.users` TO `pmsystem_msg_users`');
 		
-		$this->status('Changing timestamps from varchar(20) to varchar(19) at least');
+		status('Changing timestamps from varchar(20) to varchar(19) at least');
 		$db->SQL("ALTER TABLE `pmsystem_msg_storage` CHANGE `timestamp` `timestamp` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00'");
 		$db->SQL("ALTER TABLE `matches` CHANGE `timestamp` `timestamp` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00'");
 		$db->SQL("ALTER TABLE `matches_edit_stats` CHANGE `timestamp` `timestamp` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00'");

@@ -63,7 +63,7 @@
 				$db->execute($query, array(date('Y-m-d H:i:s'), $user->getID()));
 				
 				// are there unread messages?
-				$query = $db->prepare('SELECT `msgid` FROM `pmsystem.msg.users` WHERE `msg_status`=?'
+				$query = $db->prepare('SELECT `msgid` FROM `pmsystem_msg_users` WHERE `msg_status`=?'
 									  . ' AND `userid`=?'
 									  . ' LIMIT 1');
 				

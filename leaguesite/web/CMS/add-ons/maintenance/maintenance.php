@@ -121,11 +121,11 @@
 			
 			
 			// delete no more used PMs
-			$queryInMailboxOfUserid = $db->prepare('SELECT `msgid` FROM `pmsystem.msg.users` WHERE `userid`=?');
-			$queryInMailboxOfOthers = $db->prepare('SELECT `msgid` FROM `pmsystem.msg.users` WHERE `msgid`<>? LIMIT 1');
-			$queryDeletePMNoOwner = $db->prepare('DELETE FROM `pmsystem.msg.storage` WHERE `id`=? LIMIT 1');
-			$queryDeletePMTeamRecipients = $db->prepare('DELETE FROM `pmsystem.msg.recipients.teams` WHERE `msgid`=? LIMIT 1');
-			$queryDeletePMUserRecipients = $db->prepare('DELETE FROM `pmsystem.msg.recipients.users` WHERE `msgid`=? LIMIT 1');
+			$queryInMailboxOfUserid = $db->prepare('SELECT `msgid` FROM `pmsystem_msg_users` WHERE `userid`=?');
+			$queryInMailboxOfOthers = $db->prepare('SELECT `msgid` FROM `pmsystem_msg_users` WHERE `msgid`<>? LIMIT 1');
+			$queryDeletePMNoOwner = $db->prepare('DELETE FROM `pmsystem_msg_storage` WHERE `id`=? LIMIT 1');
+			$queryDeletePMTeamRecipients = $db->prepare('DELETE FROM `pmsystem_msg_recipients_teams` WHERE `msgid`=? LIMIT 1');
+			$queryDeletePMUserRecipients = $db->prepare('DELETE FROM `pmsystem_msg_recipients_users` WHERE `msgid`=? LIMIT 1');
 			
 			$db->execute($queryInMailboxOfUserid, $userid);
 			
@@ -155,7 +155,7 @@
 			$db->free($queryInMailboxOfUserid);
 			
 			// delete any PM in mailbox of $userid
-			$queryDeletePMInMailbox = $db->prepare('DELETE FROM `pmsystem.msg.users` WHERE `userid`=?');
+			$queryDeletePMInMailbox = $db->prepare('DELETE FROM `pmsystem_msg_users` WHERE `userid`=?');
 			$db->execute($queryDeletePMInMailbox, $userid);
 			$db->free($queryDeletePMInMailbox);
 			

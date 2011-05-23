@@ -147,7 +147,7 @@
 				// add all original recipients and author or only original author to default recipients
 				
 				// find out if original message was readable for user
-				$query = $db->prepare('SELECT COUNT(*) FROM `pmsystem.msg.users` WHERE `msgid`=? AND `userid`=?');
+				$query = $db->prepare('SELECT COUNT(*) FROM `pmsystem_msg_users` WHERE `msgid`=? AND `userid`=?');
 				$db->execute($query, array($_GET['id'], $user->getID()));
 				$rows = $db->fetchRow($query);
 				$db->free($query);
@@ -157,7 +157,7 @@
 				// TODO: output error
 				if (count($rows) > 0 && $rows['COUNT(*)'] > 0)
 				{
-					$query = $db->prepare('SELECT `subject`, `message` FROM `pmsystem.msg.storage`'
+					$query = $db->prepare('SELECT `subject`, `message` FROM `pmsystem_msg_storage`'
 										  . ' WHERE `id`=? LIMIT 1');
 					$db->execute($query, $_GET['id']);
 					$row = $db->fetchRow($query);
@@ -174,12 +174,12 @@
 					{
 						// prepare recipients queries
 						$usersQuery = $db->prepare('SELECT `name`'
-												   . ' FROM `pmsystem.msg.recipients.users` LEFT JOIN `players`'
-												   . ' ON `pmsystem.msg.recipients.users`.`userid`=`players`.`id`'
+												   . ' FROM `pmsystem_msg_recipients_users` LEFT JOIN `players`'
+												   . ' ON `pmsystem_msg_recipients_users`.`userid`=`players`.`id`'
 												   . ' WHERE `msgid`=?');
 						$teamsQuery = $db->prepare('SELECT `name`'
-												   . ' FROM `pmsystem.msg.recipients.teams` LEFT JOIN `teams`'
-												   . ' ON `pmsystem.msg.recipients.teams`.`teamid`=`teams`.`id`'
+												   . ' FROM `pmsystem_msg_recipients_teams` LEFT JOIN `teams`'
+												   . ' ON `pmsystem_msg_recipients_teams`.`teamid`=`teams`.`id`'
 												   . ' WHERE `msgid`=?');
 						
 						// add users to recipients
@@ -201,7 +201,7 @@
 					{
 						// only 1 author, thus no loop
 						$query = $db->prepare('SELECT `name` FROM `players`'
-											  . ' WHERE `id`=(SELECT `author_id` FROM `pmsystem.msg.storage`'
+											  . ' WHERE `id`=(SELECT `author_id` FROM `pmsystem_msg_storage`'
 											  . ' WHERE `id`=? LIMIT 1) LIMIT 1');
 						$db->execute($query, intval($_GET['id']));
 						$row = $db->fetchRow($query);

@@ -4,7 +4,7 @@
 #
 # Host: localhost (MySQL 5.1.57)
 # Database: bz-owl
-# Generation Time: 2011-05-17 18:36:36 +0200
+# Generation Time: 2011-05-23 11:21:28 +0200
 # ************************************************************
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -249,12 +249,12 @@ CREATE TABLE `players_profile` (
 
 
 
-# Dump of table pmsystem.msg.recipients.teams
+# Dump of table pmsystem_msg_recipients_teams
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `pmsystem.msg.recipients.teams`;
+DROP TABLE IF EXISTS `pmsystem_msg_recipients_teams`;
 
-CREATE TABLE `pmsystem.msg.recipients.teams` (
+CREATE TABLE `pmsystem_msg_recipients_teams` (
   `msgid` int(11) unsigned DEFAULT NULL,
   `teamid` int(11) unsigned DEFAULT NULL,
   KEY `msgid` (`msgid`),
@@ -263,12 +263,12 @@ CREATE TABLE `pmsystem.msg.recipients.teams` (
 
 
 
-# Dump of table pmsystem.msg.recipients.users
+# Dump of table pmsystem_msg_recipients_users
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `pmsystem.msg.recipients.users`;
+DROP TABLE IF EXISTS `pmsystem_msg_recipients_users`;
 
-CREATE TABLE `pmsystem.msg.recipients.users` (
+CREATE TABLE `pmsystem_msg_recipients_users` (
   `msgid` int(11) unsigned DEFAULT NULL,
   `userid` int(11) unsigned DEFAULT NULL,
   KEY `msgid` (`msgid`),
@@ -277,39 +277,40 @@ CREATE TABLE `pmsystem.msg.recipients.users` (
 
 
 
-# Dump of table pmsystem.msg.storage
+# Dump of table pmsystem_msg_storage
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `pmsystem.msg.storage`;
+DROP TABLE IF EXISTS `pmsystem_msg_storage`;
 
-CREATE TABLE `pmsystem.msg.storage` (
+CREATE TABLE `pmsystem_msg_storage` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `author_id` int(11) unsigned NOT NULL,
   `subject` varchar(50) NOT NULL,
   `timestamp` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `message` text NOT NULL,
+  `message` varchar(2000) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `author_id` (`author_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The message storage';
 
 
 
-# Dump of table pmsystem.msg.users
+# Dump of table pmsystem_msg_users
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `pmsystem.msg.users`;
+DROP TABLE IF EXISTS `pmsystem_msg_users`;
 
-CREATE TABLE `pmsystem.msg.users` (
+CREATE TABLE `pmsystem_msg_users` (
   `msgid` int(11) unsigned NOT NULL,
   `userid` int(11) unsigned NOT NULL,
   `folder` set('inbox','outbox') NOT NULL DEFAULT 'inbox',
   `msg_status` set('new','read') NOT NULL DEFAULT 'new',
   `msg_replied_to_msgid` int(11) unsigned DEFAULT NULL,
+  PRIMARY KEY (`msgid`),
   KEY `msgid` (`msgid`),
   KEY `userid` (`userid`),
   KEY `msg_status` (`msg_status`),
-  CONSTRAINT `pmsystem@002emsg@002eusers_ibfk_1` FOREIGN KEY (`msgid`) REFERENCES `pmsystem.msg.storage` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `pmsystem@002emsg@002eusers_ibfk_2` FOREIGN KEY (`userid`) REFERENCES `players` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `pmsystem_msg_users_ibfk_1` FOREIGN KEY (`msgid`) REFERENCES `pmsystem_msg_storage` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `pmsystem_msg_users_ibfk_2` FOREIGN KEY (`userid`) REFERENCES `players` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Connects messages to users';
 
 

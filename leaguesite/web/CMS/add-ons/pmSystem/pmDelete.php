@@ -35,7 +35,7 @@
 			// some of these queries unnecessary
 
 			// just delete it from the user's private message table
-			$query = $db->prepare('DELETE FROM `pmsystem.msg.users`'
+			$query = $db->prepare('DELETE FROM `pmsystem_msg_users`'
 					. ' WHERE `msgid`=:msgid AND `userid`=:uid AND `folder`=:folder');
 			$params = array(':msgid' => array($id, PDO::PARAM_INT),
 							':uid' => array($user->getID(), PDO::PARAM_INT),
@@ -43,7 +43,7 @@
 			$db->execute($query, $params);
 			
 			// check for message usage
-			$query = $db->prepare('SELECT `msgid` FROM `pmsystem.msg.users`'
+			$query = $db->prepare('SELECT `msgid` FROM `pmsystem_msg_users`'
 								  . ' WHERE `msgid`=:msgid LIMIT 1');
 			$params = array(':msgid' => array($id, PDO::PARAM_INT));
 			$db->execute($query, $params);
@@ -53,15 +53,15 @@
 			// delete stored message and recipients if no one has the message in mailbox anymore
 			if ($row === false)
 			{
-				$query = $db->prepare('DELETE FROM `pmsystem.msg.storage` WHERE `id`=:msgid');
+				$query = $db->prepare('DELETE FROM `pmsystem_msg_storage` WHERE `id`=:msgid');
 				// current value of $params is correct
 				$db->execute($query, $params);
 
-				$query = $db->prepare('DELETE FROM `pmsystem.msg.recipients.users` WHERE `msgid`=:msgid');
+				$query = $db->prepare('DELETE FROM `pmsystem_msg_recipients_users` WHERE `msgid`=:msgid');
 				// current value of $params is correct
 				$db->execute($query, $params);
 
-				$query = $db->prepare('DELETE FROM `pmsystem.msg.recipients.teams` WHERE `msgid`=:msgid');
+				$query = $db->prepare('DELETE FROM `pmsystem_msg_recipients_teams` WHERE `msgid`=:msgid');
 				// current value of $params is correct
 				$db->execute($query, $params);
 			}

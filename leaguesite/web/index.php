@@ -67,9 +67,8 @@
 	$path = (isset($_GET['path'])) ? $_GET['path'] : '/';
 	
 	// init common classes
-	require('CMS/site.php');
+	require(dirname(__FILE__) . '/CMS/site.php');
 	$site = new site();
-	
 	$title = 'Untitled';
 	
 	if ($config->value('maintenance.now'))
