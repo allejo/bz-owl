@@ -1,52 +1,7 @@
 
-Installing
+Overview
 ====================================
 
-Installing is not easy. It is recommended you have basic PHP knowledge before proceeding.
+This project is a CMS that serves as tool to provide a league website. Its name is derived from the game BZFlag and is an abbreviation for BZFlag Open Web League.
 
-First of all PHP 5.3 is recommended.
-PHP's variable register_globals is required to be off.
-PHP's variable magic_quotes_gpc is required to be off, see also
-	http://www.php.net/manual/en/info.configuration.php#ini.magic-quotes-gpc
-
-You need to set up four configuration files
-	CMS/siteoptions_path.php: file that shows the code where the old world config resides.
-				  A template is available at CMS/siteoptions_path_example.php
-	siteoptions.php: The old world config. This file should not reside in the webserver dir.
-					 It is also required to be readable by PHP.
-					 A template is at CMS/siteoptions_example.php
-	CMS/classes/settings_path.php: file that shows the code where the actual config resides.
-								   A template is available at CMS/classes/settings_path_example.php
-	settings.php: The actual config. This file should not reside in the webserver dir.
-				  Also it is required to be readable by PHP.
-				  A template is at CMS/classes/settings_path.php
-
-You may use the examples to modify them. :)
-	cp siteoptions_path_example.php siteoptions_path.php
-	cp settings_path_example.php settings_path.php
-Note that in this example commands it is assumed you would use the default path in siteoptions_path.php
-	cp siteoptions_example.php ../../siteoptions.php
-	cp settings_example.php ../../settings.php
-
-Now you need to set up the relational database management system.
-At the moment only using mysql is possible.
-
-A database structure dump can be found in bz-owl.sql within this directory.
-To avoid concurrent access and performance issues it is recommended to use a database only for this league software.
-
-It is highly recommended to use a BBCode library. See the CMS/nbbc-wrapper.php example file.
-
-This software uses extensive URL-rewriting. If you are using apache2 take a look at htaccess.suggested in this directory.
-Otherwise here are rewriting guidelines:
-¥ You must not rewrite URI's pointing to an existing directory or file except if it points to a path within the CMS directory or the CMS directory itself.
-¥ You must rewrite all URI's pointing to any directory within the CMS directory or the CMS directory itself.
-¥ You must rewrite the URI's the following way: call web/index.php?path=PATH/TO/FILE/RELATIVE/TO/WEB/DIR/WITHOUT/../OR/./AND/QUESTION-MARKS/CHANGED/TO/AMPERSAND/
-
-
-Updates
------------
-
-By using svn up you should get a new version of the source code, if available.
-However the database structure may has changed. We provide an updater between major stable versions in Utilities/bz-owl-db-updater.php (requires command line php installation).
-
-If you upgrade your BBCode library it is recommended to run the bbcode-library-updater.php (requires the website to be in the web dir) but keep in mind this will break legacy data in the database.
+Target audience: People with PHP/MySQL and Apache2 or lighted experience who want to host a league website.

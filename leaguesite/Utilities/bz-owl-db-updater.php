@@ -321,5 +321,8 @@
 		$db->SQL("ALTER TABLE `newssystem` CHANGE `timestamp` `timestamp` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00'");
 		$db->SQL("ALTER TABLE `players_profile` CHANGE `joined` `joined` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00'");
 		$db->SQL("ALTER TABLE `players_profile` CHANGE `last_login` `last_login` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00'");
+		
+		status('Registering new teamSystem add-on');
+		$db->SQL("INSERT INTO `CMS` (`id`,`requestPath`,`title`,`addon`) VALUES (NULL,'Teams/','Teams','teamSystem')");
 	}
 ?>

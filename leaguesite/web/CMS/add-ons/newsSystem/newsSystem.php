@@ -30,7 +30,8 @@
 			$templateToUse = 'News';
 			if (!$tmpl->setTemplate($templateToUse))
 			{
-				$tmpl->noTemplateFound();	// does not return
+				$tmpl->noTemplateFound();
+				die();
 			}
 			
 			$tmpl->assign('title', $title);
