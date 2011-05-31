@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="content-type" />
+	<link href="{$baseURL}themes/{$curTheme}/{$curTheme}.css" rel="stylesheet" type="text/css" />
+	<link rel="icon" type="image/png" href="{$faviconURL}" />
+<title>{$title}</title>
+</head>
+<body>
+<div class="logo"></div>
+
+{foreach $menu as $menuItem}{$menuItem}{foreachelse}
+No menu found.
+{/foreach}
+
+
+<div class="userbuttons">
+	<span class="date">{$date}</span>
+	<span class="Servers">Match servers: <a href="{$baseURL}Servertracker/">{$onlinePlayers}</a></span>
+	<span class="onlineUsers">Website: <a href="{$baseURL}Online/">{$onlineUsers}</a></span>
+	{if isset($logoutURL)}<span class="logout"><a href="{$logoutURL}">Logout</a></span>{/if}
+</div>
+
+<div class="content">
+{if isset($showPMButton) && $showPMButton}<a class="button" href="{$pmLink}">Send message to team</a>{/if}
+{if isset($showEditButton) && $showEditButton}<a class="button" href="./?edit={$teamid}">edit</a>{/if}
+<a class="button" href="./?opponent_stats={$teamid}">opponent stats</a>
+
+{if empty($team)}
+<div class="static_page_box">
+<p>An error occured: Display of team's profile impossible.</p>
+</div>
+{else}
+<tr class="teams_overview">
+	<td><a href="{$team.profileLink}">{$team.name}</a></td>
+	<td>{$team.score}<span class="{$team.scoreClass}"></span></td>
+	<td><a href="{$team.matchSearchLink}">{$team.matchCount}</a></td>
+	<td>{$team.memberCount}</td>
+	<td><a href="{$team.leaderLink}">{$team.leaderName}</a></td>
+	<td>{$team.activity}</td>
+	<td>{$team.created}</td>
+</tr>
+
+<div class="team_area">
+
+	<div class="team_header">
+		<div class="team_name">{$team.name}</div>
+{if isset($team.logo)}
+<img class="team_logo" src="{$team.logo}" style="max-width:300px; max-height:200px" alt="team logo" />
+{/if}
+		<span class="team_score">Rating: {$team.score}<span class="{$team.scoreClass}"></span></span>
+		<div class="team_activity"><span class="team_activity_announcement">Activity: </span><span class="team_activity">{$team.activityNew} ({$team.activityOld})</span></div>
+		<div class="team_member_count"><span class="team_member_count_announcement">Members: </span><span class="team_member_count">{$team.memberCount}</span></div>
+
+		<div class="team_created"><span class="team_created_announcement">Created: </span><span class="team_created">{$team.created}</span></div>
+	<table id="table_team_matches_data" class="nested_table">
+	<caption>Match statistics</caption>
+	<tr>
+		<th>Wins</th>
+		<th>Draws</th>
+
+		<th>Losses</th>
+		<th>Total</th>
+	</tr>
+	<tr>
+		<td>{$matches.wins}</td>
+		<td>{$matches.draws}</td>
+		<td>{$matches.losses}</td>
+
+		<td><a href="{$team.matchSearchLink}">{$matches.total}</a></td>
+	</tr>
+	</table>
+<br />
+	</div>
+</div>
+<div class="team_area">
+	<div class="team_profile_box">
+		<div class="team_profile_header_text">Team description</div>
+
+		<div class="team_description">
+		{$teamDescription}
+		</div>
+	</div>
+</div>
+</div>
+
+{if !empty($members)}
+<table id="table_team_members" class="big">
+<caption>Members of team {$team.name}/caption>
+<tr>
+	<th>Name</th>
+	<th>Location</th>
+	<th>Permissions</th>
+
+	<th>Last Login</th>
+	<th>Allowed actions</th>
+</tr>
+{foreach item="member" from=$members}
+<tr class="teams_members_overview">
+<td><a href="{$member.profileLink}">{$member.name}</a></td>
+{if isset($member.countryFlag)}
+<td><img alt="country flag" class="country_flag" src="{$member.countryFlag}" />
+{/if}
+<span class="user_profile_location">{$member.countryName}</span>
+</td>
+<td>{$member.permissions}</td>
+	<td>{$member.joined}</td>
+{if isset($member.removeLink)}
+<td><a class="button" href="{$member.removeLink}">{$member.removeDescription}</a></td>
+{/if}
+</tr>
+{/foreach}
+{else}
+<div class="static_page_box">Error: No team members found.</div>
+{/if}
+
+</table>
+<br />
+<table id="table_matches_played" class="big">
+<caption>Last entered matches</caption>
+<tr>
+	<th>Time</th>
+	<th>Teams</th>
+	<th>Result</th>
+
+	<th>last mod by</th>
+	<th>Allowed actions</th>
+</tr>
+
+<tr class="matches_overview">
+<td>{$match.time}</td>
+<td><a href="{$match.teamLink1}">{$match.teamName1}</a> - <a href="{$match.teamLink1}">{$match.teamName1}</a></td>
+<td>{$match.score1} - {$match.score2}</td>
+
+</table>
+{if isset($showDeleteButton) && $showDeleteButton}<p><a class="button" href="./?delete={$teamid}">Delete this team</a></p>{/if}
+{/if}
+
+
+</div>
+</body>
+</html>

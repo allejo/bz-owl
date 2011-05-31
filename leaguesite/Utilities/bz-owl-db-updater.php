@@ -324,5 +324,13 @@
 		
 		status('Registering new teamSystem add-on');
 		$db->SQL("INSERT INTO `CMS` (`id`,`requestPath`,`title`,`addon`) VALUES (NULL,'Teams/','Teams','teamSystem')");
+		
+		status('Changing team tables to be used with new teamSystem add-on');
+		$db->SQL('ALTER TABLE `teams_overview` DROP `id`');
+		$db->SQL('ALTER TABLE `teams_overview` ADD PRIMARY KEY  (`teamid`)');
+		$db->SQL('ALTER TABLE `teams_permissions` DROP `id`');
+		$db->SQL('ALTER TABLE `teams_permissions` ADD PRIMARY KEY  (`teamid`)');
+		$db->SQL('ALTER TABLE `teams_profile` DROP `id`');
+		$db->SQL('ALTER TABLE `teams_profile` ADD PRIMARY KEY  (`teamid`)');
 	}
 ?>

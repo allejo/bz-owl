@@ -4,7 +4,7 @@
 #
 # Host: localhost (MySQL 5.1.57)
 # Database: bz-owl
-# Generation Time: 2011-05-23 11:21:28 +0200
+# Generation Time: 2011-05-31 17:36:28 +0200
 # ************************************************************
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -29,7 +29,7 @@ CREATE TABLE `CMS` (
   `addon` varchar(256) NOT NULL DEFAULT 'staticPageEditor',
   PRIMARY KEY (`id`),
   KEY `requestPath` (`requestPath`(255))
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
 
 LOCK TABLES `CMS` WRITE;
 /*!40000 ALTER TABLE `CMS` DISABLE KEYS */;
@@ -43,7 +43,8 @@ VALUES
 	(6,'Links/','Links','staticPageEditor'),
 	(7,'Contact/','Contact','staticPageEditor'),
 	(8,'Bans/','Bans','newsSystem'),
-	(9,'Config/','Config','configSystem');
+	(9,'Config/','Config','configSystem'),
+	(10,'Teams/','Teams','teamSystem');
 
 /*!40000 ALTER TABLE `CMS` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -368,7 +369,6 @@ CREATE TABLE `teams` (
 DROP TABLE IF EXISTS `teams_overview`;
 
 CREATE TABLE `teams_overview` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `teamid` int(11) unsigned NOT NULL DEFAULT '0',
   `score` int(11) NOT NULL DEFAULT '1200',
   `num_matches_played` int(11) unsigned NOT NULL DEFAULT '0',
@@ -376,7 +376,7 @@ CREATE TABLE `teams_overview` (
   `member_count` int(11) unsigned NOT NULL DEFAULT '1',
   `any_teamless_player_can_join` tinyint(1) NOT NULL DEFAULT '1',
   `deleted` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`teamid`),
   KEY `teamid` (`teamid`),
   CONSTRAINT `teams_overview_ibfk_1` FOREIGN KEY (`teamid`) REFERENCES `teams` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='deleted: 0 new; 1 active; 2 deleted; 3 re-activated';
@@ -389,10 +389,9 @@ CREATE TABLE `teams_overview` (
 DROP TABLE IF EXISTS `teams_permissions`;
 
 CREATE TABLE `teams_permissions` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `teamid` int(11) unsigned NOT NULL DEFAULT '0',
   `locked_by_admin` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`teamid`),
   KEY `teamid` (`teamid`),
   CONSTRAINT `teams_permissions_ibfk_1` FOREIGN KEY (`teamid`) REFERENCES `teams` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -405,7 +404,6 @@ CREATE TABLE `teams_permissions` (
 DROP TABLE IF EXISTS `teams_profile`;
 
 CREATE TABLE `teams_profile` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `teamid` int(11) unsigned NOT NULL DEFAULT '0',
   `num_matches_won` int(11) NOT NULL DEFAULT '0',
   `num_matches_draw` int(11) NOT NULL DEFAULT '0',
@@ -414,7 +412,7 @@ CREATE TABLE `teams_profile` (
   `raw_description` mediumtext NOT NULL,
   `logo_url` varchar(200) DEFAULT NULL,
   `created` varchar(10) NOT NULL DEFAULT '0000-00-00',
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`teamid`),
   KEY `teamid` (`teamid`),
   CONSTRAINT `teams_profile_ibfk_1` FOREIGN KEY (`teamid`) REFERENCES `teams` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

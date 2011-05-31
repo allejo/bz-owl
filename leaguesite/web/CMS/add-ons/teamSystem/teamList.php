@@ -6,6 +6,7 @@
 		
 		}
 		
+		
 		function rankScore($score)
 		{
 			switch ($score)
@@ -51,6 +52,7 @@
 			}
 		}
 		
+		
 		function showTeams()
 		{
 			global $tmpl;
@@ -58,7 +60,7 @@
 			global $db;
 			
 			
-			if (!$tmpl->setTemplate('teamSystem'))
+			if (!$tmpl->setTemplate('teamSystemList'))
 			{
 				$tmpl->noTemplateFound();
 				die();
@@ -89,13 +91,12 @@
 				die();
 			}
 			
-			// see if query was successful
 			$teams = array();
 			while ($row = $db->fetchRow($query))
 			{
 				// use a temporary array for better readable (but slower) code
 				$prepared = array();
-				$prepared['profileLink'] = './?profile=' . $row['id'];
+				$prepared['profileLink'] = './?profile=' . $row['teamid'];
 				$prepared['name'] = $row['name'];
 				$prepared['score'] = $row['score'];
 				$prepared['scoreClass'] = $this->rankScore($row['score']);
@@ -112,6 +113,7 @@
 				// append team data
 				$teams[] = $prepared;
 			}
+			$db->free($query);
 			unset($prepared);
 			
 			echo('<pre>');
@@ -119,6 +121,70 @@
 			echo('</pre>');
 			
 			$tmpl->assign('teams', $teams);
+		}
+		
+		
+		function showTeam($teamid)
+		{
+			global $tmpl;
+			global $user;
+			global $db;
+			
+			
+			if (!$tmpl->setTemplate('teamSystemView'))
+			{
+				$tmpl->noTemplateFound();
+				die();
+			}
+			$tmpl->assign('title', 'Team overview');
+			
+			$query = $db->prepare('SELECT *'
+								  . ', (SELECT `name` FROM `players`'
+								  . ' WHERE `players`.`id`=`teams`.`leader_playerid` LIMIT 1)'
+								  . ' AS `leader_name`'
+								  . ' FROM `teams`, `teams_overview`, `teams_profile`'
+								  . ' WHERE `teams`.`id`=`teams_overview`.`teamid`'
+								  . ' AND `teams`.`id`=`teams_profile`.`teamid`'
+								  . ' AND `teams`.`id`=:teamid'
+								  . ' LIMIT 1');
+			// see if query was successful
+			if ($db->execute($query, array(':teamid' => array(intval($teamid), PDO::PARAM_INT))) == false)
+			{
+				// fatal error -> die
+				$db->logError('FATAL ERROR: Query in teamList.php (teamSystem add-on) by user '
+							  . $user->getID() . ' failed, request URI: ' . $_SERVER['REQUEST_URI']);
+				$tmpl->setTemplate('NoPerm');
+				$tmpl->display();
+				die();
+			}
+			
+			$team = array();
+			while ($row = $db->fetchRow($query))
+			{
+				echo('<pre>');
+				print_r($row);
+				echo('</pre>');
+				
+				$team['profileLink'] = './?profile=' . $row['id'];
+				$team['name'] = $row['name'];
+				$team['score'] = $row['score'];
+				$team['scoreClass'] = $this->rankScore($row['score']);
+				$team['matchSearchLink'] = ('../Matches/?search_string=' . $row['name']
+												. '&amp;search_type=team+name'
+												. '&amp;search_result_amount=20'
+												. '&amp;search=Search');
+				$team['matchCount'] = $row['num_matches_played'];
+				$team['memberCount'] = $row['member_count'];
+				$team['leaderLink'] = '../Players/?profile=' . $row['leader_playerid'];
+				$team['leaderName'] = $row['leader_name'];
+				$team['activity'] = $row['activity'];
+				$team['created'] = $row['created'];
+			}
+			$db->free($query);
+			
+			$tmpl->assign('teamid', intval($teamid));
+			$tmpl->assign('showPMButton', $user->getID() > 0 ? true : false);
+			$tmpl->assign('team', $team);
 		}
 	}
 ?>
