@@ -23,9 +23,9 @@
 				require_once dirname(__FILE__) . '/teamList.php';
 				$display = new teamList();
 				
-				switch(isset($_GET['view']))
+				switch(isset($_GET['profile']))
 				{
-					case true: $display->showTeam(intval($_GET['view'])); break;
+					case true: $display->showTeam(intval($_GET['profile'])); break;
 					default: $display->showTeams(); break;
 				}
 			}
