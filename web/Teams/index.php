@@ -1783,7 +1783,7 @@
 		{
 			echo '<tr class="teams_members_overview">' . "\n";
 			echo '<td>';
-			echo '<a href="../Players?profile=';
+			echo '<a href="../Players/?profile=';
 			$currentId = (int) $row['id'];
 			echo $currentId . '">' . ($row['name']) . '</a>';
 			echo '</td>' . "\n" . '<td>';
