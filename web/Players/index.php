@@ -705,7 +705,7 @@
 			if ((int) $row['teamid'] !== 0)
 			{
 				echo '<div class="user_profile_team_name">';
-				echo 'Team: <a href="../Teams?profile=' . $row['teamid'] . '">' . $row['team_name'] . '</a>';
+				echo 'Team: <a href="../Teams/?profile=' . $row['teamid'] . '">' . $row['team_name'] . '</a>';
 				echo '</div>' . "\n";
 			}
 			
