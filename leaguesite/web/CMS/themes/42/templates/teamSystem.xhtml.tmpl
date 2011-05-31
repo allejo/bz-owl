@@ -25,50 +25,35 @@ No menu found.
 <div class="content">
 {if isset($showNewButton)}<a class="button" href="?add">New PM</a>{/if}
 
-{if !empty($messages)}
-<table id="table_msg_overview" class="big">
-<caption>Messages in played</caption>
+{if !empty($teams)}
+<table id="table_team_members_active_teams" class="big">
+<caption>Active teams</caption>
 <tr>
-	<th>Author</th>
-	<th>Subject</th>
-	<th>Date</th>
+	<th>Name</th>
+	<th>Score</th>
+	<th>Matches</th>
 
-	<th>Recipient(s)</th>
+	<th>Members</th>
+	<th>Leader</th>
+	<th>Activity</th>
+	<th>Creation Date</th>
 </tr>
-
 {foreach item="team" from=$teams}
-<tr class="team_overview">
-	<td class="msg_overview_author">
-	{if isset($message.userProfile)}
-	<a href="{$message.userProfile}">{$message.userName}</a>
-	{else}
-	{$message.userName}
-	{/if}
-	</td>
-	<td class="msg_overview_subject">
-		<a {if isset($message.unread)} class="unread" {/if}href="{$message.link}">{$message.subject}</a></td>
-	<td class="msg_overview_timestamp">{$message.time}</td>
-	<td class="msg_overview_recipients">
-	{if isset($message.recipients.users) && ($message.recipients.users|count) > 0}
-		{foreach item="curRecipients" from=$message.recipients.users}
-		<a href="{$curRecipients.link}">{$curRecipients.name}</a>{if !$curRecipients@last || (isset($message.recipients.teams) && ($message.recipients.teams|count) > 0)},{/if}
-		
-		{/foreach}
-	{/if}
-	{if isset($message.recipients.teams) && ($message.recipients.teams|count) > 0}
-		{foreach item="curRecipients" from=$message.recipients.teams}
-			<a href="{$curRecipients.link}">{$curRecipients.name}</a>{if !$curRecipients@last},{/if}
-		{/foreach}
-	{/if}
-	
-	</td>
+<tr class="teams_overview">
+	<td><a href="{$team.profileLink}">{$team.name}</a></td>
+	<td>{$team.score}<span class="{$team.scoreClass}"></span></td>
+	<td><a href="{$team.matchSearchLink}">{$team.matchCount}</a></td>
+	<td>{$team.memberCount}</td>
+	<td><a href="{$team.leaderLink}">{$team.leaderName}</a></td>
+	<td>{$team.activity}</td>
+	<td>{$team.created}</td>
 </tr>
 {/foreach}
 </table>
 {elseif isset($offsetNext) && ($offsetNext-200) > 0}
 <div class="static_page_box">No teams on this page.</div>
 {else}
-<div class="static_page_box">No teams created yet.<br /><br />What are you waiting for? Be the first one!</div>
+<div class="static_page_box">No teams found.<br /><br />What are you waiting for? Be the first one to create a new team!</div>
 {/if}
 
 <br />
