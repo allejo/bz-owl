@@ -25,7 +25,7 @@ No menu found.
 <div class="content">
 {if isset($showReactivateButton)}<a class="button" href="?reactivate">Reactivate a team</a>{/if}
 
-{if !empty($teams)}
+{if isset($teams) && !empty($teams)}
 <table id="table_team_members_active_teams" class="big">
 <caption>Active teams</caption>
 <tr>

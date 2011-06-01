@@ -161,9 +161,11 @@
 			$team = array();
 			while ($row = $db->fetchRow($query))
 			{
+/*
 				echo('<pre>');
 				print_r($row);
 				echo('</pre>');
+*/
 				
 				$team['profileLink'] = './?profile=' . $row['id'];
 				$team['name'] = $row['name'];
@@ -179,12 +181,22 @@
 				$team['leaderName'] = $row['leader_name'];
 				$team['activity'] = $row['activity'];
 				$team['created'] = $row['created'];
+				
+				$team['wins'] = intval($row['num_matches_won']);
+				$team['draws'] = intval($row['num_matches_draw']);
+				$team['losses'] = intval($row['num_matches_lost']);
+				$team['total'] = $team['wins'] + $team['draws'] + $team['losses'];
+				
+				$tmpl->assign('teamDescription', $row['description']);
 			}
 			$db->free($query);
-			
+			$tmpl->assign('team', $team);
+
 			$tmpl->assign('teamid', intval($teamid));
 			$tmpl->assign('showPMButton', $user->getID() > 0 ? true : false);
-			$tmpl->assign('team', $team);
+			
+			$matches = array();
+			$tmpl->assign('matches', $matches);
 		}
 	}
 ?>

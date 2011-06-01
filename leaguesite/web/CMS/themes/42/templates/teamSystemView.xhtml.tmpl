@@ -27,20 +27,11 @@ No menu found.
 {if isset($showEditButton) && $showEditButton}<a class="button" href="./?edit={$teamid}">edit</a>{/if}
 <a class="button" href="./?opponent_stats={$teamid}">opponent stats</a>
 
-{if empty($team)}
+{if !isset($team) || empty($team)}
 <div class="static_page_box">
 <p>An error occured: Display of team's profile impossible.</p>
 </div>
 {else}
-<tr class="teams_overview">
-	<td><a href="{$team.profileLink}">{$team.name}</a></td>
-	<td>{$team.score}<span class="{$team.scoreClass}"></span></td>
-	<td><a href="{$team.matchSearchLink}">{$team.matchCount}</a></td>
-	<td>{$team.memberCount}</td>
-	<td><a href="{$team.leaderLink}">{$team.leaderName}</a></td>
-	<td>{$team.activity}</td>
-	<td>{$team.created}</td>
-</tr>
 
 <div class="team_area">
 
@@ -64,11 +55,10 @@ No menu found.
 		<th>Total</th>
 	</tr>
 	<tr>
-		<td>{$matches.wins}</td>
-		<td>{$matches.draws}</td>
-		<td>{$matches.losses}</td>
-
-		<td><a href="{$team.matchSearchLink}">{$matches.total}</a></td>
+		<td>{$team.wins}</td>
+		<td>{$team.draws}</td>
+		<td>{$team.losses}</td>
+		<td><a href="{$team.matchSearchLink}">{$team.total}</a></td>
 	</tr>
 	</table>
 <br />
@@ -85,7 +75,7 @@ No menu found.
 </div>
 </div>
 
-{if !empty($members)}
+{if isset($members) && !empty($members)}
 <table id="table_team_members" class="big">
 <caption>Members of team {$team.name}/caption>
 <tr>
@@ -117,6 +107,8 @@ No menu found.
 
 </table>
 <br />
+
+{if isset($matches) && !empty($matches)}
 <table id="table_matches_played" class="big">
 <caption>Last entered matches</caption>
 <tr>
@@ -127,11 +119,15 @@ No menu found.
 	<th>last mod by</th>
 	<th>Allowed actions</th>
 </tr>
-
+{foreach item="match" from=$matches}
 <tr class="matches_overview">
 <td>{$match.time}</td>
 <td><a href="{$match.teamLink1}">{$match.teamName1}</a> - <a href="{$match.teamLink1}">{$match.teamName1}</a></td>
 <td>{$match.score1} - {$match.score2}</td>
+{/foreach}
+{else}
+<div class="static_page_box">No matches entered yet.</div>
+{/if}
 
 </table>
 {if isset($showDeleteButton) && $showDeleteButton}<p><a class="button" href="./?delete={$teamid}">Delete this team</a></p>{/if}
