@@ -4,7 +4,7 @@
 #
 # Host: localhost (MySQL 5.1.57)
 # Database: bz-owl
-# Generation Time: 2011-05-31 17:36:28 +0200
+# Generation Time: 2011-06-03 14:32:14 +0200
 # ************************************************************
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -372,7 +372,8 @@ CREATE TABLE `teams_overview` (
   `teamid` int(11) unsigned NOT NULL DEFAULT '0',
   `score` int(11) NOT NULL DEFAULT '1200',
   `num_matches_played` int(11) unsigned NOT NULL DEFAULT '0',
-  `activity` varchar(20) NOT NULL DEFAULT '0.00 (0.00)',
+  `activityNew` float NOT NULL DEFAULT '0',
+  `activityOld` float NOT NULL DEFAULT '0',
   `member_count` int(11) unsigned NOT NULL DEFAULT '1',
   `any_teamless_player_can_join` tinyint(1) NOT NULL DEFAULT '1',
   `deleted` tinyint(1) unsigned NOT NULL DEFAULT '0',

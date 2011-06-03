@@ -332,5 +332,7 @@
 		$db->SQL('ALTER TABLE `teams_permissions` ADD PRIMARY KEY  (`teamid`)');
 		$db->SQL('ALTER TABLE `teams_profile` DROP `id`');
 		$db->SQL('ALTER TABLE `teams_profile` ADD PRIMARY KEY  (`teamid`)');
+		$db->SQL("ALTER TABLE `teams_overview` CHANGE `activity` `activityNew` float NOT NULL DEFAULT '0'");
+		$db->SQL("ALTER TABLE `teams_overview` ADD `activityOld` float NOT NULL DEFAULT '0'  AFTER `activityNew`");
 	}
 ?>

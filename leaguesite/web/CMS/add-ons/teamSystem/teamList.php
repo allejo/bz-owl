@@ -77,7 +77,8 @@
 								  . ' WHERE `teams`.`id`=`teams_overview`.`teamid`'
 								  . ' AND `teams`.`id`=`teams_profile`.`teamid`'
 								  . ' AND `teams_overview`.`deleted`<>?'
-								  . ' ORDER BY `teams_overview`.`score` DESC, `teams_overview`.`activity` DESC'
+								  . ' ORDER BY `teams_overview`.`score` DESC'
+								  . ', `teams_overview`.`activityNew` DESC'
 								  . ' LIMIT 100');
 			// value 2 in deleted column means team has been deleted
 			// see if query was successful
@@ -108,7 +109,8 @@
 				$prepared['memberCount'] = $row['member_count'];
 				$prepared['leaderLink'] = '../Players/?profile=' . $row['leader_playerid'];
 				$prepared['leaderName'] = $row['leader_name'];
-				$prepared['activity'] = $row['activity'];
+				$prepared['activityNew'] = $row['activityNew'];
+				$prepared['activityOld'] = $row['activityOld'];
 				$prepared['created'] = $row['created'];
 				// append team data
 				$teams[] = $prepared;
@@ -116,9 +118,11 @@
 			$db->free($query);
 			unset($prepared);
 			
+/*
 			echo('<pre>');
 			print_r($teams);
 			echo('</pre>');
+*/
 			
 			$tmpl->assign('teams', $teams);
 		}
@@ -179,7 +183,8 @@
 				$team['memberCount'] = $row['member_count'];
 				$team['leaderLink'] = '../Players/?profile=' . $row['leader_playerid'];
 				$team['leaderName'] = $row['leader_name'];
-				$team['activity'] = $row['activity'];
+				$team['activityNew'] = $row['activityNew'];
+				$team['activityOld'] = $row['activityOld'];
 				$team['created'] = $row['created'];
 				
 				$team['wins'] = intval($row['num_matches_won']);

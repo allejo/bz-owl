@@ -109,6 +109,7 @@
 			
 		}
 		
+		
 		function maintainTeams()
 		{
 			
@@ -243,14 +244,20 @@
 			}
 			
 			
-			$query = $db->prepare('UPDATE `teams_overview` SET `activity`=? WHERE `teamid`=?');
+			// set newer activity value
+			$query = $db->prepare('UPDATE `teams_overview` SET `activityNew`=? WHERE `teamid`=?');
 			for ($i = 0; $i <= $num_active_teams; $i++)
 			{
-				$team_activity45[$i] .= ' (' . $team_activity90[$i] . ')';
-				
-				// update activity entry
 				$db->execute($query, array($team_activity45[$i], $teamid[$i]));
 			}
+			
+			// set older activity value
+			$query = $db->prepare('UPDATE `teams_overview` SET `activityOld`=? WHERE `teamid`=?');
+			for ($i = 0; $i <= $num_active_teams; $i++)
+			{
+				$db->execute($query, array($team_activity90[$i], $teamid[$i]));
+			}
+			
 			
 			unset($teamid);
 			unset($team_activity45);
