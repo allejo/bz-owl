@@ -45,7 +45,7 @@ No menu found.
 	<td><a href="{$team.matchSearchLink}">{$team.matchCount}</a></td>
 	<td>{$team.memberCount}</td>
 	<td><a href="{$team.leaderLink}">{$team.leaderName}</a></td>
-	<td>{$team.activityNew} ({$team.activityOld})</td>
+	<td>{$team.activityNew|string_format:'%.2f'} ({$team.activityOld|string_format:'%.2f'})</td>
 	<td>{$team.created}</td>
 </tr>
 {/foreach}

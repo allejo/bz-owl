@@ -8,6 +8,8 @@
 						 'dbUser' => 'insert database user here',
 						 'dbPw' => 'insert database password here',
 						 'dbName' => 'bz-owl',
+						 // charset of non-ASCII user input stored in DB
+						 'db.userInputFieldCharset' => 'UTF-8',
 						 // nl2br needs php newer or equal to 4.0.5 to support xhtml
 						 // if php version is higher or equal to 4.0.5 but lower than 5.3
 						 // then xhtml will be always on

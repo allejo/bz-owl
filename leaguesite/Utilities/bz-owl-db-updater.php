@@ -313,6 +313,7 @@
 		$db->SQL('RENAME TABLE `pmsystem.msg.recipients.teams` TO `pmsystem_msg_recipients_teams`');
 		$db->SQL('RENAME TABLE `pmsystem.msg.recipients.users` TO `pmsystem_msg_recipients_users`');
 		$db->SQL('RENAME TABLE `pmsystem.msg.users` TO `pmsystem_msg_users`');
+		$db->SQL("ALTER TABLE `pmsystem_msg_storage` CHANGE `message` `message` varchar(4000) NULL DEFAULT ''");
 		
 		status('Changing timestamps from varchar(20) to varchar(19) at least');
 		$db->SQL("ALTER TABLE `pmsystem_msg_storage` CHANGE `timestamp` `timestamp` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00'");

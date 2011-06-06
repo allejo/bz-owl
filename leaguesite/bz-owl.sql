@@ -4,7 +4,7 @@
 #
 # Host: localhost (MySQL 5.1.57)
 # Database: bz-owl
-# Generation Time: 2011-06-03 14:32:14 +0200
+# Generation Time: 2011-06-06 08:33:02 +0200
 # ************************************************************
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -288,7 +288,7 @@ CREATE TABLE `pmsystem_msg_storage` (
   `author_id` int(11) unsigned NOT NULL,
   `subject` varchar(50) NOT NULL,
   `timestamp` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `message` varchar(2000) NOT NULL,
+  `message` varchar(4000) DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `author_id` (`author_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The message storage';

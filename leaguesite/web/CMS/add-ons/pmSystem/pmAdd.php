@@ -117,6 +117,7 @@
 		
 		function sanityCheck(&$confirmed)
 		{
+			global $config;
 			global $user;
 			global $tmpl;
 			global $db;
@@ -308,6 +309,38 @@
 				$tmpl->assign('MSG', 'A PM can not be sent without any recipients set.');
 				$confirmed = 0;
 			}
+			
+			
+			// check for too long or too short message
+			// first ask config on database 
+			$dbCharset = $config->value('db.userInputFieldCharset');
+			if ($dbCharset === true)
+			{
+				$tmpl->assign('MSG', 'FATAL ERROR: Config value db.userInputFieldCharset returned true.');
+				$db->logError('FATAL ERROR: Config value db.userInputFieldCharset returned true. '
+							  . 'Check if it is set in settings file. '
+							  . 'It must return a string containing DB field charset for user input.');
+				$confirmed = 0;
+			}
+			// fallback to UTF-8 if not set
+			if ($dbCharset === false)
+			{
+				$dbCharset = 'UTF-8';
+			}
+			
+			// do the actual message length check
+			$len = mb_strlen($this->PMComposer->getContent(), $dbCharset);
+			if ($len < 1)
+			{
+				$tmpl->assign('MSG', 'A message must not be empty.');
+				$confirmed = 0;
+			}
+			if ($len > 4000)
+			{
+				$tmpl->assign('MSG', 'A message must not be longer than 4000 characters.');
+				$confirmed = 0;
+			}
+			
 			
 			return true;
 		}

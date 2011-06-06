@@ -75,7 +75,7 @@
 			return $this->pdo;
 		}
 		
-		function logError($error)
+		public function logError($error)
 		{
 			global $config;
 			
