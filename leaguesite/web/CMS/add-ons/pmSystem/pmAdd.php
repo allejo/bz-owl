@@ -15,7 +15,7 @@
 			$this->PMComposer = new PMComposer();
 			
 			// FIXME: fallback to default permission name until add-on system is completly implemented
-			$entry_add_permission = 'allow_add_news';
+			$entry_add_permission = 'allow_add_messages';
 			
 			if (!$user->getPermission($entry_add_permission))
 			{
