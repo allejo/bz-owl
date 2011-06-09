@@ -335,5 +335,6 @@
 		$db->SQL('ALTER TABLE `teams_profile` ADD PRIMARY KEY  (`teamid`)');
 		$db->SQL("ALTER TABLE `teams_overview` CHANGE `activity` `activityNew` float NOT NULL DEFAULT '0'");
 		$db->SQL("ALTER TABLE `teams_overview` ADD `activityOld` float NOT NULL DEFAULT '0'  AFTER `activityNew`");
+		$db->SQL("ALTER TABLE `teams` CHANGE `leader_playerid` `leader_userid` int(11) NOT NULL DEFAULT '0'");
 	}
 ?>

@@ -25,7 +25,7 @@ No menu found.
 <div class="content">
 {if isset($showReactivateButton)}<a class="button" href="?reactivate">Reactivate a team</a>{/if}
 
-{if isset($teams) && !empty($teams)}
+{if isset($activeTeams) && !empty($activeTeams)}
 <table id="table_team_members_active_teams" class="big">
 <caption>Active teams</caption>
 <tr>
@@ -38,7 +38,7 @@ No menu found.
 	<th>Activity</th>
 	<th>Creation Date</th>
 </tr>
-{foreach item="team" from=$teams}
+{foreach item="team" from=$activeTeams}
 <tr class="teams_overview">
 	<td><a href="{$team.profileLink}">{$team.name}</a></td>
 	<td>{$team.score}<span class="{$team.scoreClass}"></span></td>
@@ -50,25 +50,55 @@ No menu found.
 </tr>
 {/foreach}
 </table>
-{elseif isset($offsetNext) && ($offsetNext-200) > 0}
-<div class="static_page_box">No teams on this page.</div>
-{else}
-<div class="static_page_box">No teams found.<br /><br />What are you waiting for? Be the first one to create a new team!</div>
 {/if}
 
+{if isset($inactiveTeams) && !empty($inactiveTeams)}
+{if isset($activeTeams) && !empty($activeTeams)}
 <br />
+{/if}
+<table id="table_team_members_active_teams" class="big">
+<caption>Inactive teams</caption>
+<tr>
+	<th>Name</th>
+	<th>Score</th>
+	<th>Matches</th>
 
+	<th>Members</th>
+	<th>Leader</th>
+	<th>Activity</th>
+	<th>Creation Date</th>
+</tr>
+{foreach item="team" from=$inactiveTeams}
+<tr class="teams_overview">
+	<td><a href="{$team.profileLink}">{$team.name}</a></td>
+	<td>{$team.score}<span class="{$team.scoreClass}"></span></td>
+	<td><a href="{$team.matchSearchLink}">{$team.matchCount}</a></td>
+	<td>{$team.memberCount}</td>
+	<td><a href="{$team.leaderLink}">{$team.leaderName}</a></td>
+	<td>{$team.activityNew|string_format:'%.2f'} ({$team.activityOld|string_format:'%.2f'})</td>
+	<td>{$team.created}</td>
+</tr>
+{/foreach}
+</table>
+{/if}
+
+{if (!isset($activeTeams) || empty($activeTeams)) && (!isset($inactiveTeams) && empty($inactiveTeams))}
+<div class="static_page_box">No team found.<br /><br />What are you waiting for? Be the first one to create a new team!</div>
+{elseif isset($offsetNext) && ($offsetNext-200) > 0}
+<div class="static_page_box">No teams on this page.</div>
+{/if}
 
 <p>
 {if isset($offsetPrev)}
+<br />
 {if $offsetPrev === 0}
-<a class="button" href="./?folder={$curFolder}">Previous messages</a>
+<a class="button" href="./?folder={$curFolder}">Previous teams</a>
 {else}
-<a class="button" href="./?folder={$curFolder}&amp;i={$offsetPrev}">Previous messages</a>
+<a class="button" href="./?folder={$curFolder}&amp;i={$offsetPrev}">Previous teams</a>
 {/if}
 {/if}
 {if isset($offsetPrev) && isset($offsetNext)} {/if}
-{if isset($offsetNext)}<a class="button" href="./?folder={$curFolder}&amp;i={$offsetNext}">Next messages</a>{/if}
+{if isset($offsetNext)}<a class="button" href="./?folder={$curFolder}&amp;i={$offsetNext}">Next teams</a>{/if}
 </p>
 
 </div>

@@ -77,7 +77,7 @@ No menu found.
 
 {if isset($members) && !empty($members)}
 <table id="table_team_members" class="big">
-<caption>Members of team {$team.name}/caption>
+<caption>Members of team {$team.name}</caption>
 <tr>
 	<th>Name</th>
 	<th>Location</th>
@@ -88,9 +88,10 @@ No menu found.
 </tr>
 {foreach item="member" from=$members}
 <tr class="teams_members_overview">
-<td><a href="{$member.profileLink}">{$member.name}</a></td>
-{if isset($member.countryFlag)}
-<td><img alt="country flag" class="country_flag" src="{$member.countryFlag}" />
+<td><a href="{$member.profileLink}">{$member.userName}</a></td>
+<td>
+{if isset($member.countryFlag) && !empty($member.countryFlag)}
+<img alt="country flag" class="country_flag" src="{$member.countryFlag}" />
 {/if}
 <span class="user_profile_location">{$member.countryName}</span>
 </td>

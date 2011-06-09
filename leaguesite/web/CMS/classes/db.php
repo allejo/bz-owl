@@ -64,7 +64,7 @@
 					echo 'Connection failed: ' . $e->getMessage();
 				} else
 				{
-					echo 'DB connection failure, see log.';
+					echo 'DB connection failure, see log. ';
 				}
 				
 				$this->logError($e->getMessage());

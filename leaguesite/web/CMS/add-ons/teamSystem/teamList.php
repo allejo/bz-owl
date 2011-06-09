@@ -7,7 +7,7 @@
 		}
 		
 		
-		function rankScore($score)
+		private function rankScore($score)
 		{
 			switch ($score)
 			{
@@ -53,6 +53,32 @@
 		}
 		
 		
+		private function addToTeamList(&$row)
+		{
+				// rename db result fields and assemble some additional informations
+				
+				$prepared = array();
+				$prepared['profileLink'] = './?profile=' . $row['teamid'];
+				$prepared['name'] = $row['name'];
+				$prepared['score'] = $row['score'];
+				$prepared['scoreClass'] = $this->rankScore($row['score']);
+				$prepared['matchSearchLink'] = ('../Matches/?search_string=' . $row['name']
+												. '&amp;search_type=team+name'
+												. '&amp;search_result_amount=20'
+												. '&amp;search=Search');
+				$prepared['matchCount'] = $row['num_matches_played'];
+				$prepared['memberCount'] = $row['member_count'];
+				$prepared['leaderLink'] = '../Players/?profile=' . $row['leader_userid'];
+				$prepared['leaderName'] = $row['leader_name'];
+				$prepared['activityNew'] = $row['activityNew'];
+				$prepared['activityOld'] = $row['activityOld'];
+				$prepared['created'] = $row['created'];
+				
+				// return result data
+				return $prepared;
+		}
+		
+		
 		function showTeams()
 		{
 			global $tmpl;
@@ -71,15 +97,15 @@
 			// TODO: move creation date in db from teams_profile to teams_overview
 			$query = $db->prepare('SELECT *'
 								  . ', (SELECT `name` FROM `players`'
-								  . ' WHERE `players`.`id`=`teams`.`leader_playerid` LIMIT 1)'
+								  . ' WHERE `players`.`id`=`teams`.`leader_userid` LIMIT 1)'
 								  . ' AS `leader_name`'
 								  . ' FROM `teams`, `teams_overview`, `teams_profile`'
 								  . ' WHERE `teams`.`id`=`teams_overview`.`teamid`'
 								  . ' AND `teams`.`id`=`teams_profile`.`teamid`'
 								  . ' AND `teams_overview`.`deleted`<>?'
+								  . ' AND `teams_overview`.`activityNew`<>0'
 								  . ' ORDER BY `teams_overview`.`score` DESC'
-								  . ', `teams_overview`.`activityNew` DESC'
-								  . ' LIMIT 100');
+								  . ', `teams_overview`.`activityNew` DESC');
 			// value 2 in deleted column means team has been deleted
 			// see if query was successful
 			if ($db->execute($query, '2') == false)
@@ -92,39 +118,38 @@
 				die();
 			}
 			
-			$teams = array();
+			$activeTeams = array();
 			while ($row = $db->fetchRow($query))
 			{
 				// use a temporary array for better readable (but slower) code
-				$prepared = array();
-				$prepared['profileLink'] = './?profile=' . $row['teamid'];
-				$prepared['name'] = $row['name'];
-				$prepared['score'] = $row['score'];
-				$prepared['scoreClass'] = $this->rankScore($row['score']);
-				$prepared['matchSearchLink'] = ('../Matches/?search_string=' . $row['name']
-												. '&amp;search_type=team+name'
-												. '&amp;search_result_amount=20'
-												. '&amp;search=Search');
-				$prepared['matchCount'] = $row['num_matches_played'];
-				$prepared['memberCount'] = $row['member_count'];
-				$prepared['leaderLink'] = '../Players/?profile=' . $row['leader_playerid'];
-				$prepared['leaderName'] = $row['leader_name'];
-				$prepared['activityNew'] = $row['activityNew'];
-				$prepared['activityOld'] = $row['activityOld'];
-				$prepared['created'] = $row['created'];
 				// append team data
-				$teams[] = $prepared;
+				$activeTeams[] = $this->addToTeamList($row);
 			}
 			$db->free($query);
-			unset($prepared);
 			
-/*
-			echo('<pre>');
-			print_r($teams);
-			echo('</pre>');
-*/
+			$query = $db->prepare('SELECT *'
+								  . ', (SELECT `name` FROM `players`'
+								  . ' WHERE `players`.`id`=`teams`.`leader_userid` LIMIT 1)'
+								  . ' AS `leader_name`'
+								  . ' FROM `teams`, `teams_overview`, `teams_profile`'
+								  . ' WHERE `teams`.`id`=`teams_overview`.`teamid`'
+								  . ' AND `teams`.`id`=`teams_profile`.`teamid`'
+								  . ' AND `teams_overview`.`deleted`<>?'
+								  . ' AND `teams_overview`.`activityNew`=0'
+								  . ' ORDER BY `teams_overview`.`score` DESC'
+								  . ', `teams_overview`.`activityNew` DESC');
+			$db->execute($query, '2');
+			$inactiveTeams = array();
+			while ($row = $db->fetchRow($query))
+			{
+				// use a temporary array for better readable (but slower) code
+				// append team data
+				$inactiveTeams[] = $this->addToTeamList($row);
+			}
+			$db->free($query);
 			
-			$tmpl->assign('teams', $teams);
+			$tmpl->assign('activeTeams', $activeTeams);
+			$tmpl->assign('inactiveTeams', $inactiveTeams);
 		}
 		
 		
@@ -142,9 +167,12 @@
 			}
 			$tmpl->assign('title', 'Team overview');
 			
+			// the team's leader
+			$teamLeader = 0;
+			
 			$query = $db->prepare('SELECT *'
 								  . ', (SELECT `name` FROM `players`'
-								  . ' WHERE `players`.`id`=`teams`.`leader_playerid` LIMIT 1)'
+								  . ' WHERE `players`.`id`=`teams`.`leader_userid` LIMIT 1)'
 								  . ' AS `leader_name`'
 								  . ' FROM `teams`, `teams_overview`, `teams_profile`'
 								  . ' WHERE `teams`.`id`=`teams_overview`.`teamid`'
@@ -170,6 +198,8 @@
 				print_r($row);
 				echo('</pre>');
 */
+				$teamLeader = intval($row['leader_userid']);
+				
 				
 				$team['profileLink'] = './?profile=' . $row['id'];
 				$team['name'] = $row['name'];
@@ -181,7 +211,7 @@
 												. '&amp;search=Search');
 				$team['matchCount'] = $row['num_matches_played'];
 				$team['memberCount'] = $row['member_count'];
-				$team['leaderLink'] = '../Players/?profile=' . $row['leader_playerid'];
+				$team['leaderLink'] = '../Players/?profile=' . $row['leader_userid'];
 				$team['leaderName'] = $row['leader_name'];
 				$team['activityNew'] = $row['activityNew'];
 				$team['activityOld'] = $row['activityOld'];
@@ -197,8 +227,48 @@
 			$db->free($query);
 			$tmpl->assign('team', $team);
 
-			$tmpl->assign('teamid', intval($teamid));
+			$tmpl->assign('teamid', $teamid);
 			$tmpl->assign('showPMButton', $user->getID() > 0 ? true : false);
+			
+			
+			$members = array();
+			$query = $db->prepare('SELECT `players`.`name` AS `player_name`'
+								  . ', `players`.`id` AS `userid`'
+								  . ', (SELECT `name` FROM `countries`'
+								  . ' WHERE `countries`.`id`=`players_profile`.`location`'
+								  . ' AND `players_profile`.`playerid`=`players`.`id` LIMIT 1)'
+								  . ' AS `country_name`'
+								  . ', (SELECT `flagfile` FROM `countries`'
+								  . ' WHERE `countries`.`id`=`players_profile`.`location`'
+								  . ' AND `players_profile`.`playerid`=`players`.`id` LIMIT 1)'
+								  . ' AS `flagfile`'
+								  . ', `players_profile`.`joined`'
+								  . ', `players_profile`.`last_login`'
+								  . ' FROM `players`,`players_profile`'
+								  . 'WHERE `players`.`id`=`players_profile`.`playerid`'
+								  . ' AND `teamid`=?');
+			$db->execute($query, $teamid);
+			while ($row = $db->fetchRow($query))
+			{
+/* 				echo('<pre>'); print_r($row); echo('</pre>'); */
+				// rename db result fields and assemble some additional informations
+				// use a temporary array for better readable (but slower) code
+				$prepared = array();
+				$prepared['profileLink'] = '../Players/?profile=' . $row['userid'];
+				$prepared['userName'] = $row['player_name'];
+				$prepared['permissions'] = $teamLeader === intval($row['userid']) ? 'Leader' : 'none';
+				$prepared['countryName'] = $row['country_name'];
+				$prepared['countryFlag'] = '../Flags/' . $row['flagfile'];
+				$prepared['joined'] = $row['joined'];
+				
+				// append current member data
+				$members[] = $prepared;
+			}
+			$db->free($query);
+			unset($prepared);
+/* 			echo('<pre>'); print_r($members); echo('</pre>'); */
+			$tmpl->assign('members', $members);
+			
 			
 			$matches = array();
 			$tmpl->assign('matches', $matches);
