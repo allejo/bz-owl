@@ -231,6 +231,12 @@
 			$tmpl->assign('showPMButton', $user->getID() > 0 ? true : false);
 			
 			
+			$showActionColumn = false;
+			if ($user->getID() === $teamLeader
+				|| $user->getPermission('allow_kick_any_team_members'))
+			{
+				$showActionColumn = true;
+			}
 			$members = array();
 			$query = $db->prepare('SELECT `players`.`name` AS `player_name`'
 								  . ', `players`.`id` AS `userid`'
@@ -250,16 +256,41 @@
 			$db->execute($query, $teamid);
 			while ($row = $db->fetchRow($query))
 			{
-/* 				echo('<pre>'); print_r($row); echo('</pre>'); */
 				// rename db result fields and assemble some additional informations
 				// use a temporary array for better readable (but slower) code
 				$prepared = array();
+				if (!$showActionColumn && $user->getID() === intval($row['userid']))
+				{
+					$showActionColumn = true;
+				}
 				$prepared['profileLink'] = '../Players/?profile=' . $row['userid'];
 				$prepared['userName'] = $row['player_name'];
-				$prepared['permissions'] = $teamLeader === intval($row['userid']) ? 'Leader' : 'none';
+				$prepared['permissions'] = $teamLeader === intval($row['userid']) ? 'Leader' : 'Standard';
 				$prepared['countryName'] = $row['country_name'];
-				$prepared['countryFlag'] = '../Flags/' . $row['flagfile'];
+				if (strlen($row['flagfile']) > 0)
+				{
+					$prepared['countryFlag'] = '../Flags/' . $row['flagfile'];
+				}
 				$prepared['joined'] = $row['joined'];
+				
+				// show leave/kick links if permission is given
+				// a team leader can not leave or be kicked
+				// you must first give someone else leadership
+				if (($user->getID() === $teamLeader
+					|| $user->getID() === intval($row['userid'])
+					|| $user->getPermission('allow_kick_any_team_members'))
+					&& $user->getID() !== $teamLeader)
+				{
+					$prepared['removeLink'] = './?remove=' . intval($row['userid']);
+					
+					if ($user->getID() === intval($row['userid']))
+					{
+						$prepared['removeDescription'] = 'Leave team';
+					} else
+					{
+						$prepared['removeDescription'] = 'Kick member from team';
+					}
+				}
 				
 				// append current member data
 				$members[] = $prepared;
@@ -268,7 +299,7 @@
 			unset($prepared);
 /* 			echo('<pre>'); print_r($members); echo('</pre>'); */
 			$tmpl->assign('members', $members);
-			
+			$tmpl->assign('showActionColumn', $showActionColumn);
 			
 			$matches = array();
 			$tmpl->assign('matches', $matches);

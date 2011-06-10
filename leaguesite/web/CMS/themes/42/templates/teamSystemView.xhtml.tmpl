@@ -84,7 +84,9 @@ No menu found.
 	<th>Permissions</th>
 
 	<th>Last Login</th>
+	{if isset($showActionColumn) && $showActionColumn}
 	<th>Allowed actions</th>
+	{/if}
 </tr>
 {foreach item="member" from=$members}
 <tr class="teams_members_overview">
@@ -99,6 +101,8 @@ No menu found.
 	<td>{$member.joined}</td>
 {if isset($member.removeLink)}
 <td><a class="button" href="{$member.removeLink}">{$member.removeDescription}</a></td>
+{elseif isset($showActionColumn) && $showActionColumn}
+<td></td>
 {/if}
 </tr>
 {/foreach}
