@@ -79,7 +79,7 @@
 		}
 		
 		
-		function showTeams()
+		public function showTeams()
 		{
 			global $tmpl;
 			global $user;
@@ -153,7 +153,7 @@
 		}
 		
 		
-		function showTeam($teamid)
+		public function showTeam($teamid)
 		{
 			global $tmpl;
 			global $user;
@@ -166,6 +166,8 @@
 				die();
 			}
 			$tmpl->assign('title', 'Team overview');
+			// FIXME: implement something to avoid hardcoded paths
+			$tmpl->assign('pmLink', '../PM/?add&teamid=' . $teamid);
 			
 			// the team's leader
 			$teamLeader = 0;
@@ -193,11 +195,6 @@
 			$team = array();
 			while ($row = $db->fetchRow($query))
 			{
-/*
-				echo('<pre>');
-				print_r($row);
-				echo('</pre>');
-*/
 				$teamLeader = intval($row['leader_userid']);
 				
 				
