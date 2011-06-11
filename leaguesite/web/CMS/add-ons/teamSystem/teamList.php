@@ -228,11 +228,11 @@
 			$tmpl->assign('showPMButton', $user->getID() > 0 ? true : false);
 			
 			
-			$showActionColumn = false;
+			$showMemberActionOptions = false;
 			if ($user->getID() === $teamLeader
 				|| $user->getPermission('allow_kick_any_team_members'))
 			{
-				$showActionColumn = true;
+				$showMemberActionOptions = true;
 			}
 			$members = array();
 			$query = $db->prepare('SELECT `players`.`name` AS `player_name`'
@@ -256,9 +256,9 @@
 				// rename db result fields and assemble some additional informations
 				// use a temporary array for better readable (but slower) code
 				$prepared = array();
-				if (!$showActionColumn && $user->getID() === intval($row['userid']))
+				if (!$showMemberActionOptions && $user->getID() === intval($row['userid']))
 				{
-					$showActionColumn = true;
+					$showMemberActionOptions = true;
 				}
 				$prepared['profileLink'] = '../Players/?profile=' . $row['userid'];
 				$prepared['userName'] = $row['player_name'];
@@ -296,9 +296,58 @@
 			unset($prepared);
 /* 			echo('<pre>'); print_r($members); echo('</pre>'); */
 			$tmpl->assign('members', $members);
-			$tmpl->assign('showActionColumn', $showActionColumn);
+			$tmpl->assign('showMemberActionOptions', $showMemberActionOptions);
 			
+			
+			// show last entered matches
 			$matches = array();
+			
+			// show available options if any available
+			$allowEdit = $user->getPermission('allow_edit_match');
+			$allowDelete = $user->getPermission('allow_delete_match');
+			$tmpl->assign('showMatchActionOptions', $allowEdit || $allowDelete);
+			$tmpl->assign('allowEdit', $allowEdit);
+			$tmpl->assign('allowDelete', $allowDelete);
+			
+			// get match data
+			// sort the data by id to find out if abusers entered data a loong time in the past
+			$query = $db->prepare('SELECT `timestamp`,`team1_teamid`,`team2_teamid`,'
+								  . '(SELECT `name` FROM `teams` WHERE `id`=`team1_teamid`) AS `team1_name`'
+								  . ',(SELECT `name` FROM `teams` WHERE `id`=`team2_teamid`) AS `team2_name`'
+								  . ',`team1_points`,`team2_points`,`playerid`'
+								  . ',(SELECT `players`.`name` FROM `players`'
+								  . ' WHERE `players`.`id`=`matches`.`playerid`)'
+								  . ' AS `playername`'
+								  . ',`matches`.`id`'
+								  . ' FROM `matches` WHERE `matches`.`team1_teamid`=?'
+								  . ' OR `matches`.`team2_teamid`=?'
+								  . ' ORDER BY `id` DESC LIMIT 0,10');
+			$db->execute($query, array($teamid, $teamid));
+			while ($row = $db->fetchRow($query))
+			{
+				// rename db result fields and assemble some additional informations
+				// use a temporary array for better readable (but slower) code
+				$prepared = array();
+ 				$prepared['time'] = $row['timestamp'];
+				$prepared['team1Link'] = '../Teams/?profile=' . $row['team1_teamid'];
+				$prepared['team2Link'] = '../Teams/?profile=' . $row['team2_teamid'];
+				$prepared['teamName1'] = $row['team1_name'];
+				$prepared['teamName2'] = $row['team2_name'];
+				$prepared['score1'] = $row['team1_points'];
+				$prepared['score2'] = $row['team2_points'];
+				$prepared['lastModBy'] = $row['playername'];
+				
+				if ($allowEdit)
+				{
+					$prepared['editLink'] = '../Matches/?edit=' . $row['id'];
+				}
+				if ($allowDelete)
+				{
+					$prepared['deleteLink'] = '../Matches/?delete=' . $row['id'];
+				}
+				
+				$matches[] = $prepared;
+			}
 			$tmpl->assign('matches', $matches);
 		}
 	}

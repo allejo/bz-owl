@@ -84,7 +84,7 @@ No menu found.
 	<th>Permissions</th>
 
 	<th>Last Login</th>
-	{if isset($showActionColumn) && $showActionColumn}
+	{if isset($showMemberActionOptions) && $showMemberActionOptions}
 	<th>Allowed actions</th>
 	{/if}
 </tr>
@@ -101,7 +101,7 @@ No menu found.
 	<td>{$member.joined}</td>
 {if isset($member.removeLink)}
 <td><a class="button" href="{$member.removeLink}">{$member.removeDescription}</a></td>
-{elseif isset($showActionColumn) && $showActionColumn}
+{elseif isset($showMemberActionOptions) && $showMemberActionOptions}
 <td></td>
 {/if}
 </tr>
@@ -122,13 +122,26 @@ No menu found.
 	<th>Result</th>
 
 	<th>last mod by</th>
+	{if $showMatchActionOptions}
 	<th>Allowed actions</th>
+	{/if}
 </tr>
 {foreach item="match" from=$matches}
 <tr class="matches_overview">
 <td>{$match.time}</td>
-<td><a href="{$match.teamLink1}">{$match.teamName1}</a> - <a href="{$match.teamLink1}">{$match.teamName1}</a></td>
+<td><a href="{$match.teamLink1}">{$match.teamName1}</a> - <a href="{$match.teamLink2}">{$match.teamName2}</a></td>
 <td>{$match.score1} - {$match.score2}</td>
+<td>{$match.lastModBy}</td>
+{if $showMatchActionOptions}
+<td>
+{if $allowEdit}
+<a class="button" href="{$match.editLink}">Edit match</a>
+{/if}
+{if $allowDelete}
+<a class="button" href="{$match.deleteLink}">Delete match</a>
+{/if}
+</td>
+{/if}
 {/foreach}
 {else}
 <div class="static_page_box">No matches entered yet.</div>
