@@ -70,7 +70,7 @@
 								  . ' AND `pmsystem_msg_storage`.`id`=?'
 								  . ' ORDER BY `pmsystem_msg_storage`.`id` DESC'
 								  . ' LIMIT 1');
-			$db->execute($query, array($config->value('displayedSystemUsername'), $user->getID(), $folder, $id));
+			$db->execute($query, array($config->getValue('displayedSystemUsername'), $user->getID(), $folder, $id));
 			
 			$rows = $db->fetchAll($query);
 			$db->free($query);
@@ -170,7 +170,7 @@
 			
 			
 			$tmpl->assign('time', $rows[0]['timestamp']);
-			if ($config->value('bbcodeLibAvailable'))
+			if ($config->getValue('bbcodeLibAvailable'))
 			{
 				$tmpl->assign('content', $tmpl->encodeBBCode($rows[0]['message']));
 			} else
@@ -231,7 +231,7 @@
 								  . ' ORDER BY `pmsystem_msg_storage`.`id` DESC'
 								  . ' LIMIT :limit OFFSET :offset');
 			$params = array();
-			$params[':author'] = array($config->value('displayedSystemUsername'), PDO::PARAM_STR);
+			$params[':author'] = array($config->getValue('displayedSystemUsername'), PDO::PARAM_STR);
 			$params[':userid'] = array($user->getID(), PDO::PARAM_INT);
 			$params[':folder'] = array($folder, PDO::PARAM_STR);
 			$params[':limit'] = array($max_per_page+1, PDO::PARAM_INT);
@@ -268,7 +268,7 @@
 				// 0 is an internal system user that shares its id with not logged-in users
 				if (intval($rows[$i]['author_id']) > 0)
 				{
-					$messages[$i]['userProfile'] = ($config->value('baseaddress')
+					$messages[$i]['userProfile'] = ($config->getValue('baseaddress')
 													. 'Players/?profile=' . $rows[$i]['author_id']);
 				}
 				$messages[$i]['userName'] = $rows[$i]['author'];

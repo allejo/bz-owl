@@ -75,7 +75,7 @@
 			{
 				case true:
 					$tmpl->assign('authorName',  htmlent($author['name']));
-					if ($config->value('bbcodeLibAvailable'))
+					if ($config->getValue('bbcodeLibAvailable'))
 					{
 						$tmpl->assign('content',  $tmpl->encodeBBCode($this->PMComposer->getContent()));
 					} else
@@ -313,7 +313,7 @@
 			
 			// check for too long or too short message
 			// first ask config on database 
-			$dbCharset = $config->value('db.userInputFieldCharset');
+			$dbCharset = $config->getValue('db.userInputFieldCharset');
 			if ($dbCharset === true)
 			{
 				$tmpl->assign('MSG', 'FATAL ERROR: Config value db.userInputFieldCharset returned true.');

@@ -103,7 +103,7 @@
 			{
 				case true:
 					$tmpl->assign('rawContent', htmlent($content));
-					if ($config->value('bbcodeLibAvailable'))
+					if ($config->getValue('bbcodeLibAvailable'))
 					{
 						$tmpl->assign('contentPreview',  $tmpl->encodeBBCode($content));
 					} else
@@ -162,7 +162,7 @@
 			{
 				$author = $row['author'];
 				$last_modified = $row['last_modified'];
-				if ($raw && $config->value('bbcodeLibAvailable'))
+				if ($raw && $config->getValue('bbcodeLibAvailable'))
 				{
 					$content = $row['raw_content'];
 				} else
@@ -200,7 +200,7 @@
 			$date_format = date('Y-m-d H:i:s');
 			
 			$args = array($user->getID(), $date_format, $content);
-			if ($config->value('bbcodeLibAvailable'))
+			if ($config->getValue('bbcodeLibAvailable'))
 			{
 				$args[] = $tmpl->encodeBBCode($content);
 			} else

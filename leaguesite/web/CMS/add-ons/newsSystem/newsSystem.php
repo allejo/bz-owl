@@ -308,7 +308,7 @@
 			}
 			
 			// let authors change timestamp, if allowed in config
-			if ($config->value('newsSystem.permissions.allowChangeTimestampOnEdit'))
+			if ($config->getValue('newsSystem.permissions.allowChangeTimestampOnEdit'))
 			{
 				if ($readonly || isset($_POST['confirmationStep']) && isset($_POST['time']))
 				{
@@ -326,7 +326,7 @@
 					$tmpl->assign('titlePreview',  htmlent($content['title']));
 					$tmpl->assign('authorPreview',  htmlent($content['author']['name']));
 					$tmpl->assign('rawContent', htmlent($content['raw_msg']));
-					if ($config->value('bbcodeLibAvailable'))
+					if ($config->getValue('bbcodeLibAvailable'))
 					{
 						$tmpl->assign('contentPreview',  $tmpl->encodeBBCode($content['raw_msg']));
 					} else
@@ -505,7 +505,7 @@
 				default:
 					if (isset($_POST['time']))
 					{
-						if ($config->value('newsSystem.permissions.allowChangeTimestampOnEdit'))
+						if ($config->getValue('newsSystem.permissions.allowChangeTimestampOnEdit'))
 						{
 							if (strtotime($_POST['time']) === false)
 							{
@@ -543,7 +543,7 @@
 			}
 			
 			$args = array($author['name'], $title, $date_format, $content);
-			if ($config->value('bbcodeLibAvailable'))
+			if ($config->getValue('bbcodeLibAvailable'))
 			{
 				$args[] = $tmpl->encodeBBCode($content);
 			} else

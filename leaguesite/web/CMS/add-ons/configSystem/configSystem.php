@@ -11,7 +11,7 @@
 			$output_buffer = '';
 			ob_start();
 			
-			@setcookie('cookies', 'allowed', 0, $config->value('basepath') . 'Config/', $config->value('domain'), 0);
+			@setcookie('cookies', 'allowed', 0, $config->getValue('basepath') . 'Config/', $config->getValue('domain'), 0);
 			
 			$theme = '';
 			if (isset($_GET['theme']))
@@ -86,7 +86,7 @@
 				}
 				
 				// filter unfinished themes if debugSQL is turned off
-				if (isset($themes[$i]) && !$config->value('debugSQL')
+				if (isset($themes[$i]) && !$config->getValue('debugSQL')
 					&& file_exists(dirname(dirname(dirname(__FILE__))) . '/themes/' . $curFile . '/unfinished'))
 				{
 					unset($themes[$i]);

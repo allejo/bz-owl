@@ -23,10 +23,10 @@
 				{
 					$link .= 'class="unread" ';
 				}
-				$link .= 'href="' . ($config->value('baseaddress') . $folder) . '">';
+				$link .= 'href="' . ($config->getValue('baseaddress') . $folder) . '">';
 			} elseif ($showCurNavLink)
 			{
-				$link .= '<a class="current_nav_entry" href="' . ($config->value('baseaddress') . $folder) . '">';
+				$link .= '<a class="current_nav_entry" href="' . ($config->getValue('baseaddress') . $folder) . '">';
 			}
 			$link .= $title;
 			if (!$current || $showCurNavLink)
@@ -92,7 +92,7 @@
 				$menu[] = $this->writeLink('', 'Home' , !isset($_GET['path']));
 			} else
 			{
-				$menu[] = '<li><a href="' . $config->value('baseaddress') . '">Home</a></li>' . "\n";
+				$menu[] = '<li><a href="' . $config->getValue('baseaddress') . '">Home</a></li>' . "\n";
 			}
 			
 			if ($user->getPermission('user_logged_in'))

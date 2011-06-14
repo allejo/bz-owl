@@ -71,10 +71,10 @@
 	$site = new site();
 	$title = 'Untitled';
 	
-	if ($config->value('maintenance.now'))
+	if ($config->getValue('maintenance.now'))
 	{
 		header('Content-Type: text/plain');
-		exit($config->value('maintenance.msg') ? $config->value('maintenance.msg') : 'This site has been shut down due to maintenance.' . "\n");
+		exit($config->getValue('maintenance.msg') ? $config->getValue('maintenance.msg') : 'This site has been shut down due to maintenance.' . "\n");
 	}
 	
 	// load the add-on

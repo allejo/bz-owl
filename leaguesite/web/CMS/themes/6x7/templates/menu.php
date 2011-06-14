@@ -15,17 +15,17 @@
 				{
 					$link .= 'class="unread" ';
 				}
-				$link .= 'href="' . ($config->value('baseaddress') . $folder) . '">';
+				$link .= 'href="' . ($config->getValue('baseaddress') . $folder) . '">';
 			} elseif (count($_GET) > 0)
 			{
-				$link .= '<a class="current_nav_entry" href="' . ($config->value('baseaddress') . $folder) . '">';
+				$link .= '<a class="current_nav_entry" href="' . ($config->getValue('baseaddress') . $folder) . '">';
 			}
 			if (strlen($img) > 0)
 			{
-				$link .= ('<img src="' . $config->value('baseaddress') . 'styles/'
+				$link .= ('<img src="' . $config->getValue('baseaddress') . 'styles/'
 						  . $user->getTheme() . '/img/'
 						  . $img . '" alt="' . $title . '"');
-				$config->value('useXhtml') ? ' />' : '>';
+				$config->getValue('useXhtml') ? ' />' : '>';
 			} else
 			{
 				$link .= $title;
@@ -104,11 +104,11 @@
 					$menu[] = '<li>Home</li>' . "\n";
 				} else
 				{
-					$menu[] = '<li><a class="current_nav_entry" href="' . ($config->value('baseaddress')) . '">Home</a></li>' . "\n";
+					$menu[] = '<li><a class="current_nav_entry" href="' . ($config->getValue('baseaddress')) . '">Home</a></li>' . "\n";
 				}
 			} else
 			{
-				$menu[] = '<li><a href="' . $config->value('baseaddress') . '">Home</a></li>' . "\n";
+				$menu[] = '<li><a href="' . $config->getValue('baseaddress') . '">Home</a></li>' . "\n";
 			}
 			
 			$menu[] = $this->writeLink('News/', 'News', (strcmp($name, 'News') == 0), false, 'button_idea_3D.png');

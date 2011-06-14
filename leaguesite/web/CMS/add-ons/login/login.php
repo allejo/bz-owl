@@ -255,7 +255,7 @@
 						$suspended_mode = $row['status'];
 						if (strcmp(($row['external_id']), '') === 0)
 						{
-							$convert_to_external_login = $config->value('convertUsersToExternalLogin');
+							$convert_to_external_login = $config->getValue('convertUsersToExternalLogin');
 						}
 					}
 				} elseif (isset($_SESSION['external_id']) && $_SESSION['external_id'])
@@ -311,7 +311,7 @@
 				
 				if (isset($_SESSION['external_id']) && $_SESSION['external_id'] && ($convert_to_external_login))
 				{
-					$msg .= '<form action="' . $config->value('baseaddress') . 'Login/'. '" method="post">' . "\n";
+					$msg .= '<form action="' . $config->getValue('baseaddress') . 'Login/'. '" method="post">' . "\n";
 					$msg .= 'The account you tried to login to does not support ';
 					if (isset($module['bzbb']) && ($module['bzbb']))
 					{
@@ -323,12 +323,12 @@
 					$msg .= '. You may update the account first by using your local login.</p>' . "\n";
 					$msg .= '<p>In case someone other than you owns the local account then you need to contact an admin to solve the problem.' . "\n";
 					$account_needs_to_be_converted = true;
-					$msg .= '<form action="' . $config->value('baseaddress') . 'Login/'. '" method="post">' . "\n";
+					$msg .= '<form action="' . $config->getValue('baseaddress') . 'Login/'. '" method="post">' . "\n";
 					$msg .= '<p class="first_p">' . "\n";
-					if ($config->value('forceExternalLoginOnly'))
+					if ($config->getValue('forceExternalLoginOnly'))
 					{
 						$msg .= $tmpl->return_self_closing_tag('input type="submit" name="local_wanted" value="Update old account from '
-															   . htmlent($config->value('oldWebsiteName')) . '"');
+															   . htmlent($config->getValue('oldWebsiteName')) . '"');
 					} else
 					{
 						$msg .= $tmpl->return_self_closing_tag('input type="submit" name="local_wanted" value="Local login"');
@@ -609,7 +609,7 @@
 						}
 						
 						$this->helper->addMsg($msg);
-						if ($config->value('forceExternalLoginOnly'))
+						if ($config->getValue('forceExternalLoginOnly'))
 						{
 							$this->logoutAndAbort('');
 						}
@@ -839,7 +839,7 @@
 			$result = '<';
 			$result .= $tag;
 			// do we use xhtml (->true) or html (->false)
-			if ($config->value('useXhtml'))
+			if ($config->getValue('useXhtml'))
 			{
 				$result .= ' /';
 			}

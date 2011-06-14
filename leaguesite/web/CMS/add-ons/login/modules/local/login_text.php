@@ -7,7 +7,7 @@
 		}
 	}
 	
-	$account_old_website = htmlent($config->value('oldWebsiteName'));
+	$account_old_website = htmlent($config->getValue('oldWebsiteName'));
 	
 	if (!isset($msg))
 	{
@@ -16,9 +16,9 @@
 	
 	if (!(isset($_POST['local_login_wanted']) && $_POST['local_login_wanted']))
 	{
-		$msg .= '<form action="' . $config->value('baseaddress') . 'Login/'. '" method="post">' . "\n";
+		$msg .= '<form action="' . $config->getValue('baseaddress') . 'Login/'. '" method="post">' . "\n";
 		$msg .= '<p class="first_p">' . "\n";
-		if ($config->value('forceExternalLoginOnly'))
+		if ($config->getValue('forceExternalLoginOnly'))
 		{
 			$msg .= $this->helper->return_self_closing_tag('input type="submit" name="local_login_wanted" value="Update old account from ' . $account_old_website . '"');
 		} else
@@ -33,7 +33,7 @@
 /* 		$msg .= '<div class="static_page_box">' . "\n"; */
 		
 		$msg .= '<p class="first_p">';
-		if ($config->value('ConvertUsersToExternalLogin'))
+		if ($config->getValue('ConvertUsersToExternalLogin'))
 		{
 			require_once dirname(dirname(__FILE__)) . '/login_module_list.php';
 			if (isset($module['bzbb']) && ($module['bzbb']))

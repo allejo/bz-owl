@@ -17,8 +17,8 @@
 			$this->cache_lifetime = 120;
 			
 			parent::__construct();
-			parent::assign('faviconURL', $config->value('favicon'));
-			parent::assign('baseURL', $config->value('baseaddress'));
+			parent::assign('faviconURL', $config->getValue('favicon'));
+			parent::assign('baseURL', $config->getValue('baseaddress'));
 		}
 		
 		
@@ -44,7 +44,7 @@
 			
 			parent::assign('date', date('Y-m-d H:i:s T'));
 /*
-			if ($config->value('debugSQL'))
+			if ($config->getValue('debugSQL'))
 			{
 				$this->assign('MSG', 'Used menu: ' . $menuFile);
 			}
@@ -114,7 +114,7 @@
 			if ($user->loggedIn())
 			{
 				/* 				parent::assign('LOGOUT'); */
-				parent::assign('logoutURL', ($config->value('baseaddress') . 'Logout/'));
+				parent::assign('logoutURL', ($config->getValue('baseaddress') . 'Logout/'));
 			}
 		}
 		
@@ -137,7 +137,7 @@
 			
 			return file_exists(dirname(dirname(__FILE__)) . '/themes/'
 							   . $theme . '/templates/' . $template
-							   . ($config->value('useXhtml') ? '.xhtml.tmpl' : '.html.tmpl'));
+							   . ($config->getValue('useXhtml') ? '.xhtml.tmpl' : '.html.tmpl'));
 		}
 		
 		
@@ -146,35 +146,35 @@
 		{
 			global $config;
 			
-			if (strcmp($config->value('bbcodeLibPath'), '') === 0)
+			if (strcmp($config->getValue('bbcodeLibPath'), '') === 0)
 			{
 				// no bbcode library specified
 				return $this->linebreaks(htmlent($bbcode));
 			}
 			// load the library
-			require_once ($config->value('bbcodeLibPath'));
+			require_once ($config->getValue('bbcodeLibPath'));
 			
-			if (strcmp($config->value('bbcodeCommand'), '') === 0)
+			if (strcmp($config->getValue('bbcodeCommand'), '') === 0)
 			{
 				// no command that starts the parser
 				return $this->linebreaks(htmlent($bbcode));
 			} else
 			{
-				$parse_command = $config->value('bbcodeCommand');
+				$parse_command = $config->getValue('bbcodeCommand');
 			}
 			
-			if (!(strcmp($config->value('bbcodeClass'), '') === 0))
+			if (!(strcmp($config->getValue('bbcodeClass'), '') === 0))
 			{
 				// no class specified
 				// this is no error, it only means the library stuff isn't started by a command in a class
-				$bbcode_class = $config->value('bbcodeClass');
+				$bbcode_class = $config->getValue('bbcodeClass');
 				$bbcode_instance = new $bbcode_class;
 			}
 			
 			// execute the bbcode algorithm
 			if (isset($bbcode_class))
 			{
-				if ($config->value('bbcodeSetsLinebreaks'))
+				if ($config->getValue('bbcodeSetsLinebreaks'))
 				{
 					return $bbcode_instance->$parse_command($bbcode);
 				} else
@@ -183,7 +183,7 @@
 				}
 			} else
 			{
-				if ($config->value('bbcodeSetsLinebreaks'))
+				if ($config->getValue('bbcodeSetsLinebreaks'))
 				{
 					return $parse_command($bbcode);
 				} else
@@ -200,7 +200,7 @@
 			
 			if (phpversion() >= ('5.3'))
 			{
-				return nl2br($text, ($config->value('useXhtml')));
+				return nl2br($text, ($config->getValue('useXhtml')));
 			} else
 			{
 				return nl2br($text);
@@ -264,7 +264,7 @@
 			
 			if ($compile_id === null)
 			{
-				$compile_id = $config->value('basepath') . ', theme ' . $user->getTheme() . ', lang en';
+				$compile_id = $config->getValue('basepath') . ', theme ' . $user->getTheme() . ', lang en';
 			}
 			
 			// code disabled because multi line problem in input type="hidden" does not work with xhtml header
@@ -275,7 +275,7 @@
 			// nevertheless it's still a good idea for debugging because
 			// an XML parser is a lot simpler and has no error correction  -> speed :)
 			// TODO: needs digging into http://tools.ietf.org/html/rfc2616#section-14.1
-			if ($config->value('useXhtml') && !$config->value('debugSQL')
+			if ($config->getValue('useXhtml') && !$config->getValue('debugSQL')
 				&& isset($_SERVER['HTTP_ACCEPT'])
 				&& !strstr($_SERVER['HTTP_ACCEPT'], 'application/xhtml+xml,q=0')
 				&& strstr($_SERVER['HTTP_ACCEPT'], 'application/xhtml+xml'))
@@ -309,8 +309,8 @@
 			
 			// init template system
 			parent::setTemplateDir($themeFolder . 'templates');
-			parent::setCompileDir($config->value('tmpl.compiled'));
-			parent::setCacheDir($config->value('tmpl.cached'));
+			parent::setCompileDir($config->getValue('tmpl.compiled'));
+			parent::setCacheDir($config->getValue('tmpl.cached'));
 			parent::setConfigDir($themeFolder . 'config');
 			
 			$this->theme = $themeFolder;
@@ -325,18 +325,18 @@
 			
 			//			$this->tpl->loadTemplatefile($template . '.tmpl.html', true, true);
 			
-			$template .= (($config->value('useXhtml')) ? '.xhtml' : '.html') . '.tmpl';
+			$template .= (($config->getValue('useXhtml')) ? '.xhtml' : '.html') . '.tmpl';
 			
 			if (!file_exists($themeFolder . 'templates/' . $template))
 			{
-				if ($config->value('debugSQL'))
+				if ($config->getValue('debugSQL'))
 				{
 					echo 'Tried to use template: ' . $themeFolder . 'templates/' . $template
 					. ' but failed: file does not exist.';
 				}
 				
 				return false;
-			} elseif ($config->value('debugSQL'))
+			} elseif ($config->getValue('debugSQL'))
 			{
 				// debug output used template
 				//				$this->assign('MSG', 'Used template: ' . $themeFolder

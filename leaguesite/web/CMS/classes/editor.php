@@ -25,7 +25,7 @@
 			global $tmpl;
 			global $config;
 			
-			if (!$config->value('bbcodeLibAvailable'))
+			if (!$config->getValue('bbcodeLibAvailable'))
 			{
 				// no bbcode -> no buttons
 				return;
@@ -142,12 +142,12 @@
 				default:
 					$tmpl->assign('USER_NOTE');
 					
-					if ($config->value('bbcodeLibAvailable'))
+					if ($config->getValue('bbcodeLibAvailable'))
 					{
 						$tmpl->assign('notes', 'Keep in mind to use BBCode instead of HTML or XHTML.');
 					} else
 					{
-						if ($config->value('useXhtml'))
+						if ($config->getValue('useXhtml'))
 						{
 							$tmpl->assign('notes', 'Keep in mind the home page currently uses XHTML, not HTML or BBCode.');
 						} else

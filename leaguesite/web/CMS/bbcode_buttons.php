@@ -13,10 +13,10 @@
 				// new code framework
 				
 				// check for bbcode library
-				if ($config->value('bbcodeLibAvailable'))
+				if ($config->getValue('bbcodeLibAvailable'))
 				{
 					$buttons = array();
-					$buttons[] = '<script type="text/javascript" src="' . $config->value('baseaddress') . 'bbcode_buttons.js"></script>' . "\n";
+					$buttons[] = '<script type="text/javascript" src="' . $config->getValue('baseaddress') . 'bbcode_buttons.js"></script>' . "\n";
 					$buttons[] = ('<input type="button" name="bold" value="b" '
 								  . 'style="font-weight: bold;" '
 								  . 'onclick="' . "insert('[b]', '[/b]', '$form_number', '$element_name')" . '" />');

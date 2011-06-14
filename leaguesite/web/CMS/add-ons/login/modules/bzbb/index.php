@@ -11,7 +11,8 @@ if ( (isset($_GET['bzbbauth'])) && ($_GET['bzbbauth']) )
 	$groups = Array ('VERIFIED','GU-LEAGUE.REFEREES','GU-LEAGUE.ADMINS');
 	$args = explode (',', urldecode($_GET['bzbbauth']));
 	// $args[0] is token, $args[1] is callsign
-	if (!$info = validate_token ($args[0], $args[1], $groups, false))
+	if (!$info = validate_token ($args[0], $args[1], $groups,
+								 !$config->getValue('login.modules.bzbb.disableCheckIP')))
 	{
 		// login did not work, removing permissions not necessary as additional permissions where never granted
 		// after permissions were removed at the beginning of the file

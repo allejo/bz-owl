@@ -22,7 +22,7 @@
 			
 			// set the date and time
 			// suppress warning on invalid value to keep output well-formed
-			if (@date_default_timezone_set($config->value('timezone')) === false)
+			if (@date_default_timezone_set($config->getValue('timezone')) === false)
 			{
 				// fallback to UTC if supplied config value is invalid
 				date_default_timezone_set('UTC');
@@ -50,8 +50,8 @@
 			{
 				// invalidate old session
 				// default: 15 minutes (60*15)
-				$sessionRegenTime = ($config->value('sessionRegenTime')) ?
-									 $config->value('sessionRegenTime') : (60*15);
+				$sessionRegenTime = ($config->getValue('sessionRegenTime')) ?
+									 $config->getValue('sessionRegenTime') : (60*15);
 				if (time() - $_SESSION['creationTime'] > (60*15))
 				{
 					// session creationTime older than $sessionRegenTime
@@ -65,8 +65,8 @@
 			
 			// logout inactive users
 			// default: 2 hours (60*60*2)
-			$sessionExpiryTime = ($config->value('logoutUserAfterXSecondsInactive')) ?
-								  $config->value('logoutUserAfterXSecondsInactive') : (60*60*2);
+			$sessionExpiryTime = ($config->getValue('logoutUserAfterXSecondsInactive')) ?
+								  $config->getValue('logoutUserAfterXSecondsInactive') : (60*60*2);
 			if (isset($_SESSION['lastActivity']) && (time() - $_SESSION['lastActivity']) > $sessionExpiryTime)
 			{
 				// last access older than $sessionExpiryTime

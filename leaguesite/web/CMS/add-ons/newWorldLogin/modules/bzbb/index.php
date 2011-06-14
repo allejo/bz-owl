@@ -11,7 +11,7 @@
 			global $config;
 			
 			
-			$this->xhtml = $config->value('useXhtml');
+			$this->xhtml = $config->getValue('useXhtml');
 		}
 		
 		
@@ -22,7 +22,7 @@
 			
 			$text = ('<p class="first_p">Please log in using your account at <a href='
 					 . '"http://my.bzflag.org/weblogin.php?action=weblogin&amp;url='
-					 . urlencode($config->value('baseaddress') . 'Login2/'
+					 . urlencode($config->getValue('baseaddress') . 'Login2/'
 							   . '?module=bzbb&action=login&auth=%TOKEN%,%USERNAME%')
 					 . '">my.bzflag.org (BZBB)</a>.</p>' . "\n");
 			
@@ -55,7 +55,8 @@
 			// load module specific auth helper
 			require dirname(__FILE__) . '/checkToken.php';
 			
-			if (($this->groups = $config->value('login.bzbb.groups')) === false || is_array($groups) === false)
+			if (($this->groups = $config->getValue('login.modules.bzbb.groups')) === false
+				|| is_array($groups) === false)
 			{
 				// no accepted groups in config -> no login
 				$output = 'config error : no login group was specified.';
@@ -73,7 +74,8 @@
 			}
 			unset($group);
 			
-			if (!$this->info = validate_token($params[0], $params[1], $groupNames, false))
+			if (!$this->info = validate_token($params[0], $params[1], $groupNames,
+											  !$config->getValue('login.modules.bzbb.disableCheckIP')))
 			{
 				// login did not work
 				$output = ('<p class="first_p">Login failed: The returned values could not be validated!'

@@ -28,10 +28,10 @@
 			
 			if ($this->getMobile())
 			{
-				$default_theme = $config->value('defaultMobileTheme');
+				$default_theme = $config->getValue('defaultMobileTheme');
 			} else
 			{
-				$default_theme = $config->value('defaultTheme');
+				$default_theme = $config->getValue('defaultTheme');
 			}
 			
 			$theme = $default_theme;
@@ -99,7 +99,7 @@
 			global $config;
 			
 			// save theme for two months
-			setcookie('theme', $theme, time()+60*60*24*30*2, $config->value('basepath'), $config->value('domain'), 0);
+			setcookie('theme', $theme, time()+60*60*24*30*2, $config->getValue('basepath'), $config->getValue('domain'), 0);
 			
 			// save it in session based variable if setting cookie failed
 			// it could fail because user did not accept cookie for instance

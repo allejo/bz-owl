@@ -51,15 +51,15 @@
 			try
 			{
 				$this->pdo = new PDO(
-									 'mysql:host='. strval($config->value('dbHost'))
-									 . ';dbname=' . strval($config->value('dbName')),
-									 strval($config->value('dbUser')),
-									 strval($config->value('dbPw')),
+									 'mysql:host='. strval($config->getValue('dbHost'))
+									 . ';dbname=' . strval($config->getValue('dbName')),
+									 strval($config->getValue('dbUser')),
+									 strval($config->getValue('dbPw')),
 									 array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"));
 			}
 			catch (PDOException $e)
 			{
-				if ($config->value('debugSQL'))
+				if ($config->getValue('debugSQL'))
 				{
 					echo 'Connection failed: ' . $e->getMessage();
 				} else
@@ -94,7 +94,7 @@
 			}
 			
 			
-			$logfile = strval($config->value('errorLogFile'));
+			$logfile = strval($config->getValue('errorLogFile'));
 			if (strlen($logfile) > 0 && file_exists($logfile) && is_writable($logfile))
 			{
 				$handle = @fopen($logfile, 'a');
@@ -109,7 +109,7 @@
 		}
 		
 		// deprecated function
-		// use config->value('debugSQL') instead
+		// use config->getValue('debugSQL') instead
 		function getDebugSQL()
 		{
 			global $config;
@@ -119,7 +119,7 @@
 				return ($_SESSION['debugSQL']);
 			} else
 			{
-				return $config->value('debugSQL');
+				return $config->getValue('debugSQL');
 			}
 		}
 		

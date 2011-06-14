@@ -31,8 +31,12 @@
 						 'maintenance.updateDB' => false,
 						 // display local login on front login page
 						 'login.local.showLoginText' => false,
+						 // ability to turn off ip-address check on bzbb login
+						 // can be useful for testing behind NAT
+						 // production environments: always use false
+						 'login.modules.bzbb.disableCheckIP' = false,
 						 // accepted bzbb login groups
-						 'login.bzbb.groups' => array('VERIFIED' => array('name' => 'VERIFIED',
+						 'login.modules.bzbb.groups' => array('VERIFIED' => array('name' => 'VERIFIED',
 																		  'permissions' => array('allow_add_messages' => true,
 																								 'allow_delete_messages' => true,
 																								 'allow_watch_servertracker' => true)),

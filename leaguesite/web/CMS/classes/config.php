@@ -13,7 +13,7 @@
 			$this->options = $settings->settings();
 		}
 		
-		function value($setting)
+		function getValue($setting)
 		{
 			// lookup the value in the array 
 			if (isset($this->options[$setting]))

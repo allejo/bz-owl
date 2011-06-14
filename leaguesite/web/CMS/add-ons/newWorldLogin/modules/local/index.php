@@ -8,7 +8,7 @@
 			global $config;
 			
 			
-			$this->xhtml = $config->value('useXhtml');
+			$this->xhtml = $config->getValue('useXhtml');
 		}
 		
 		
@@ -18,7 +18,7 @@
 			
 			
 			// show login text only if configured to do so
-			if ($config->value('login.local.showLoginText'))
+			if ($config->getValue('login.local.showLoginText'))
 			{
 				return ('local login form text');
 			}

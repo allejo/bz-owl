@@ -21,7 +21,7 @@
 				{
 					$recipientName['0']['name'] = 'ERROR: Could not find out team name';
 				}
-				$recipient['link'] = ($config->value('baseaddress') . 'Teams/?profile='
+				$recipient['link'] = ($config->getValue('baseaddress') . 'Teams/?profile='
 									  . htmlent($recipientID));
 			} else
 			{
@@ -34,7 +34,7 @@
 					$recipientName['0']['name'] = 'ERROR: Could not find out player name';
 				}
 				
-				$recipient['link'] = ($config->value('baseaddress') . 'Players/?profile='
+				$recipient['link'] = ($config->getValue('baseaddress') . 'Players/?profile='
 									  . htmlent($recipientID));
 			}
 			

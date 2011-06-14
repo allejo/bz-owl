@@ -65,11 +65,11 @@
 			global $config;
 			
 			
-			$subject = ($config->value('login.welcome.subject') ?
-						$config->value('login.welcome.subject') :
+			$subject = ($config->getValue('login.welcome.subject') ?
+						$config->getValue('login.welcome.subject') :
 						'Welcome');
-			$content = ($config->value('login.welcome.content') ?
-						$config->value('login.welcome.content') :
+			$content = ($config->getValue('login.welcome.content') ?
+						$config->getValue('login.welcome.content') :
 						'Welcome and thanks for registering at this website!' . "\n"
 									. 'In the FAQ you can find the most important informations'
 									. ' about organising and playing matches.' . "\n\n"

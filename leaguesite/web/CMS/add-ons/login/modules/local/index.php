@@ -28,7 +28,7 @@
 		
 		// get player id
 		$query = 'SELECT `id`';
-		if ($config->value('forceExternalLoginOnly'))
+		if ($config->getValue('forceExternalLoginOnly'))
 		{
 			$query .= ', `external_id` ';
 		}
@@ -46,19 +46,19 @@
 		while($row = $db->fetchRow($query))
 		{
 			$playerid = $row['id'];
-			if ($config->value('forceExternalLoginOnly') && !(strcmp(($row['external_id']), '') === 0))
+			if ($config->getValue('forceExternalLoginOnly') && !(strcmp(($row['external_id']), '') === 0))
 			{
 				$convert_to_external_login = false;
 			}
 		}
 		
 		// local login tried but external login forced in settings
-		if (!$convert_to_external_login && $config->value('forceExternalLoginOnly'))
+		if (!$convert_to_external_login && $config->getValue('forceExternalLoginOnly'))
 		{
 			$msg = '<span class="unread_messages">You already enabled ';
 			if (isset($module['bzbb']) && ($module['bzbb']))
 			{
-				$url = urlencode($config->value('baseaddress') . 'Login/' . '?bzbbauth=%TOKEN%,%USERNAME%');
+				$url = urlencode($config->getValue('baseaddress') . 'Login/' . '?bzbbauth=%TOKEN%,%USERNAME%');
 				$msg .= '<a href="' . htmlspecialchars('http://my.bzflag.org/weblogin.php?action=weblogin&url=') . $url;						
 				$msg .= '">global (my.bzflag.org/bb/) login</a>';
 			} else

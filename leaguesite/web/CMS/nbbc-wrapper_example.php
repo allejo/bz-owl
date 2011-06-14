@@ -15,7 +15,7 @@
 				$setup->SetSmileyURL(baseaddress() . 'smileys');
 			} else
 			{
-				$setup->SetSmileyURL($config->value('baseaddress') . 'smileys');
+				$setup->SetSmileyURL($config->getValue('baseaddress') . 'smileys');
 			}
 			// $setup->SetEnableSmileys(false);
 			$setup->SetAllowAmpersand(true);
