@@ -34,7 +34,7 @@
 						 // ability to turn off ip-address check on bzbb login
 						 // can be useful for testing behind NAT
 						 // production environments: always use false
-						 'login.modules.bzbb.disableCheckIP' = false,
+						 'login.modules.bzbb.disableCheckIP' => false,
 						 // accepted bzbb login groups
 						 'login.modules.bzbb.groups' => array('VERIFIED' => array('name' => 'VERIFIED',
 																		  'permissions' => array('allow_add_messages' => true,
