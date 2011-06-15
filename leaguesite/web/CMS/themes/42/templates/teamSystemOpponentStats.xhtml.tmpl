@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="content-type" />
+	<link href="{$baseURL}themes/{$curTheme}/{$curTheme}.css" rel="stylesheet" type="text/css" />
+	<link rel="icon" type="image/png" href="{$faviconURL}" />
+<title>{$title}</title>
+</head>
+<body>
+<div class="logo"></div>
+
+{foreach $menu as $menuItem}{$menuItem}{foreachelse}
+No menu found.
+{/foreach}
+
+
+<div class="userbuttons">
+	<span class="date">{$date}</span>
+	<span class="Servers">Match servers: <a href="{$baseURL}Servertracker/">{$onlinePlayers}</a></span>
+	<span class="onlineUsers">Website: <a href="{$baseURL}Online/">{$onlineUsers}</a></span>
+	{if isset($logoutURL)}<span class="logout"><a href="{$logoutURL}">Logout</a></span>{/if}
+</div>
+
+<div class="content">
+<a class="button" href="./">overview</a>
+<a class="button" href="./?profile={$teamid}">back to team profile</a>
+{if !isset($teamOpponents) || empty($teamOpponents)}
+<div class="static_page_box">This team has not played any match yet.</div>
+{else}
+<table class="big" id="opponent_stats">
+<caption>Opponent statistics for team Enough Is Enough!</caption>
+<tr>
+	<th><a href="./?opponent_stats=40&amp;sort=Name&amp;order=asc">Name</a></th>
+	<th><a href="./?opponent_stats=40&amp;sort=Total&amp;order=asc">Total</a></th>
+
+	<th><a href="./?opponent_stats=40&amp;sort=Won&amp;order=asc">Won</a></th>
+	<th><a href="./?opponent_stats=40&amp;sort=Tied&amp;order=asc">Tied</a></th>
+	<th><a href="./?opponent_stats=40&amp;sort=Lost&amp;order=asc">Lost</a></th>
+	<th><a href="./?opponent_stats=40&amp;sort=Won%20Ratio&amp;order=asc">Won Ratio</a></th>
+</tr>
+{foreach item="team" from=$teamOpponents}
+{/foreach}
+</table>
+{/if}
+
+</div>
+</body>
+</html>

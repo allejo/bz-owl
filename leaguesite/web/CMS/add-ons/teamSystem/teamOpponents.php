@@ -1,5 +1,5 @@
 <?php
-	class teamList
+	class teamOpponents
 	{
 		function __construct()
 		{
@@ -64,7 +64,7 @@
 				$prepared['scoreClass'] = $this->rankScore($row['score']);
 				$prepared['matchSearchLink'] = ('../Matches/?search_string=' . $row['name']
 												. '&amp;search_type=team+name'
-												. '&amp;search_result_amount=200'
+												. '&amp;search_result_amount=20'
 												. '&amp;search=Search');
 				$prepared['matchCount'] = $row['num_matches_played'];
 				$prepared['memberCount'] = $row['member_count'];
@@ -79,96 +79,22 @@
 		}
 		
 		
-		public function showTeams()
+		public function showOpponentStats($teamid)
 		{
 			global $tmpl;
 			global $user;
 			global $db;
 			
 			
-			if (!$tmpl->setTemplate('teamSystemList'))
+			if (!$tmpl->setTemplate('teamSystemOpponentStats'))
 			{
 				$tmpl->noTemplateFound();
 				die();
 			}
-			$tmpl->assign('title', 'Team overview');
+			$tmpl->assign('title', 'Team opponent statistics');
+			$tmpl->assign('teamid', $teamid);
 			
-			// get list of active, inactive and new teams (no deleted teams)
-			// TODO: move creation date in db from teams_profile to teams_overview
-			$query = $db->prepare('SELECT *'
-								  . ', (SELECT `name` FROM `players`'
-								  . ' WHERE `players`.`id`=`teams`.`leader_userid` LIMIT 1)'
-								  . ' AS `leader_name`'
-								  . ' FROM `teams`, `teams_overview`, `teams_profile`'
-								  . ' WHERE `teams`.`id`=`teams_overview`.`teamid`'
-								  . ' AND `teams`.`id`=`teams_profile`.`teamid`'
-								  . ' AND `teams_overview`.`deleted`<>?'
-								  . ' AND `teams_overview`.`activityNew`<>0'
-								  . ' ORDER BY `teams_overview`.`score` DESC'
-								  . ', `teams_overview`.`activityNew` DESC');
-			// value 2 in deleted column means team has been deleted
-			// see if query was successful
-			if ($db->execute($query, '2') == false)
-			{
-				// fatal error -> die
-				$db->logError('FATAL ERROR: Query in teamList.php (teamSystem add-on) by user '
-							  . $user->getID() . ' failed, request URI: ' . $_SERVER['REQUEST_URI']);
-				$tmpl->setTemplate('NoPerm');
-				$tmpl->display();
-				die();
-			}
-			
-			$activeTeams = array();
-			while ($row = $db->fetchRow($query))
-			{
-				// use a temporary array for better readable (but slower) code
-				// append team data
-				$activeTeams[] = $this->addToTeamList($row);
-			}
-			$db->free($query);
-			
-			$query = $db->prepare('SELECT *'
-								  . ', (SELECT `name` FROM `players`'
-								  . ' WHERE `players`.`id`=`teams`.`leader_userid` LIMIT 1)'
-								  . ' AS `leader_name`'
-								  . ' FROM `teams`, `teams_overview`, `teams_profile`'
-								  . ' WHERE `teams`.`id`=`teams_overview`.`teamid`'
-								  . ' AND `teams`.`id`=`teams_profile`.`teamid`'
-								  . ' AND `teams_overview`.`deleted`<>?'
-								  . ' AND `teams_overview`.`activityNew`=0'
-								  . ' ORDER BY `teams_overview`.`score` DESC'
-								  . ', `teams_overview`.`activityNew` DESC');
-			$db->execute($query, '2');
-			$inactiveTeams = array();
-			while ($row = $db->fetchRow($query))
-			{
-				// use a temporary array for better readable (but slower) code
-				// append team data
-				$inactiveTeams[] = $this->addToTeamList($row);
-			}
-			$db->free($query);
-			
-			$tmpl->assign('activeTeams', $activeTeams);
-			$tmpl->assign('inactiveTeams', $inactiveTeams);
-		}
-		
-		
-		public function showTeam($teamid)
-		{
-			global $tmpl;
-			global $user;
-			global $db;
-			
-			
-			if (!$tmpl->setTemplate('teamSystemProfile'))
-			{
-				$tmpl->noTemplateFound();
-				die();
-			}
-			$tmpl->assign('title', 'Team overview');
-			// FIXME: implement something to avoid hardcoded paths
-			$tmpl->assign('pmLink', '../PM/?add&teamid=' . $teamid);
-			
+/*
 			// the team's leader
 			$teamLeader = 0;
 			
@@ -204,7 +130,7 @@
 				$team['scoreClass'] = $this->rankScore($row['score']);
 				$team['matchSearchLink'] = ('../Matches/?search_string=' . $row['name']
 												. '&amp;search_type=team+name'
-												. '&amp;search_result_amount=200'
+												. '&amp;search_result_amount=20'
 												. '&amp;search=Search');
 				$team['matchCount'] = $row['num_matches_played'];
 				$team['memberCount'] = $row['member_count'];
@@ -223,8 +149,7 @@
 			}
 			$db->free($query);
 			$tmpl->assign('team', $team);
-
-			$tmpl->assign('teamid', $teamid);
+			
 			$tmpl->assign('showPMButton', $user->getID() > 0 ? true : false);
 			
 			
@@ -294,7 +219,6 @@
 			}
 			$db->free($query);
 			unset($prepared);
-/* 			echo('<pre>'); print_r($members); echo('</pre>'); */
 			$tmpl->assign('members', $members);
 			$tmpl->assign('showMemberActionOptions', $showMemberActionOptions);
 			
@@ -349,6 +273,7 @@
 				$matches[] = $prepared;
 			}
 			$tmpl->assign('matches', $matches);
+*/
 		}
 	}
 ?>

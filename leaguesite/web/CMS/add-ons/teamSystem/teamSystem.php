@@ -18,6 +18,11 @@
 			{
 				require_once dirname(__FILE__) . '/teamDelete.php';
 				new pmDelete($folder, intval($_GET['delete']));
+			} elseif (isset($_GET['opponent_stats']))
+			{
+				require_once dirname(__FILE__) . '/teamOpponents.php';
+				$teamOpponents = new teamOpponents();
+				$teamOpponents->showOpponentStats(intval($_GET['opponent_stats']));
 			} else
 			{
 				require_once dirname(__FILE__) . '/teamList.php';
