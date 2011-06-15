@@ -64,7 +64,7 @@
 				$prepared['scoreClass'] = $this->rankScore($row['score']);
 				$prepared['matchSearchLink'] = ('../Matches/?search_string=' . $row['name']
 												. '&amp;search_type=team+name'
-												. '&amp;search_result_amount=20'
+												. '&amp;search_result_amount=200'
 												. '&amp;search=Search');
 				$prepared['matchCount'] = $row['num_matches_played'];
 				$prepared['memberCount'] = $row['member_count'];
@@ -204,7 +204,7 @@
 				$team['scoreClass'] = $this->rankScore($row['score']);
 				$team['matchSearchLink'] = ('../Matches/?search_string=' . $row['name']
 												. '&amp;search_type=team+name'
-												. '&amp;search_result_amount=20'
+												. '&amp;search_result_amount=200'
 												. '&amp;search=Search');
 				$team['matchCount'] = $row['num_matches_played'];
 				$team['memberCount'] = $row['member_count'];
