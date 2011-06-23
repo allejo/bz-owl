@@ -10,6 +10,8 @@
 						 'dbName' => 'bz-owl',
 						 // charset of non-ASCII user input stored in DB
 						 'db.userInputFieldCharset' => 'UTF-8',
+						 // show unfinished (and thus likely not properly working) themes in config chooser, too
+						 'config.themes.showUnfinished' => false,
 						 // nl2br needs php newer or equal to 4.0.5 to support xhtml
 						 // if php version is higher or equal to 4.0.5 but lower than 5.3
 						 // then xhtml will be always on

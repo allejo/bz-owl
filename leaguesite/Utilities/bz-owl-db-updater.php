@@ -37,7 +37,7 @@
 	$site = new site();
 	
 	// do not run if website is in production mode
-	if (!$config->value('debugSQL') && (!$config->value('maintenance.now') || !$config->value('maintenance.updateDB')))
+	if (!$config->getValue('debugSQL') && (!$config->getValue('maintenance.now') || !$config->getValue('maintenance.updateDB')))
 	{
 		exit('Can only update DB if live website is down for maintenance.' . "\n");
 	}
@@ -79,7 +79,7 @@
 	{
 		updateDB($dbVersion, $error);
 	}
-	echo ($error === false) ? ('The used database (' . $config->value('dbName')
+	echo ($error === false) ? ('The used database (' . $config->getValue('dbName')
 							   . ') is up to date (version ' . $dbVersion . ').' . "\n") : $error;
 	exit();
 	
