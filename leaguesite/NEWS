@@ -6,6 +6,13 @@ bz-owl release notes
 --
 * nothing yet
 
+1.2.1 (current development trunk)
+--
+* Minor theme changes
+* show unfinished themes by config option
+* updated db structure to avoid periods in table names
+* Partial reimplementation of Teams page by a new teamSystem add-on
+
 1.2 (2011-05-13)
 ---
 * overall code re-organisation, concentrating on readability
