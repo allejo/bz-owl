@@ -36,9 +36,11 @@ No menu found.
 </div>
 
 {if isset($pmDeleted) && ($pmDeleted === true)}
+<div class="static_page_box">
 <p>The private message has been deleted successfully.</p>
 
 <p>Return to <a href="./?folder={$curFolder}">{$curFolder}</a>.</p>
+</div>
 {else}
 <span class="prev_next_msg_buttons">
 {if isset($prevMsg)}<a class="button" id="prev_msg" href="./?folder=inbox&amp;view={$prevMsg}">Previous message</a>{/if}

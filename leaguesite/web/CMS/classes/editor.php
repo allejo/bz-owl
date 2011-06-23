@@ -138,6 +138,7 @@
 					{
 						$tmpl->assign('MSG', 'Failed writing changes. The underlying error message was: ' . $status . $tmpl->linebreaks("\n\n"));
 					}
+					break;
 					
 				default:
 					$tmpl->assign('USER_NOTE');

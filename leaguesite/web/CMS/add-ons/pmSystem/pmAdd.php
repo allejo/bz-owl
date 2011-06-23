@@ -88,6 +88,7 @@
 					break;
 				
 				default:
+					$tmpl->assign('showSendForm', true);
 					// display the formatting buttons addded by addFormatButtons
 					$this->editor->showFormatButtons();
 					break;
@@ -350,7 +351,8 @@
 		{
 			global $tmpl;
 			
-			$tmpl->assign('MSG', 'Message sent successfully.' . $tmpl->linebreaks("\n\n"));
+			$tmpl->assign('showMsgSentSuccessfully', true);
+			$tmpl->clearAssign('showSendForm');
 		}
 		
 		

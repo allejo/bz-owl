@@ -29,6 +29,12 @@ No menu found.
 <div><input type="hidden" name="key_name" value="{$keyName}" /></div>
 <div><input type="hidden" name="{$keyName}" value="{$keyValue}" /></div>
 
+{if isset($showMsgSentSuccessfully) && $showMsgSentSuccessfully}
+<div class="static_page_box">
+<p>Message sent successfully.</p>
+<p><a href="./">Return to inbox.</a></p>
+</div>
+{/if}
 
 {if isset($showPreview) && $showPreview}
 <div class="msg_area"><div class="msg_view_full">
@@ -63,7 +69,7 @@ No menu found.
 {/if}
 
 
-{if !isset($showPreview) || !$showPreview}
+{if isset($showSendForm) && $showSendForm}
 <div class="static_page_box">
 
 {if isset($MSG)}<div>{$MSG}</div>{/if}
@@ -97,7 +103,7 @@ No menu found.
 
 {if isset($notes)}<div>{$notes}</div>{/if}
 
-{if !isset($showPreview) || !$showPreview}
+{if isset($showSendForm) && $showSendForm}
 <div>
 	<input type="text" name="subject" value="{$subject}" onfocus="if(this.value=='Enter subject here') this.value=''" onblur="if(this.value=='') this.value='Enter subject here'" /></div>
 {if isset($buttonsToFormat)}<div>
@@ -113,11 +119,16 @@ No menu found.
 <div><input type="hidden" name="content" value="{$rawContent}" /></div>
 {/if}
 
+{if !isset($showMsgSentSuccessfully) || !$showMsgSentSuccessfully}
 <div><input type="hidden" name="confirmationStep" value="{$confirmationStep}" /></div>
 <p><input type="submit" name="submit" value="{$submitText}" />
-{if isset($showPreview) && $showPreview}<input type="submit" name="editPageAgain" value="Edit again" />{/if}</p>
+{/if}
+{if isset($showPreview) && $showPreview}<input type="submit" name="editPageAgain" value="Edit again" />{/if}
+{if !isset($showMsgSentSuccessfully) || !$showMsgSentSuccessfully}
+</p>
+{/if}
 
-{if !isset($showPreview) || !$showPreview}
+{if isset($showSendForm) && $showSendForm}
 </div>
 {/if}
 
