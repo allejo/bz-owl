@@ -303,7 +303,7 @@
 				@$site->execute_query('players', $query, $connection);
 				
 				// FIXME: if user marked deleted check if he was leader of a team
-				$query = 'SELECT `id` FROM `teams` WHERE `leader_playerid`=' . sqlSafeStringQuotes($one_inactive_player);
+				$query = 'SELECT `id` FROM `teams` WHERE `leader_userid`=' . sqlSafeStringQuotes($one_inactive_player);
 				// only one player was changed and thus only one team at maximum needs to be updated
 				$query .= ' LIMIT 1';
 				// execute query
@@ -317,8 +317,8 @@
 				while ($row = mysql_fetch_array($result))
 				{
 					// set the leader to 0 (no player)
-					$query = 'Update `teams` SET `leader_playerid`=' . sqlSafeStringQuotes('0');
-					$query .= ' WHERE `leader_playerid`=' . sqlSafeStringQuotes($one_inactive_player);
+					$query = 'Update `teams` SET `leader_userid`=' . sqlSafeStringQuotes('0');
+					$query .= ' WHERE `leader_userid`=' . sqlSafeStringQuotes($one_inactive_player);
 					// execute query, ignore result
 					@$site->execute_query('teams', $query, $connection);
 					

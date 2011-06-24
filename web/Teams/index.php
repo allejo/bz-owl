@@ -379,14 +379,14 @@
 			mysql_free_result($result);
 			
 			// create the team itself
-			$query = 'INSERT INTO `teams` (`name`, `leader_playerid`) VALUES (' . sqlSafeStringQuotes($name) . ', ' . sqlSafeStringQuotes($viewerid) . ')';
+			$query = 'INSERT INTO `teams` (`name`, `leader_userid`) VALUES (' . sqlSafeStringQuotes($name) . ', ' . sqlSafeStringQuotes($viewerid) . ')';
 			if (!($result = @$site->execute_query('teams', $query, $connection)))
 			{
 				// query was bad, error message was already given in $site->execute_query(...)
 				$site->dieAndEndPage('');
 			}
 			
-			$query = 'SELECT `id` FROM `teams` WHERE `leader_playerid`=' . sqlSafeStringQuotes($viewerid);
+			$query = 'SELECT `id` FROM `teams` WHERE `leader_userid`=' . sqlSafeStringQuotes($viewerid);
 			if (!($result = @$site->execute_query('teams', $query, $connection)))
 			{
 				// query was bad, error message was already given in $site->execute_query(...)
@@ -985,7 +985,7 @@
 			mysql_free_result($result);
 		}
 		
-		$query = 'SELECT `leader_playerid` FROM `teams` WHERE `id`=' . sqlSafeStringQuotes($teamid) . ' LIMIT 0,1';
+		$query = 'SELECT `leader_userid` FROM `teams` WHERE `id`=' . sqlSafeStringQuotes($teamid) . ' LIMIT 0,1';
 		if (!($result = @$site->execute_query('teams', $query, $connection)))
 		{
 			// query was bad, error message was already given in $site->execute_query(...)
@@ -997,7 +997,7 @@
 		{
 			while($row = mysql_fetch_array($result))
 			{
-				$team_leader_id = intval($row['leader_playerid']);
+				$team_leader_id = intval($row['leader_userid']);
 			}
 		}
 		
@@ -1070,7 +1070,7 @@
 					$query = ('UPDATE `teams`,`teams_overview`'
 							  . ' SET `teams_overview`.`deleted`=' . sqlSafeStringQuotes('2')
 							  . ' ,`teams_overview`.`member_count`=' . sqlSafeStringQuotes('0')
-                                                          . ',`teams`.`leader_playerid`=' . sqlSafeStringQuotes('0')
+                                                          . ',`teams`.`leader_userid`=' . sqlSafeStringQuotes('0')
 							  . ' WHERE `teams_overview`.`teamid`=' . sqlSafeStringQuotes($teamid)
 							  . ' AND `teams`.`id`=`teams_overview`.`teamid`');
 					if (!($result_update = @$site->execute_query('teams_overview', $query, $connection)))
@@ -1306,7 +1306,7 @@
 				}
 				
 				// sanity checks passed, change the team leader
-				$query = 'UPDATE `teams` SET `leader_playerid`=' . sqlSafeStringQuotes($new_leader) . ' WHERE `id`=' . "'" . sqlSafeString($teamid) . "'";
+				$query = 'UPDATE `teams` SET `leader_userid`=' . sqlSafeStringQuotes($new_leader) . ' WHERE `id`=' . "'" . sqlSafeString($teamid) . "'";
 				if (!($result = @$site->execute_query('teams', $query, $connection)))
 				{
 					// query was bad, error message was already given in $site->execute_query(...)
@@ -1644,7 +1644,7 @@
 		echo '<div class="p"></div>' . "\n";
 		
 		// join the tables `teams`, `teams_overview` and `teams_profile` using the team's id
-		$query = 'SELECT `name`, `score`, `activity`, `member_count`, `num_matches_played`, `num_matches_won`, `num_matches_draw`, `num_matches_lost`, `teams_profile`.`logo_url`, `created`';
+		$query = 'SELECT `name`, `score`, `activityNew`,`activityOld`, `member_count`, `num_matches_played`, `num_matches_won`, `num_matches_draw`, `num_matches_lost`, `teams_profile`.`logo_url`, `created`';
 		$query .= ' FROM `teams`, `teams_overview`, `teams_profile`';
 		$query .= ' WHERE `teams`.`id` = `teams_overview`.`teamid` AND `teams_overview`.`teamid` = `teams_profile`.`teamid` AND `teams`.`id`=';
 		$query .= sqlSafeStringQuotes($profile) . ' LIMIT 1';
@@ -1684,7 +1684,7 @@
 			rankingLogo($row['score']);
 			echo '</span>' . "\n";
 			echo '		<div class="team_activity"><span class="team_activity_announcement">Activity: </span><span class="team_activity">'
-				 . strval($row['activity']) . '</span></div>' . "\n";
+			.  number_format($row['activityNew'],2) . ' (' . number_format($row['activityOld'],2) . ')' . ')' . '</span></div>' . "\n";
 			$number_team_members = (int) $row['member_count'];
 			echo '		<div class="team_member_count"><span class="team_member_count_announcement">Members: </span><span class="team_member_count">'
 				 . strval($number_team_members) . '</span></div>' . "\n";
@@ -2383,11 +2383,11 @@
 	}
 	
 	// list the non deleted teams
-	// example query: SELECT `teamid`,`name`, `score`, `member_count`,`activity`,`any_teamless_player_can_join` FROM `teams`, `teams_overview`
+	// example query: SELECT `teamid`,`name`, `score`, `member_count`,`activityNew`, `activityOld`,`any_teamless_player_can_join` FROM `teams`, `teams_overview`
 	// WHERE `teams`.`id` = `teams_overview`.`teamid` AND (`teams_overview`.`deleted`='0' OR `teams_overview`.`deleted`='1') ORDER BY `score`		
-	$query = ('SELECT `teamid`,`teams`.`name` AS `name`,`leader_playerid`,'
-	. ' (SELECT `name` FROM `players` WHERE `players`.`id`=`leader_playerid` LIMIT 1) AS `leader_name`,'
-	. ' `score`,`num_matches_played`,`activity`, `member_count`,`any_teamless_player_can_join`,'
+	$query = ('SELECT `teamid`,`teams`.`name` AS `name`,`leader_userid`,'
+	. ' (SELECT `name` FROM `players` WHERE `players`.`id`=`leader_userid` LIMIT 1) AS `leader_name`,'
+	. ' `score`,`num_matches_played`,`activityNew`, `activityOld`, `member_count`,`any_teamless_player_can_join`,'
 	. ' (SELECT `created` from `teams_profile` WHERE `teams_profile`.`teamid` = `teams`.`id` LIMIT 1) AS `created`'
 	. ' FROM `teams`, `teams_overview`'
 	. ' WHERE `teams`.`id` = `teams_overview`.`teamid`'
@@ -2459,7 +2459,7 @@
 				//echo '	<td>' . $team['num_matches_played'] . '</td>' . "\n";
 				echo '	<td><a href="' .basepath() . 'Matches/?search_string=' . $team['name'] . '&amp;search_type=team+name&amp;search_result_amount=20&amp;search=Search' . '">' . htmlent($team['num_matches_played']) . '</a></td>' . "\n";
 				echo '	<td>' . $team['member_count'] . '</td>' . "\n";
-				echo '	<td><a href="'. basepath() . 'Players/?profile=' . $team['leader_playerid'] . '">' . htmlent($team['leader_name']) . '</a></td>' . "\n";
+				echo '	<td><a href="'. basepath() . 'Players/?profile=' . $team['leader_userid'] . '">' . htmlent($team['leader_name']) . '</a></td>' . "\n";
 				echo '	<td>' . $team['activity'] . '</td>' . "\n";
 				echo '	<td>' . $team['created'] . '</td>' . "\n";
 				if (($viewerid > 0) && ((int) $team['any_teamless_player_can_join'] === 1))
@@ -2496,7 +2496,9 @@
 		while ($row = mysql_fetch_array($result))
 		{
 			// classify team as active (at least 1 match in last 45 days) or not
-			if (strcmp(substr($row['activity'],0,4), '0.00') === 0)
+			if (strcmp(substr(
+							  (number_format($row['activityNew'],2) . ' (' . number_format($row['activityNew'],2) . ')'
+							  ),0,4), '0.00') === 0)
 			{
 				// inactive team
 				$inactive_teams[$row['teamid']]['teamid'] = $row['teamid'];
@@ -2504,9 +2506,10 @@
 				$inactive_teams[$row['teamid']]['score'] = $row['score'];
 				$inactive_teams[$row['teamid']]['num_matches_played'] = $row['num_matches_played'];
 				$inactive_teams[$row['teamid']]['member_count'] = $row['member_count'];
-				$inactive_teams[$row['teamid']]['leader_playerid'] = $row['leader_playerid'];
+				$inactive_teams[$row['teamid']]['leader_userid'] = $row['leader_userid'];
 				$inactive_teams[$row['teamid']]['leader_name'] = $row['leader_name'];
-				$inactive_teams[$row['teamid']]['activity'] = $row['activity'];
+				$inactive_teams[$row['teamid']]['activity'] = number_format($row['activityNew'],2)
+															  . ' (' . number_format($row['activityOld'],2) . ')';
 				$inactive_teams[$row['teamid']]['created'] = $row['created'];
 				$inactive_teams[$row['teamid']]['any_teamless_player_can_join'] = $row['any_teamless_player_can_join'];
 				
@@ -2518,9 +2521,10 @@
 				$active_teams[$row['teamid']]['score'] = $row['score'];
 				$active_teams[$row['teamid']]['num_matches_played'] = $row['num_matches_played'];
 				$active_teams[$row['teamid']]['member_count'] = $row['member_count'];
-				$active_teams[$row['teamid']]['leader_playerid'] = $row['leader_playerid'];
+				$active_teams[$row['teamid']]['leader_userid'] = $row['leader_userid'];
 				$active_teams[$row['teamid']]['leader_name'] = $row['leader_name'];
-				$active_teams[$row['teamid']]['activity'] = $row['activity'];
+				$active_teams[$row['teamid']]['activity'] = number_format($row['activityNew'],2)
+															. ' (' . number_format($row['activityOld'],2) . ')';
 				$active_teams[$row['teamid']]['created'] = $row['created'];
 				$active_teams[$row['teamid']]['any_teamless_player_can_join'] = $row['any_teamless_player_can_join'];
 			}
