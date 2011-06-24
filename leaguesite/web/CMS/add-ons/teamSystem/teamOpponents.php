@@ -94,31 +94,48 @@
 			$tmpl->assign('title', 'Team opponent statistics');
 			$tmpl->assign('teamid', $teamid);
 			
-/*
-			// the team's leader
-			$teamLeader = 0;
 			
-			$query = $db->prepare('SELECT *'
-								  . ', (SELECT `name` FROM `players`'
-								  . ' WHERE `players`.`id`=`teams`.`leader_userid` LIMIT 1)'
-								  . ' AS `leader_name`'
-								  . ' FROM `teams`, `teams_overview`, `teams_profile`'
-								  . ' WHERE `teams`.`id`=`teams_overview`.`teamid`'
-								  . ' AND `teams`.`id`=`teams_profile`.`teamid`'
-								  . ' AND `teams`.`id`=:teamid'
-								  . ' LIMIT 1');
-			// see if query was successful
-			if ($db->execute($query, array(':teamid' => array(intval($teamid), PDO::PARAM_INT))) == false)
+			// get team name for specified teamid
+			$params = array(':teamid' => array($teamid, PDO::PARAM_INT));
+			$query = $db->prepare('SELECT `name` FROM `teams` WHERE `id`=:teamid LIMIT 0,1');
+			if (!$db->execute($query, $params))
 			{
-				// fatal error -> die
-				$db->logError('FATAL ERROR: Query in teamList.php (teamSystem add-on) by user '
-							  . $user->getID() . ' failed, request URI: ' . $_SERVER['REQUEST_URI']);
-				$tmpl->setTemplate('NoPerm');
+				$tmpl->assign('teamName', 'Error: No team name found for specified teamid.');
 				$tmpl->display();
+				$db->logError('FATAL ERROR: Invalid query to find out team name in '
+							  . __FILE__ . ': function: showOpponentStats');
 				die();
 			}
 			
-			$team = array();
+			// if teamName not set, template has to present an error and stop output, too
+			if ($row = $db->fetchRow($query))
+			{
+				$tmpl->assign('teamName', $row['name']);
+			} else
+			{
+				$tmpl->display();
+				die();
+			}
+			$db->free($query);
+			unset($row);
+			
+			
+			// collect team opponent informations for specified teamid
+			$teamOpponents = array();
+			$query = $db->prepare('SELECT * FROM `matches` '
+								  . 'WHERE `team1_teamid`=:teamid OR `team2_teamid`=:teamid');
+			$db->execute($query, $params);
+			while ($row = $db->fetchRow($query))
+			{
+				$teamOpponents[] = $this->addToTeamList($row);
+			}
+			$db->free($query);
+			unset($row);
+			
+			// pass the opponent data to template
+			$tmpl->assign('teamOpponents', $teamOpponents);
+						
+/*			$team = array();
 			while ($row = $db->fetchRow($query))
 			{
 				$teamLeader = intval($row['leader_userid']);

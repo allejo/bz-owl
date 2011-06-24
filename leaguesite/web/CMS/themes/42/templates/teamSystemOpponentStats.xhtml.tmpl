@@ -25,23 +25,30 @@ No menu found.
 <div class="content">
 <a class="button" href="./">overview</a>
 <a class="button" href="./?profile={$teamid}">back to team profile</a>
+
+{if !isset($teamName)}
+<div class="static_page_box">Error: Could not find out team name for specified teamid {$teamid}.</div>
+{else}
+
 {if !isset($teamOpponents) || empty($teamOpponents)}
-<div class="static_page_box">This team has not played any match yet.</div>
+<div class="static_page_box">The team {$teamName} has not played any match yet.</div>
 {else}
 <table class="big" id="opponent_stats">
-<caption>Opponent statistics for team Enough Is Enough!</caption>
+<caption>Opponent statistics for team {$teamName}</caption>
 <tr>
-	<th><a href="./?opponent_stats=40&amp;sort=Name&amp;order=asc">Name</a></th>
-	<th><a href="./?opponent_stats=40&amp;sort=Total&amp;order=asc">Total</a></th>
+	<th><a href="./?opponent_stats={$teamid}&amp;sort=Name&amp;order=asc">Name</a></th>
+	<th><a href="./?opponent_stats={$teamid}&amp;sort=Total&amp;order=asc">Total</a></th>
 
-	<th><a href="./?opponent_stats=40&amp;sort=Won&amp;order=asc">Won</a></th>
-	<th><a href="./?opponent_stats=40&amp;sort=Tied&amp;order=asc">Tied</a></th>
-	<th><a href="./?opponent_stats=40&amp;sort=Lost&amp;order=asc">Lost</a></th>
-	<th><a href="./?opponent_stats=40&amp;sort=Won%20Ratio&amp;order=asc">Won Ratio</a></th>
+	<th><a href="./?opponent_stats={$teamid}&amp;sort=Won&amp;order=asc">Won</a></th>
+	<th><a href="./?opponent_stats={$teamid}&amp;sort=Tied&amp;order=asc">Tied</a></th>
+	<th><a href="./?opponent_stats={$teamid}&amp;sort=Lost&amp;order=asc">Lost</a></th>
+	<th><a href="./?opponent_stats={$teamid}&amp;sort=Win%20Ratio&amp;order=asc">Win Ratio</a></th>
 </tr>
 {foreach item="team" from=$teamOpponents}
 {/foreach}
 </table>
+{/if}
+
 {/if}
 
 </div>
