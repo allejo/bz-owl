@@ -1684,7 +1684,7 @@
 			rankingLogo($row['score']);
 			echo '</span>' . "\n";
 			echo '		<div class="team_activity"><span class="team_activity_announcement">Activity: </span><span class="team_activity">'
-				 . strval($row['activity']) . ' (' . strval($row['activity']) . ')' . '</span></div>' . "\n";
+			.  number_format($row['activityNew'],2) . ' (' . number_format($row['activityOld'],2) . ')' . ')' . '</span></div>' . "\n";
 			$number_team_members = (int) $row['member_count'];
 			echo '		<div class="team_member_count"><span class="team_member_count_announcement">Members: </span><span class="team_member_count">'
 				 . strval($number_team_members) . '</span></div>' . "\n";
@@ -2496,7 +2496,9 @@
 		while ($row = mysql_fetch_array($result))
 		{
 			// classify team as active (at least 1 match in last 45 days) or not
-			if (strcmp(substr(($row['activityNew'] . ' (' . $row['activityNew'] . ')'),0,4), '0.00') === 0)
+			if (strcmp(substr(
+							  (number_format($row['activityNew'],2) . ' (' . number_format($row['activityNew'],2) . ')'
+							  ),0,4), '0.00') === 0)
 			{
 				// inactive team
 				$inactive_teams[$row['teamid']]['teamid'] = $row['teamid'];
@@ -2506,7 +2508,8 @@
 				$inactive_teams[$row['teamid']]['member_count'] = $row['member_count'];
 				$inactive_teams[$row['teamid']]['leader_userid'] = $row['leader_userid'];
 				$inactive_teams[$row['teamid']]['leader_name'] = $row['leader_name'];
-				$inactive_teams[$row['teamid']]['activity'] = $row['activityNew'] . ' (' . $row['activityOld'] . ')';
+				$inactive_teams[$row['teamid']]['activity'] = number_format($row['activityNew'],2)
+															  . ' (' . number_format($row['activityOld'],2) . ')';
 				$inactive_teams[$row['teamid']]['created'] = $row['created'];
 				$inactive_teams[$row['teamid']]['any_teamless_player_can_join'] = $row['any_teamless_player_can_join'];
 				
@@ -2520,7 +2523,8 @@
 				$active_teams[$row['teamid']]['member_count'] = $row['member_count'];
 				$active_teams[$row['teamid']]['leader_userid'] = $row['leader_userid'];
 				$active_teams[$row['teamid']]['leader_name'] = $row['leader_name'];
-				$active_teams[$row['teamid']]['activity'] = $row['activityNew'] . ' (' . $row['activityOld'] . ')';
+				$active_teams[$row['teamid']]['activity'] = number_format($row['activityNew'],2)
+															. ' (' . number_format($row['activityOld'],2) . ')';
 				$active_teams[$row['teamid']]['created'] = $row['created'];
 				$active_teams[$row['teamid']]['any_teamless_player_can_join'] = $row['any_teamless_player_can_join'];
 			}
