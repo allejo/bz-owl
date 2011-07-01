@@ -108,10 +108,12 @@
 		private function doLogin($moduleInstance, $moduleName)
 		{
 			global $user;
-			global $db;
+/* 			global $db; */
 			
 			
+			// if used login module is not local, then an external login has been used
 			$externalLogin = strcasecmp($moduleName, 'local') !== 0;
+			// init user id to reserved value 0
 			$uid = 0;
 			
 			// load operations framework
@@ -130,18 +132,32 @@
 			}
 			
 			
+			// uid is 0 if it's a user with no external login id
+			// but an external login id has been provided
+			// uid is also 0 if a user registers
 			if ($uid === 0)
 			{
-				// uid is 0 if it's a user with no external login id
-				// but external login id has been provided
-				// or if it's a new user
+				// try to recover uid by username based db lookup
+				$uid = $userOperations->findIDByName($moduleInstance->getName());
+				
+				// init newUser to false (do not send welcome message by default)
 				$newUser = false;
+				
+				// find out if an internal id can be found for callsign
+				$newUser = ($uid !== 0) ? false: true;
 				
 				if ($newUser)
 				{
 					$userOperations->sendWelcomeMessage($uid);
 				}
-				return '<p>An internal error occurred: $uid === 0.</p>' . "\n";
+				
+				if ($uid === 0)
+				{
+					// call logout as bandaid for erroneous login modules
+					// these may log the user in, even though they never should
+					$user->logout();
+					return '<p>An internal error occurred: $uid === 0.</p>' . "\n";
+				}
 			}
 			
 			

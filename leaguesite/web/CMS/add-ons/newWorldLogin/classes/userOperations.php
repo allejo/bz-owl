@@ -1,5 +1,5 @@
 <?php
-	class userOperations extends db
+	class userOperations extends database
 	{
 		public function activateAccount($id)
 		{
@@ -29,10 +29,33 @@
 		}
 		
 		
+		public function findIDByName($name)
+		{
+			// internal id is an integer of length 11 by definition
+			$internalID = 0;
+			
+			$query = $this->prepare('SELECT `id` FROM `players` WHERE `name`=:name LIMIT 1');
+			// the id can be of any data type and of any length
+			// just assume it's a 50 characters long string
+			$this->execute($query, array(':id' => array($name, PDO::PARAM_STR, 50)));
+			
+			if ($row = $this->fetchRow($query))
+			{
+				$internalID = intval($row['id']);
+			}
+			$this->free($query);
+			
+			return $internalID;
+		}
+		
+		
 		public function getAccountStatus($id)
 		{
 			$query = $this->prepare('SELECT `status` FROM `players` WHERE `id`=:uid LIMIT 1');
-			$this->execute($query, array(':id' => array($id, PDO::PARAM_INT)));
+			$this->execute($query, array(':uid' => array($id, PDO::PARAM_INT)));
+			
+			// init status to "login disabled" to block login on error
+			$status = 'login disableds';
 			
 			if ($row = $this->fetchRow($query))
 			{
@@ -57,7 +80,7 @@
 			}
 			$this->free($query);
 			
-			return $status;
+			return;
 		}
 		
 		public function sendWelcomeMessage($id)

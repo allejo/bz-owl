@@ -20,7 +20,7 @@
 			global $config;
 			
 			
-			$text = ('<p class="first_p">Please log in using your account at <a href='
+			$text = ('<p class="first_p">Please login using your account at <a href='
 					 . '"http://my.bzflag.org/weblogin.php?action=weblogin&amp;url='
 					 . urlencode($config->getValue('baseaddress') . 'Login2/'
 							   . '?module=bzbb&action=login&auth=%TOKEN%,%USERNAME%')
@@ -56,7 +56,7 @@
 			require dirname(__FILE__) . '/checkToken.php';
 			
 			if (($this->groups = $config->getValue('login.modules.bzbb.groups')) === false
-				|| is_array($groups) === false)
+				|| is_array($this->groups) === false)
 			{
 				// no accepted groups in config -> no login
 				$output = 'config error : no login group was specified.';
@@ -68,12 +68,13 @@
 			$params = explode(',', urldecode($_GET['auth']));
 			
 			$groupNames = array();
-			foreach ($groups as $group)
+			foreach ($this->groups as $group)
 			{
 				$groupNames[] = $group['name'];
 			}
 			unset($group);
 			
+			// set external login data
 			if (!$this->info = validate_token($params[0], $params[1], $groupNames,
 											  !$config->getValue('login.modules.bzbb.disableCheckIP')))
 			{
@@ -83,16 +84,20 @@
 				return false;
 			}
 			
-			// set external login id
-			$this->bzid = $info['bzid'];
 			
 			// code ran successfully
 			return true;
 		}
 		
+		
 		public function getID()
 		{
-			return $this->bzid;
+			return $this->info['bzid'];
+		}
+		
+		public function getName()
+		{
+			return $this->info['username'];
 		}
 		
 		public function givePermissions()
@@ -111,6 +116,7 @@
 					// case insensitive comparison of group names
 					if (strcmp($memberOfGroup, $group['name']) === 0)
 					{
+						echo '<p>Applying permissions of group ' . $group['name'] . '</p>';
 						$this->applyPermissions($group);
 						
 						// TODO: consider removing matched entry from array using array_splice
@@ -126,7 +132,6 @@
 			global $user;
 			
 			
-			echo '<p>Applying permissions of group ' . $group . '</p>';
 			// iterate through the permissions specified in config
 			// and apply them individually
 			foreach ($group['permissions'] as $name => $value)
