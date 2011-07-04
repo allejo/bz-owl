@@ -95,6 +95,8 @@
 													 . 'In the FAQ you can find the most important informations'
 													 . ' about organising and playing matches.' . "\n\n"
 													 . 'See you on the battlefield.'),
+						 // welcome summary, displayed at first login
+						 'login.welcome.summary' => 'Welcome and thanks for registering on this website.',
 						 // allow authors to change timestamp of original message
 						 'newsSystem.permissions.allowChangeTimestampOnEdit' => false,
 						 // regenerate session id after x seconds, default 15 minutes (60*15)
