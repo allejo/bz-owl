@@ -186,6 +186,12 @@
 				// if team not active and is not new, delete it for real (do not mark as deleted but actually do it!)
 				if (!$cur_team_active && $curTeamNew)
 				{
+					// set players belonging to the deleted team to teamless
+					$query = 'UPDATE `players` SET `last_teamid`=' . sqlSafeStringQuotes($curTeam);
+					$query .= ', `teamid`=' . sqlSafeStringQuotes('0');
+					$query .= ' WHERE `teamid`=' . sqlSafeStringQuotes($curTeam);
+					@$site->execute_query('players', $query, $connection);
+					
 					// delete (for real) the new team
 					$query = 'DELETE FROM `teams` WHERE `id`=' . "'" . ($curTeam) . "'";
 					// execute query, ignore result
@@ -198,7 +204,7 @@
 					@$site->execute_query('teams_permissions', $query, $connection);
 					$query = 'DELETE FROM `teams_profile` WHERE `teamid`=' . "'" . ($curTeam) . "'";
 					// execute query, ignore result
-					@$site->execute_query('teams_profile', $query, $connection);						
+					@$site->execute_query('teams_profile', $query, $connection);
 				}
 				
 				// if team not active but is not new, mark it as deleted

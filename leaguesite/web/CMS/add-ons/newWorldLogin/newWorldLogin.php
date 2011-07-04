@@ -1,13 +1,15 @@
 <?php
 	class newWorldLogin
 	{
-		function __construct()
+		private $moduleOutput = '';
+		
+		public function __construct()
 		{
 			global $tmpl;
 			
 			
+			// activate module code based on user requested action
 			$modules = array();
-						
 			if (isset($_GET['module']) === false)
 			{
 				$this->getLoginText($modules);
@@ -21,6 +23,7 @@
 			{
 				include_once(dirname(__FILE__) . '/modules/' . $module . '/index.php');
 				$moduleInstance = new $module;
+				
 				switch($_GET['action'])
 				{
 					case 'form':
@@ -29,7 +32,7 @@
 					case 'login':
 						if ($moduleInstance->validateLogin($message))
 						{
-							$module .= $this->doLogin($moduleInstance, $module);
+							$this->doLogin($moduleInstance, $module);
 						}
 						if (strlen($message) > 0)
 						{
@@ -45,19 +48,30 @@
 			{
 				$modules[] = $module;
 			}
-			
+			print_r($modules);
 			
 			if (count($modules) > 0)
 			{
-				$tmpl->assign('modules', $modules);
+				$this->moduleOutput = $modules;
 			}
 			
+		}
+		
+		public function __destruct()
+		{
+			global $tmpl;
+			
+			
+			$tmpl->assign('modules', $this->moduleOutput);
 			$tmpl->display('newWorldLogin');
 		}
 		
 		
 		private function getRequestedModule($moduleName)
 		{
+			// search user supplied module name for invalid data
+			
+			// return false if invalid data was found
 			return (isset($moduleName)
 					&& preg_match('/^[0-9A-Za-z]+$/', $moduleName)
 					&& file_exists(dirname(__FILE__) . '/modules/' . $moduleName))
@@ -108,8 +122,7 @@
 		private function doLogin($moduleInstance, $moduleName)
 		{
 			global $user;
-/* 			global $db; */
-			
+			$this->moduleOutput .= 'doLogin';
 			
 			// if used login module is not local, then an external login has been used
 			$externalLogin = strcasecmp($moduleName, 'local') !== 0;
@@ -156,7 +169,8 @@
 					// call logout as bandaid for erroneous login modules
 					// these may log the user in, even though they never should
 					$user->logout();
-					return '<p>An internal error occurred: $uid === 0.</p>' . "\n";
+					$this->moduleOutput .= '<p>An internal error occurred: $uid === 0.</p>' . "\n";
+					return false;
 				}
 			}
 			
@@ -168,10 +182,13 @@
 			{
 				case 'active' : break;
 				case 'deleted':	$userOperations->activateAccount($uid); break;
-				case 'login disabled' : return '<p>Your account is disabled: No login possible.</p>'; break;
+				case 'login disabled' :
+					$this->moduleOutput .= '<p>Your account is disabled: No login possible.</p>';
+					return false;
+					break;
 				// TODO: implement site wide ban list
-				case 'banned' : return '<p>You have been banned from this website.</p>'; break;
-				default: return '<p>The impossible happened: Account status is' . htmlent($status) . '.</p>' ;
+				case 'banned' : $this->moduleOutput .= '<p>You have been banned from this website.</p>'; return false; break;
+				default: $this->moduleOutput .= '<p>The impossible happened: Account status is' . htmlent($status) . '.</p>'; return false;
 			}
 			
 			if ($uid > 0)
