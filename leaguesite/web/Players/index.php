@@ -170,7 +170,7 @@
 				$site->dieAndEndPage('');
 			}
 			
-			$query = 'SELECT `id` FROM `teams` WHERE `leader_playerid`=' . sqlSafeStringQuotes($viewerid) . ' LIMIT 1';
+			$query = 'SELECT `id` FROM `teams` WHERE `leader_userid`=' . sqlSafeStringQuotes($viewerid) . ' LIMIT 1';
 			if (!($result = @$site->execute_query('teams', $query, $connection)))
 			{
 				echo '<div class="static_page_box">' . "\n";
@@ -800,7 +800,7 @@
 			$leader_of_team_with_id = 0;
 			if (!($allow_invite_in_any_team))
 			{
-				$query = 'SELECT `id` FROM `teams` WHERE `leader_playerid`=' . "'" . sqlSafeString($viewerid) . "'" . ' LIMIT 1';
+				$query = 'SELECT `id` FROM `teams` WHERE `leader_userid`=' . "'" . sqlSafeString($viewerid) . "'" . ' LIMIT 1';
 				if (!($result = @$site->execute_query('teams', $query, $connection)))
 				{
 					$site->dieAndEndPage('A database related problem prevented to find out if the viewer of this site is the leader of a team.');
