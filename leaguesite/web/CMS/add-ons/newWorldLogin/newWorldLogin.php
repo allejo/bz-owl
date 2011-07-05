@@ -22,7 +22,7 @@
 			// NOTE: certain modules may suppress their login text, depending on circumstances
 			if (isset($_GET['module']) === false)
 			{
-				$this->getLoginText($this->moduleOutput);
+				$this->getLoginText();
 				return;
 			}
 			
@@ -63,9 +63,6 @@
 				default: 
 					$this->moduleOutput = '<p>Unknown module action requested, request not accepted.</p>';
 			}
-			
-			
-			print_r($module);
 		}
 		
 		public function __destruct()
@@ -78,8 +75,10 @@
 		}		
 		
 		
-		private function getLoginText(&$modules)
+		public static function getModules()
 		{
+			$modules = array();
+			
 			// first scan the files in the modules directory
 			$modules = scandir(dirname(__FILE__) . '/modules/');
 			foreach ($modules as $i => $curFile)
@@ -106,13 +105,32 @@
 						unset($modules[$i]);
 						break;
 				}
-				
-				
-				if (isset($modules[$i]))
+			}
+			
+			return $modules;
+		}		
+		
+		private function getLoginText()
+		{
+			$modules = $this->getModules();
+			$n = count($modules);
+			$firstLoginModuleText = true;
+			
+			for ($i = 1; $i <= $n; $i++)
+			{
+				if ($module = array_shift($modules))
 				{
-					include_once(dirname(__FILE__) . '/modules/' . $curFile . '/index.php');
-					$class = new $curFile();
-					$modules[$i] = $class->showLoginText();
+					include_once(dirname(__FILE__) . '/modules/' . $module . '/index.php');
+					$class = new $module();
+
+					if ($firstLoginModuleText === false)
+					{
+						$this->moduleOutput[] = '<p><strong>or</strong></p>';
+					}
+					
+					$this->moduleOutput[] = $class->showLoginText();
+
+					$firstLoginModuleText = false;
 				}
 			}
 		}
