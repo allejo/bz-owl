@@ -57,7 +57,7 @@
 					}
 					if (strlen($message) > 0)
 					{
-						$this->moduleOutput .= '<p> returned a message: ' . $message . '</p>' . "\n";
+						$this->moduleOutput .= '<p>' . $message . '</p>' . "\n";
 					}
 					break;
 				default: 
