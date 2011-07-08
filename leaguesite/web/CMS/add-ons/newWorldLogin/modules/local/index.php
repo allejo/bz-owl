@@ -148,8 +148,8 @@
 			$lenLogin = strlen($loginname);
 			if (($lenLogin > 50) || ($lenLogin < 1))
 			{
-				$output .= 'User names must be using less than 50 '
-						   . 'but more than 0 <abbr title="characters">chars</abbr>.' . "\n");
+				$output .= ('User names must be using less than 50 '
+							. 'but more than 0 <abbr title="characters">chars</abbr>.' . "\n");
 				return false;
 			}
 			
@@ -167,12 +167,12 @@
 			
 			
 			// initialise with reserved player id 0 (no player)
-			$playerid = (int) 0;
+			$userid = (int) 0;
 			$convert_to_external_login = true;
 			while($row = $db->fetchRow($query))
 			{
-				$playerid = $row['id'];
-				if ($config->getValue('forceExternalLoginOnly') && !(strcmp(($row['external_id']), '') === 0))
+				$userid = $row['id'];
+				if (!(strcmp(($row['external_id']), '') === 0))
 				{
 					$convert_to_external_login = false;
 				}
@@ -197,10 +197,38 @@
 				unset($modules);
 				
 				return false;
+			} elseif ($convert_to_external_login)
+			{
+				// convert user account to external login implicitly
+				
+				// find out which login modules are installed
+				$modules = newWorldLogin::getModules();
+				
+				// convert to use bzbb external login
+				if (array_search('bzbb', $modules) !== false)
+				{
+					// try to convert the account using the module's inbuilt function
+					$moduleConvertMsg = '';
+					if (!bzbb::convertAccount($userid, $loginname, $moduleConvertMsg))
+					{
+						if (strlen($moduleConvertMsg) > 0)
+						{
+							$output[] = ('Module bzbb has returned the following error on convertAccount: '
+										 . $moduleConvertMsg;
+						}
+						return false;
+					}
+					if (strlen($moduleConvertMsg) > 0)
+					{
+						$output[] = ('Module bzbb has returned the success message on convertAccount: '
+									 . $moduleConvertMsg;
+					}
+					unset($moduleConvertMsg);
+				}
 			}
 			
 			
-			if (intval($playerid) === 0)
+			if (intval($userid) === 0)
 			{
 				$user->logout();
 				
@@ -216,7 +244,7 @@
 			
 			// execute query
 			$query = $db->prepare($query);
-			if (!$db->execute($query, $playerid))
+			if (!$db->execute($query, $userid))
 			{
 				// query failed
 				$output .= 'Could not retrieve password for you in database.';
@@ -262,6 +290,7 @@
 				return false;
 			}
 			
+			
 			// sanity checks passed -> login successful
 			return true;
 			
@@ -278,7 +307,7 @@
 			// standard permissions for user
 			$_SESSION['username'] = $loginname;
 			$_SESSION['user_logged_in'] = true;
-			$internal_login_id = $playerid;
+			$internal_login_id = $userid;
 			
 			// permissions for private messages
 			$user->setPermission('allow_add_messages');
