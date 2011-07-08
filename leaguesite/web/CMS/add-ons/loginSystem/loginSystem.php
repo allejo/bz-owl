@@ -1,5 +1,5 @@
 <?php
-	class newWorldLogin
+	class loginSystem
 	{
 		private $moduleOutput = '';
 		

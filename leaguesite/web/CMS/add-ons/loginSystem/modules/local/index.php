@@ -67,7 +67,7 @@
 			
 			if ($config->getValue('login.local.convertUsersToExternalLogin'))
 			{
-				$modules = newWorldLogin::getModules();
+				$modules = loginSystem::getModules();
 				if (array_search('bzbb', $modules) !== false)
 				{
 					$msg .= ('<strong><span class="unread_messages">'
@@ -182,7 +182,7 @@
 			if (!$convert_to_external_login && $config->getValue('forceExternalLoginOnly'))
 			{
 				$msg = '<span class="unread_messages">You already enabled ';
-				$modules = newWorldLogin::getModules();
+				$modules = loginSystem::getModules();
 				if (array_search('bzbb', $modules) !== false)
 				{
 					$url = urlencode($config->getValue('baseaddress') . 'Login/' . '?bzbbauth=%TOKEN%,%USERNAME%');
@@ -202,7 +202,7 @@
 				// convert user account to external login implicitly
 				
 				// find out which login modules are installed
-				$modules = newWorldLogin::getModules();
+				$modules = loginSystem::getModules();
 				
 				// convert to use bzbb external login
 				if (array_search('bzbb', $modules) !== false)
@@ -214,14 +214,14 @@
 						if (strlen($moduleConvertMsg) > 0)
 						{
 							$output[] = ('Module bzbb has returned the following error on convertAccount: '
-										 . $moduleConvertMsg;
+										 . $moduleConvertMsg);
 						}
 						return false;
 					}
 					if (strlen($moduleConvertMsg) > 0)
 					{
 						$output[] = ('Module bzbb has returned the success message on convertAccount: '
-									 . $moduleConvertMsg;
+									 . $moduleConvertMsg);
 					}
 					unset($moduleConvertMsg);
 				}

@@ -34,7 +34,7 @@
 		if (strcmp($path, 'Login/') === 0)
 		{
 			$title = 'Login';
-			$addon = 'login';
+			$addon = 'loginSystem';
 			
 			return true;
 		}
