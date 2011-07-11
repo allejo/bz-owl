@@ -22,7 +22,7 @@
 			
 			$text = ('<p class="first_p">Please login using your account at <a href='
 					 . '"http://my.bzflag.org/weblogin.php?action=weblogin&amp;url='
-					 . urlencode($config->getValue('baseaddress') . 'Login2/'
+					 . urlencode($config->getValue('baseaddress') . 'Login/'
 							   . '?module=bzbb&action=login&auth=%TOKEN%,%USERNAME%')
 					 . '">my.bzflag.org (BZBB)</a>.</p>' . "\n");
 			
