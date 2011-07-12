@@ -199,15 +199,21 @@
 						$this->moduleOutput .= '<p>Welcome and thanks for registering on this website.</p>';
 					}
 					
-					$userOperations->sendWelcomeMessage($uid);
+					// register the account on db
+					if ($uid = $userOperations->registerAccount($moduleInstance, $externalLogin))
+					{
+						// send welcome message if registering was successful
+						$userOperations->sendWelcomeMessage($uid);
+					}
 				}
 				
+				// does a user try to log in using reserved id 0?
 				if ($uid === 0)
 				{
 					// call logout as bandaid for erroneous login modules
 					// these may log the user in, even though they never should
 					$user->logout();
-					$this->moduleOutput .= '<p>An internal error occurred: $uid === 0.</p>' . "\n";
+					$this->moduleOutput[] = 'An internal error occurred: $uid === 0 on login.';
 					return false;
 				}
 			}

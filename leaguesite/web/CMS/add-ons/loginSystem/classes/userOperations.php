@@ -84,12 +84,12 @@
 		}
 		
 		
-		public function addToOnlineUserList($name, $id);
+		public function addToOnlineUserList($name, $id)
 		{
 			// find out if table exists
-			$query = $db->SQL('SHOW TABLES LIKE ' . "'" . 'online_users' . "'");
-			$numRows = count($db->fetchRow($query));
-			$db->free($query);
+			$query = $this->SQL('SHOW TABLES LIKE ' . "'" . 'online_users' . "'");
+			$numRows = count($this->fetchRow($query));
+			$this->free($query);
 			
 			$onlineUsers = false;
 			if ($numRows > 0)
@@ -102,30 +102,71 @@
 			// use the resulting data
 			if ($onlineUsers)
 			{
-				$query = $db->prepare('SELECT * FROM `online_users` WHERE `userid`=?');
-				$db->execute($query, $user_id);
-				$rows = $db->rowCount($query);
+				$query = $this->prepare('SELECT * FROM `online_users` WHERE `userid`=?');
+				$this->execute($query, $id);
+				$rows = $this->rowCount($query);
 				// done
-				$db->free($query);
+				$this->free($query);
 				
 				$onlineUsers = false;
 				if ($rows > 0)
 				{
 					// already logged in
 					// so log him out
-					$query = $db->prepare('DELETE FROM `online_users` WHERE `userid`=?');
-					if (!$db->execute($query, $user_id))
+					$query = $this->prepare('DELETE FROM `online_users` WHERE `userid`=?');
+					if (!$this->execute($query, $id))
 					{
-						$db->logError('Could not remove already logged in user from online user table (userid=' . strval($user_id) . ').');
+						$this->logError('Could not remove already logged in user from online user table (userid=' . strval($id) . ').');
 					}
 				}
 				
 				// insert logged in user into online_users table
-				$query = $db->prepare('INSERT INTO `online_users` (`userid`, `username`, `last_activity`) Values (?, ?, ?)');
-				$args = array($user_id, $name, $curDate);
-				$db->execute($query, $args);
+				$query = $this->prepare('INSERT INTO `online_users` (`userid`, `username`, `last_activity`) Values (?, ?, ?)');
+				$date = new DateTime('now', new DateTimeZone('UTC'));
+				$curDate = $date->format('Y-m-d H:i:s');
+				$args = array($id, $name, $curDate);
+				$this->execute($query, $args);
 			}
 		}
+		
+		
+		public function registerAccount($moduleInstance, $externalLogin=false)
+		{
+			$uid = false;
+			
+			// lock tables before registering
+			$this->SQL('LOCK TABLES `players` WRITE');
+			$this->SQL('SET AUTOCOMMIT = 0');
+			
+			if ($externalLogin)
+			{
+				$query = $this->prepare('INSERT INTO `players` (`name`, `external_id`) VALUES (?,?)');
+				$this->execute($query, array($moduleInstance->getName(), $moduleInstance->getID()));
+			} else
+			{
+				$query = $this->prepare('INSERT INTO `players` (`name`) VALUES (?)');
+				$this->execute($query, $moduleInstance->getName());
+			}
+			
+			// retrieve last insertion id database independently
+			// by asking for 1 id, beginning with last one
+			$query = $this->SQL('SELECT `id` FROM `players` ORDER BY `id` DESC LIMIT 1');
+			$row = $this->fetchRow($query);
+			$uid = $row['id'];
+			$this->free($query);
+			
+			// unlock tables after registering
+			$this->SQL('UNLOCK TABLES');
+			$this->SQL('COMMIT');
+			$this->SQL('SET AUTOCOMMIT = 1');
+			
+			// create empty profile connected to new user id
+			$query = $this->prepare('INSERT INTO `players_profile` (`playerid`) VALUES (?)');
+			$this->execute($query, $uid);
+			
+			return $uid;
+		}
+		
 		
 		public function sendWelcomeMessage($id)
 		{
@@ -142,7 +183,7 @@
 									. ' about organising and playing matches.' . "\n\n"
 									. 'See you on the battlefield.');
 			// prepare welcome message
-			include(dirname(dirname(__FILE__)) . '/pmSystem/classes/PMComposer.php');
+			include(dirname(dirname(dirname(__FILE__))) . '/pmSystem/classes/PMComposer.php');
 			$pmComposer = new pmComposer();
 			$pmComposer->setSubject($subject);
 			$pmComposer->setContent($content);

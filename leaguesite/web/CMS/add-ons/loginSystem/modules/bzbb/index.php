@@ -79,8 +79,8 @@
 											  !$config->getValue('login.modules.bzbb.disableCheckIP')))
 			{
 				// login did not work
-				$output = ('<p class="first_p">Login failed: The returned values could not be validated!'
-						   . ' You may check your username and password and <a href="./">try again</a>.</p>' . "\n");
+				$output = ('Login failed: The returned values could not be validated! '
+						   . 'You may check your username and password and <a href="./">try again</a>.');
 				return false;
 			}
 			
