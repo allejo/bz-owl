@@ -37,7 +37,7 @@
 			$query = $this->prepare('SELECT `id` FROM `players` WHERE `name`=:name LIMIT 1');
 			// the id can be of any data type and of any length
 			// just assume it's a 50 characters long string
-			$this->execute($query, array(':id' => array($name, PDO::PARAM_STR, 50)));
+			$this->execute($query, array(':name' => array($name, PDO::PARAM_STR, 50)));
 			
 			if ($row = $this->fetchRow($query))
 			{
