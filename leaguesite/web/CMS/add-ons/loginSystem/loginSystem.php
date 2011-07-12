@@ -175,9 +175,9 @@
 			}
 			
 			
-			// uid is 0 if it's a user with no external login id
-			// but an external login id has been provided
-			// uid is also 0 if a user registers
+			// if uid is 0 this means
+			// either new user
+			// or user already registered using local login
 			if ($uid === 0)
 			{
 				// try to recover uid by username based db lookup
@@ -191,12 +191,14 @@
 				
 				if ($newUser)
 				{
+					// a new user, be happy :)
+					
 					if ($config->getValue('login.welcome.summary'))
 					{
-						$this->moduleOutput .= '<p>' . $config->getValue('login.welcome.summary') . '</p>';
+						$this->moduleOutput[] = $config->getValue('login.welcome.summary');
 					} else
 					{
-						$this->moduleOutput .= '<p>Welcome and thanks for registering on this website.</p>';
+						$this->moduleOutput[] = 'Welcome and thanks for registering on this website.';
 					}
 					
 					// register the account on db
@@ -205,6 +207,19 @@
 						// send welcome message if registering was successful
 						$userOperations->sendWelcomeMessage($uid);
 					}
+				} else
+				{
+					// existing account with no external login
+					
+					// call logout as bandaid for erroneous login modules
+					$user->logout();
+					$this->moduleOutput[] = ('This account does not have any external logins enabled. '
+											 . 'You may try using '
+											 . '<a href="./?module=local&amp;action=form">local login</a>'
+											 . ' instead.');
+					
+					// login failed without any possibility to recover from user error
+					return false;
 				}
 				
 				// does a user try to log in using reserved id 0?
