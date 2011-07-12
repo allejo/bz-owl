@@ -97,7 +97,7 @@
 		
 		public function getName()
 		{
-			return $this->info['username'];
+			return htmlent($this->info['username']);
 		}
 		
 		public function givePermissions()

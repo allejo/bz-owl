@@ -2,6 +2,7 @@
 	class local
 	{
 		private $xhtml = true;
+		private $info = array();
 		
 		function __construct()
 		{
@@ -290,6 +291,9 @@
 				return false;
 			}
 			
+			// put information into class variable for usage outside of this function
+			$this->info['id'] = $userid;
+			$this->info['username'] = $loginname;
 			
 			// sanity checks passed -> login successful
 			return true;
@@ -299,13 +303,29 @@
 		}
 		
 		
+		public function getID()
+		{
+			return $this->info['id'];
+		}
+		
+		public function getName()
+		{
+			return htmlent($this->info['username']);
+		}
+		
+		static public function convertAccount($userid, $loginname, &$output)
+		{
+			// can not convert, failsave
+			return false;
+		}
+		
 		public function givePermissions()
 		{
 			global $user;
 			
 			
 			// standard permissions for user
-			$_SESSION['username'] = $loginname;
+			$_SESSION['username'] = $this->info['username'];
 			$_SESSION['user_logged_in'] = true;
 			$internal_login_id = $userid;
 			

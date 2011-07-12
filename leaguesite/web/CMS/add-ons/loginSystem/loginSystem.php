@@ -71,7 +71,7 @@
 			
 			
 			$tmpl->assign('modules', $this->moduleOutput);
-			$tmpl->display('newWorldLogin');
+			$tmpl->display('loginSystem');
 		}		
 		
 		
@@ -240,6 +240,7 @@
 				$user->setID($uid);
 				$moduleInstance->givePermissions();
 				$userOperations->updateLastLogin($uid);
+				$userOperations->addToOnlineUserList($moduleInstance->getName(), $uid);
 				
 				$this->moduleOutput .= '<p>Login was successful!</p>';
 				return true;

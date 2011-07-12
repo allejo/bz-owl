@@ -83,6 +83,50 @@
 			return;
 		}
 		
+		
+		public function addToOnlineUserList($name, $id);
+		{
+			// find out if table exists
+			$query = $db->SQL('SHOW TABLES LIKE ' . "'" . 'online_users' . "'");
+			$numRows = count($db->fetchRow($query));
+			$db->free($query);
+			
+			$onlineUsers = false;
+			if ($numRows > 0)
+			{
+				// no need to create table in case it does not exist
+				// any interested viewer looking at the online page will create it
+				$onlineUsers = true;
+			}
+			
+			// use the resulting data
+			if ($onlineUsers)
+			{
+				$query = $db->prepare('SELECT * FROM `online_users` WHERE `userid`=?');
+				$db->execute($query, $user_id);
+				$rows = $db->rowCount($query);
+				// done
+				$db->free($query);
+				
+				$onlineUsers = false;
+				if ($rows > 0)
+				{
+					// already logged in
+					// so log him out
+					$query = $db->prepare('DELETE FROM `online_users` WHERE `userid`=?');
+					if (!$db->execute($query, $user_id))
+					{
+						$db->logError('Could not remove already logged in user from online user table (userid=' . strval($user_id) . ').');
+					}
+				}
+				
+				// insert logged in user into online_users table
+				$query = $db->prepare('INSERT INTO `online_users` (`userid`, `username`, `last_activity`) Values (?, ?, ?)');
+				$args = array($user_id, $name, $curDate);
+				$db->execute($query, $args);
+			}
+		}
+		
 		public function sendWelcomeMessage($id)
 		{
 			global $config;
