@@ -4,7 +4,9 @@ bz-owl release notes
 
 1.3 (current development trunk)
 --
-* nothing yet
+* Replaced login add-on with a entirely new loginSystem that provides a better framework
+* fixed a bug that did not reset a user's teamid upon deletion of a team
+* New pageSystem add-on to control which page is shown without directly editing db
 
 1.2.1 (current development trunk)
 --

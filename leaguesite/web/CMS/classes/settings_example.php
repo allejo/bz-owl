@@ -90,6 +90,8 @@
 																										 // TODO permissions
 																										 'allow_view_todo' => true,
 																										 'allow_edit_todo' => true,
+																										 // pageSystem permissions
+																										 'allow_admin_pageSystem' => true,
 																										 // aux permissions
 																										 'is_admin' => true))),
 						 // subject of welcome message

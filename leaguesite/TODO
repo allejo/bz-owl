@@ -5,8 +5,6 @@ until next release:
 * Move CMS tree and other files that are not direct URL targets out of
   the web tree.
 
-* Move leaguesite installation instructions from README to INSTALL.
-
 * Re-implement Matches, Online, Players, Teams and rss as add-ons
 
 
