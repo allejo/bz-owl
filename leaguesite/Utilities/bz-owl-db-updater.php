@@ -65,7 +65,7 @@
 		
 		$dbVersion = (count($rows) < 1) ? MAX_DB_VERSION : $rows[0]['db.Version'];
 		
-		if ($dbVersion > 0)
+		if (($dbVersion > 0) && (count($rows) < 1))
 		{
 			$db->SQL('INSERT INTO `misc_data` (`db.Version`) VALUES (' . MAX_DB_VERSION . ')');
 		}
@@ -74,13 +74,12 @@
 	// call the updating code now that we know the current db version
 	// use a while loop instead of iterating inside the update function
 	// so we keep the used stack memory low
-	$error = false;
-	while ($dbVersion < MAX_DB_VERSION && $error === false)
+	while ($dbVersion < MAX_DB_VERSION)
 	{
-		updateDB($dbVersion, $error);
+		updateDB($dbVersion);
 	}
-	echo ($error === false) ? ('The used database (' . $config->getValue('dbName')
-							   . ') is up to date (version ' . $dbVersion . ').' . "\n") : $error;
+	echo ('The used database (' . $config->getValue('dbName')
+		  . ') is up to date (version ' . $dbVersion . ').' . "\n");
 	exit();
 	
 	function status($message='')
@@ -88,7 +87,7 @@
 		echo($message . "\n");
 	}
 	
-	function updateDB(&$version, &$error)
+	function updateDB(&$version)
 	{
 		echo('DB at version ' . $version . "\n");
 		
@@ -97,9 +96,12 @@
 			echo('Updating...' . "\n");
 			
 			$updateVersionFunction = 'updateVersion' . $version;
-			$updateVersionFunction();
-			// TODO: update code here
-			// TODO: if non-recoverable error occurs, write it into $error
+			$updateWorked = $updateVersionFunction();
+			if (!$updateWorked)
+			{
+				exit('A non-recoverable error occured in ' . strval($updateVersionFunction) . '() -> update stopped!' . "\n");
+			}
+			tagDBVersion(intval($version)+1);
 			
 			// update counter
 			$version++;
@@ -301,7 +303,8 @@
 		
 		status('Adding DB version column (db.version) to misc_data');
 		$db->SQL("ALTER TABLE `misc_data` ADD `db.version` int(11) NOT NULL DEFAULT '0'  AFTER `last_servertracker_query`");
-		tagDBVersion(1);
+		
+		return true;
 	}
 	
 	function updateVersion1()
@@ -336,5 +339,33 @@
 		$db->SQL("ALTER TABLE `teams_overview` CHANGE `activity` `activityNew` float NOT NULL DEFAULT '0'");
 		$db->SQL("ALTER TABLE `teams_overview` ADD `activityOld` float NOT NULL DEFAULT '0'  AFTER `activityNew`");
 		$db->SQL("ALTER TABLE `teams` CHANGE `leader_playerid` `leader_userid` int(11) NOT NULL DEFAULT '0'");
+		
+		return true;
+	}
+	
+	function updateVersion2()
+	{
+		// find out if pageSystem add-on is added
+		$query = $db->SQL("SELECT `requestPath` FROM `CMS` WHERE `addon`='pageSystem' LIMIT 1");
+		if (count($db->fetchAll($query)) < 1)
+		{
+			// add pageSystem if pages path not already set
+			$query = $db->SQL("SELECT `requestPath` FROM `CMS` WHERE `requestPath`='Pages/'");
+			$pageSystemInsertionQuery = ("INSERT INTO `CMS` (`requestPath`, `title`, `addon`)
+			VALUES
+			('Pages/', 'Page assignments', 'pageSystem')");
+			if (count($db->fetchAll($query)) < 1)
+			{
+				$db->SQL(pageSystemInsertionQuery);
+			} else
+			{
+				// print out an error message and log the problem
+				status('Adding pageSystem to CMS table failed because Pages/ entry was already set.');
+				$db->logError('bz-owl-db-updater: ' . $pageSystemInsertionQuery . ' failed: Pages/ already set.');
+				return false;
+			}
+		}
+		
+		return true;
 	}
 ?>

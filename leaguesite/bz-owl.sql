@@ -1,17 +1,20 @@
-# Sequel Pro dump
-# Version 2492
-# http://code.google.com/p/sequel-pro
+﻿# ************************************************************
+# Sequel Pro SQL dump
+# Version 3348
+#
+# http://www.sequelpro.com/
+# http://code.google.com/p/sequel-pro/
 #
 # Host: localhost (MySQL 5.1.57)
 # Database: bz-owl
-# Generation Time: 2011-06-09 17:48:21 +0200
+# Generation Time: 2011-07-13 16:40:27 +0200
 # ************************************************************
+
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8 */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
@@ -29,11 +32,12 @@ CREATE TABLE `CMS` (
   `addon` varchar(256) NOT NULL DEFAULT 'staticPageEditor',
   PRIMARY KEY (`id`),
   KEY `requestPath` (`requestPath`(255))
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
 
 LOCK TABLES `CMS` WRITE;
 /*!40000 ALTER TABLE `CMS` DISABLE KEYS */;
-INSERT INTO `CMS` (`id`,`requestPath`,`title`,`addon`)
+
+INSERT INTO `CMS` (`id`, `requestPath`, `title`, `addon`)
 VALUES
 	(1,'/','Home','staticPageEditor'),
 	(2,'PM/','Mail overview','pmSystem'),
@@ -44,7 +48,8 @@ VALUES
 	(7,'Contact/','Contact','staticPageEditor'),
 	(8,'Bans/','Bans','newsSystem'),
 	(9,'Config/','Config','configSystem'),
-	(10,'Teams/','Teams','teamSystem');
+	(10,'Teams/','Teams','teamSystem'),
+	(11,'Pages/','Page assignments','pageSystem');
 
 /*!40000 ALTER TABLE `CMS` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -442,12 +447,9 @@ CREATE TABLE `visits` (
 
 
 
-
-
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
