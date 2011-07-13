@@ -84,7 +84,7 @@
 			$msg .= "\n";
 			
 			// load form
-			$msg .= '<form action="' . $config->getValue('baseaddress') . 'Login/'. '" method="post">' . "\n";
+			$msg .= '<form action="./?module=local&amp;action=login'. '" method="post">' . "\n";
 			$msg .= '<div class="p">Name:</div>' . "\n";
 			$msg .= '<p class="first_p">' . "\n";
 			$msg .= '<input type="text" class="small_input_field" name="loginname" value="" maxlength="300"';
@@ -122,6 +122,11 @@
 		
 		public function validateLogin(&$output)
 		{
+			global $user;
+			
+			// initialise permissions
+			$user->removeAllPermissions();
+			
 			// set password based on POST parameter
 			// no password -> login failed
 			if (!isset($_POST['pw']))
@@ -134,12 +139,15 @@
 			// no loginname -> login failed
 			if (!isset($_POST['loginname']))
 			{
+				$output = ('Error: You must specify a name. '
+						   . 'You may <a href="./?module=local&amp;action=form">try logging in again</a>.');
 				return false;
 			}
-			$loginname = $_POST['loginname'];
 			
-			// initialise permissions
-			$user->removeAllPermissions();
+			// escape username before storing it in db
+			// that way encoding when displaying (on other pages)
+			// using (X)HTML is not needed
+			$loginname = htmlent($_POST['loginname']);
 			
 			// initialise match variables for password and user
 			$correctUser = false;

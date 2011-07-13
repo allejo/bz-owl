@@ -57,11 +57,11 @@
 					}
 					if (strlen($message) > 0)
 					{
-						$this->moduleOutput .= '<p>' . $message . '</p>' . "\n";
+						$this->moduleOutput[] = $message;
 					}
 					break;
 				default: 
-					$this->moduleOutput = '<p>Unknown module action requested, request not accepted.</p>';
+					$this->moduleOutput = 'Unknown module action requested, request not accepted.';
 			}
 		}
 		
