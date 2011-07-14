@@ -8,21 +8,18 @@
 			
 			// check if id set in db
 			// TODO: check if no data change -> abort soon
-			$query = $this->prepare('SELECT `id`,`addon` FROM `CMS` WHERE `id`=? LIMIT 1');
-			$this->execute($query, $id);
-			$row = $this->fetchRow($query);
-			if (!$row)
+			$curAddon = $this->getAddonUsed($id);
+			if (!$curAddon)
 			{
 				return 'FATAL ERROR: Change of id ' . $id . ' in pageSystem requested but id not in db.';
 			}
-			$this->free($query);
 			
 			// do not allow to change any entry of pageSystem
-			if (strcmp($row['addon'], 'pageSystem') === 0)
+			if (strcmp($curAddon, 'pageSystem') === 0)
 			{
 				return ('Removing pageSystem from any URL is not supported by this add-on. '
 						.'Reason: It could really confuse people and cause plenty of trouble. '
-						.'If you really want to do this, you must edit db directly instead');
+						.'If you really want to do this, you must edit database directly instead.');
 			}
 			
 			// remove illegal characters from request path
@@ -66,6 +63,100 @@
 			rtrim($path);
 			
 			return $path;
+		}
+		
+		
+		public function getAddonList($include='')
+		{
+			// this function returns an array of installed add-ons
+			// as array, excluding the add-ons that can not be handle pages directly
+			
+			// the directory where the add-ons reside
+			$addonDir = dirname(dirname(dirname(__FILE__)));
+			
+			// create an array of everything found in that directory
+			$addons = scandir($addonDir);
+			
+			// blacklist unwanted entries
+			foreach ($addons as $i => $curFile)
+			{
+				// remove entry from array if it's no folder
+				if (!is_dir($addonDir . '/' . $curFile))
+				{
+					unset($addons[$i]);
+					continue;
+				}
+				
+				// filter reserved directory names
+				switch ($curFile)
+				{
+					case (strcasecmp('.', $curFile) === 0):
+						unset($addons[$i]);
+						break;
+						
+					case (strcasecmp('..', $curFile) === 0):
+						unset($addons[$i]);
+						break;
+						
+					case (strcasecmp('.svn', $curFile) === 0):
+						unset($addons[$i]);
+						break;
+				}
+				
+				// whitelist explicitly included addon
+				if (strcmp($include, $curFile) === 0)
+				{
+					continue;
+				}
+				
+				// filter addons that can not handle pages directly
+				if (isset($addons[$i])
+					&& file_exists($addonDir . '/' . $curFile . '/' . 'indirect'))
+				{
+					unset($addons[$i]);
+				}
+				
+				// filter pageSystem (this) add-on based on file path
+				if (isset($addons[$i])
+					&& strcmp($addonDir . '/' . $curFile, dirname(dirname(__FILE__))) === 0)
+				{
+					unset($addons[$i]);
+				}
+			}
+			unset($curFile);
+			
+			return $addons;
+		}
+		
+		
+		public function getIdExists($id)
+		{
+			// you may use getAddonUsed instead
+			
+			$query = $this->prepare('SELECT `id` FROM `CMS` WHERE `id`=? LIMIT 1');
+			$this->execute($query, $id);
+			$row = $this->fetchRow($query);
+			if (!$row)
+			{
+				return false;
+			}
+			$this->free($query);
+			
+			return true;
+		}
+		
+		public function getAddonUsed($id)
+		{
+			$query = $this->prepare('SELECT `addon` FROM `CMS` WHERE `id`=? LIMIT 1');
+			$this->execute($query, $id);
+			$row = $this->fetchRow($query);
+			if (!$row)
+			{
+				return false;
+			}
+			$this->free($query);
+			
+			return $row['addon'];
 		}
 		
 		

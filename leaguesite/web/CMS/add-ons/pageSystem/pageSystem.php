@@ -131,9 +131,9 @@
 			// get id in question from request string
 			$id = intval(substr(strval($operation[0]), 6));
 			
-			// TODO: eek, count is slow and insecure in this context! Ask db whether entry exists instead.
-			$pages = $this->pageOperations->getPageList();
-			if (count($pages) < $id)
+			// find out if id is valid
+			$curAddon = $this->pageOperations->getAddonUsed($id);
+			if ($curAddon === false)
 			{
 				echo('error: request was to change higher entry than existing');
 				die();
@@ -145,8 +145,10 @@
 			
 			// tell template that we're trying to edit page assignment data
 			$tmpl->assign('pageChange', true);
+			$tmpl->assign('addonDropDownChoices', $this->pageOperations->getAddonList($curAddon));
+			$tmpl->assign('curAddon', $curAddon);
 			
-			// generate random keys to avoid changing data through accidental clicking on links
+			// generate random keys to avoid changing data through accidental clicking on 3rd party forms
 			$this->generateKey();
 		}
 		

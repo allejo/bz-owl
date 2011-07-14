@@ -29,7 +29,7 @@ No menu found.
 <p>Even though this add-on will try to prevent you from doing malicious operations, such as removing itself from active add-ons, <strong>please think twice before applying changes</strong>.</p>
 
 {if !empty($pageList)}
-<form enctype="application/x-www-form-urlencoded" method="POST" action="./?action=change">
+<form enctype="application/x-www-form-urlencoded" method="post" action="./?action=change">
 <table class="nested_table">
 <caption>Pages in database</caption>
 <tr>
@@ -64,14 +64,22 @@ No menu found.
 <p>Lorem ipsum</p>
 
 {if isset($pageData)}
-<form enctype="application/x-www-form-urlencoded" method="POST" action="./?action=change">
+<form enctype="application/x-www-form-urlencoded" method="post" action="./?action=change">
 <div><input type="hidden" name="change" value="{$pageData.id}" /></div>
 <p>Request Path</p>
 <p><input type="text" name="requestPath" value="{$pageData.requestPath}" /></p>
 <p>Title</p>
 <p><input type="text" name="title" value="{$pageData.title}" /></p>
 <p>Add-on</p>
+{if !isset($addonDropDownChoices)}
 <p><input type="text" name="addon" value="{$pageData.addon}" /></p>
+{else}
+<p><select name="addon">
+{foreach item=value from=$addonDropDownChoices}
+	<option value="{$value}"{if $value==$curAddon} selected="selected"{/if}>{$value}</option>
+{/foreach}
+</select></p>
+{/if}
 <div><input type="hidden" name="key_name" value="{$keyName}" /></div>
 <div><input type="hidden" name="{$keyName}" value="{$keyValue}" /></div>
 <p><input type="submit" name="submit" value="Save Changes" /><input type="submit" name="cancel" value="Cancel" /></p>
