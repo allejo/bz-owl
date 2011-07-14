@@ -64,27 +64,18 @@ No menu found.
 <p>Lorem ipsum</p>
 
 {if isset($pageData)}
-<table class="nested_table">
-<caption>Pages in database</caption>
-<tr>
-	<th>Request Path</th>
-	<th>Title</th>
-	<th>Add-on</th>
-	<th>Action</th>
-</tr>
-<tr>
-	<td>
-		{$pageData.requestPath}
-	</td>
-	<td>
-		{$pageData.title}
-	</td>
-	<td>
-		{$pageData.addon}
-	</td>
-	<td>
-		Save / Cancel
-	</td>
+<form enctype="application/x-www-form-urlencoded" method="POST" action="./?action=change">
+<div><input type="hidden" name="change" value="{$pageData.id}" /></div>
+<p>Request Path</p>
+<p><input type="text" name="requestPath" value="{$pageData.requestPath}" /></p>
+<p>Title</p>
+<p><input type="text" name="title" value="{$pageData.title}" /></p>
+<p>Add-on</p>
+<p><input type="text" name="addon" value="{$pageData.addon}" /></p>
+<div><input type="hidden" name="key_name" value="{$keyName}" /></div>
+<div><input type="hidden" name="{$keyName}" value="{$keyValue}" /></div>
+<p><input type="submit" name="submit" value="Save Changes" /><input type="submit" name="cancel" value="Cancel" /></p>
+</form>
 {/if}
 
 {/if}
