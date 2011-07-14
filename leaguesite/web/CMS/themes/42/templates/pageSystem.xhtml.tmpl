@@ -28,8 +28,8 @@ No menu found.
 
 <p>Even though this add-on will try to prevent you from doing malicious operations, such as removing itself from active add-ons, <strong>please think twice before applying changes</strong>.</p>
 
-{if !empty($pages)}
-<form enctype="application/x-www-form-urlencoded" method="POST" action="./">
+{if !empty($pageList)}
+<form enctype="application/x-www-form-urlencoded" method="POST" action="./?action=change">
 <table class="nested_table">
 <caption>Pages in database</caption>
 <tr>
@@ -39,7 +39,7 @@ No menu found.
 	<th>Action</th>
 </tr>
 
-{foreach item="page" from=$pages}
+{foreach item="page" from=$pageList}
 <tr>
 	<td>
 		{$page.requestPath}
@@ -51,7 +51,7 @@ No menu found.
 		{$page.addon}
 	</td>
 	<td>
-		<input type="submit" value="Change" />
+		<input type="submit" name="change{$page.id}" value="Change" />
 	</td>
 </tr>
 {/foreach}
@@ -60,10 +60,36 @@ No menu found.
 </form>
 {/if}
 
-</div>
-{if isset($repositoryVersion)}
-<p>SVN revision: {$repositoryVersion}</p>
+{if isset($pageChange)}
+<p>Lorem ipsum</p>
+
+{if isset($pageData)}
+<table class="nested_table">
+<caption>Pages in database</caption>
+<tr>
+	<th>Request Path</th>
+	<th>Title</th>
+	<th>Add-on</th>
+	<th>Action</th>
+</tr>
+<tr>
+	<td>
+		{$pageData.requestPath}
+	</td>
+	<td>
+		{$pageData.title}
+	</td>
+	<td>
+		{$pageData.addon}
+	</td>
+	<td>
+		Save / Cancel
+	</td>
 {/if}
+
+{/if}
+
+</div>
 </div>
 </body>
 </html>
