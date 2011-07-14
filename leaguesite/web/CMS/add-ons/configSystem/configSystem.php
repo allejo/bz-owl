@@ -81,7 +81,6 @@
 				if (isset($themes[$i])
 					&& !file_exists(dirname(dirname(dirname(dirname(__FILE__)))) . '/themes/' . $curFile . '/' . $curFile . '.css'))
 				{
-					echo dirname(dirname(dirname(__FILE__))) . '/themes/' . $curFile . '/' . $curFile . '.css' . '<br>';
 					unset($themes[$i]);
 				}
 				
