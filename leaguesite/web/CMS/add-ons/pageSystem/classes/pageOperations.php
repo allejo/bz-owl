@@ -7,15 +7,29 @@
 			
 			
 			// check if id set in db
-			// TODO: check if no data change -> abort soon
 			$curAddon = $this->getAddonUsed($id);
 			if (!$curAddon)
 			{
-				return 'FATAL ERROR: Change of id ' . $id . ' in pageSystem requested but id not in db.';
+				return 'Change of id ' . $id . ' in pageSystem requested but id does not exist in db.';
+			}
+			
+			// check if no data change -> abort soon
+			$query = $this->prepare('SELECT `requestPath`,`title`,`addon` FROM `CMS` WHERE `id`=? LIMIT 1');
+			$this->execute($query, $id);
+			$row = $this->fetchRow($query);
+			$this->free($query);
+			if (!$row
+				|| (strcmp($row['requestPath'], $requestPath) === 0
+				&& strcmp($row['title'], $title) === 0
+				&& strcmp($row['addon'], $addon) === 0))
+			{
+				return 'No data to be changed. Aborting save.';
 			}
 			
 			// do not allow to change any entry of pageSystem
-			if (strcmp($curAddon, 'pageSystem') === 0)
+			if (strcmp($curAddon, 'pageSystem') === 0
+				&& (strcmp($row['requestPath'], $requestPath) !== 0
+				|| strcmp($row['addon'], $addon) !== 0))
 			{
 				return ('Removing pageSystem from any URL is not supported by this add-on. '
 						.'Reason: It could really confuse people and cause plenty of trouble. '
