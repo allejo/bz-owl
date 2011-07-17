@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="content-type" />
+	<link href="{$baseURL}themes/{$curTheme}/{$curTheme}.css" rel="stylesheet" type="text/css" />
+	<link rel="icon" type="image/png" href="{$faviconURL}" />
+<title>{$title}</title>
+</head>
+<body>
+<div class="logo"></div>
+
+{foreach $menu as $menuItem}{$menuItem}{foreachelse}
+No menu found.
+{/foreach}
+
+
+<div class="userbuttons">
+	<span class="date">{$date}</span>
+	<span class="Servers">Match servers: <a href="{$baseURL}Servertracker/">{$onlinePlayers}</a></span>
+	<span class="onlineUsers">Website: <a href="{$baseURL}Online/">{$onlineUsers}</a></span>
+	{if isset($logoutURL)}<span class="logout"><a href="{$logoutURL}">Logout</a></span>{/if}
+</div>
+
+<div class="content">
+<div class="static_page_box">
+<p class="first_p">{if !isset($operationMessage)}You may configure the CMS page assignments using this add-on. Please note that you <strong>can not overwrite hardcoded pages such as Login</strong>.{else}{$operationMessage}{/if}</p>
+
+<p>Even though this add-on will try to prevent you from doing malicious operations, such as removing itself from active add-ons, <strong>please think twice before applying changes</strong>.</p>
+
+{if !empty($pageList)}
+<form enctype="application/x-www-form-urlencoded" method="post" action="./">
+<table class="nested_table">
+<caption>Pages in database</caption>
+<tr>
+	<th>Request Path</th>
+	<th>Title</th>
+	<th>Add-on</th>
+	<th>Action</th>
+</tr>
+
+{foreach item="page" from=$pageList}
+<tr>
+	<td>
+		{$page.requestPath}
+	</td>
+	<td>
+		{$page.title}
+	</td>
+	<td>
+		{$page.addon}
+	</td>
+	<td>
+		<input type="submit" name="change{$page.id}" value="Change" />
+	</td>
+</tr>
+{/foreach}
+
+</table>
+<div><input type="hidden" name="action" value="change" /></div>
+</form>
+{/if}
+
+{if isset($pageChange)}
+<p>Lorem ipsum</p>
+
+{if isset($pageData)}
+<form enctype="application/x-www-form-urlencoded" method="post" action="./">
+<div><input type="hidden" name="change" value="{$pageData.id}" /></div>
+<p>Request Path</p>
+<p><input type="text" name="requestPath" value="{$pageData.requestPath}" /></p>
+<p>Title</p>
+<p><input type="text" name="title" value="{$pageData.title}" /></p>
+<p>Add-on</p>
+{if !isset($addonDropDownChoices)}
+<p><input type="text" name="addon" value="{$pageData.addon}" /></p>
+{else}
+<p><select name="addon">
+{foreach item=value from=$addonDropDownChoices}
+	<option value="{$value}"{if $value==$curAddon} selected="selected"{/if}>{$value}</option>
+{/foreach}
+</select></p>
+{/if}
+<div><input type="hidden" name="action" value="change" /></div>
+<div><input type="hidden" name="key_name" value="{$keyName}" /></div>
+<div><input type="hidden" name="{$keyName}" value="{$keyValue}" /></div>
+<p><input type="submit" name="submit" value="Save Changes" /><input type="submit" name="cancel" value="Cancel" /></p>
+</form>
+{/if}
+
+{/if}
+
+</div>
+</div>
+</body>
+</html>
