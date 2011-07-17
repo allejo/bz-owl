@@ -294,7 +294,7 @@
 				}
 			}
 			
-			// put message in database
+			// put message into database
 			$query = $db->prepare('INSERT INTO `pmsystem_msg_storage`'
 								  . ' (`author_id`, `subject`, `timestamp`, `message`)'
 								  . ' VALUES (?, ?, ?, ?)');

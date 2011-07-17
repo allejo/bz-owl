@@ -38,6 +38,13 @@
 			$this->createConnection();
 		}
 		
+		public function __destruct()
+		{
+			// unlock tables, just in case a lock was not removed earlier
+			// the latter can be caused by bad code or server problems
+			$this->unlockTables();
+		}
+		
 		function getConnection()
 		{
 			return $this->connection;
