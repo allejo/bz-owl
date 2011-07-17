@@ -31,14 +31,14 @@
 			
 			
 			// show overview by default if no action specified, post parameters missing or cancel requested
-			if (!isset($_GET['action']) || count($_POST) < 1 || isset($_POST['cancel']))
+			if (!isset($_POST['action']) || count($_POST) < 1 || isset($_POST['cancel']))
 			{
 				$this->showOverview();
 				die();
 			}
 			
 			// call the event handlers to process the requested task
-			switch($_GET['action'])
+			switch($_POST['action'])
 			{
 				case 'change':
 					$this->handleChangePageRequest();
@@ -104,10 +104,14 @@
 				{
 					// pass this to the pageOperations class which will do db sanity checks and apply changes
 					// it needs id, request path, title and add-on to be used
-					echo ($this->pageOperations->changeRequested($_POST['change'],
-																 $_POST['requestPath'],
-																 $_POST['title'],
-																 $_POST['addon']));
+					$changeOutcome = ($this->pageOperations->changeRequested($_POST['change'],
+																			 $_POST['requestPath'],
+																			 $_POST['title'],
+																			 $_POST['addon']));
+					if ($changeOutcome !== true && $changeOutcome !== false && strlen($changeOutcome) > 0)
+					{
+						$tmpl->assign('operationMessage', $changeOutcome);
+					}
 				} else
 				{
 					echo('error: request illegal: Could not confirm key data');
@@ -123,7 +127,7 @@
 			// see if first part of request is equal change (removing the number) if form requested
 			if (substr_compare(strval($operation[0]), 'change', 0, 6))
 			{
-				echo('error: request illegal:' . strval($operation[0]));
+				echo('error: request illegal: ' . strval($operation[0]));
 				die();
 			}
 			

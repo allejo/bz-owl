@@ -24,12 +24,12 @@ No menu found.
 
 <div class="content">
 <div class="static_page_box">
-<p class="first_p">You may configure the CMS page assignments using this add-on. Please note that you <strong>can not overwrite hardcoded pages such as Login</strong>.</p>
+<p class="first_p">{if !isset($operationMessage)}You may configure the CMS page assignments using this add-on. Please note that you <strong>can not overwrite hardcoded pages such as Login</strong>.{else}{$operationMessage}{/if}</p>
 
 <p>Even though this add-on will try to prevent you from doing malicious operations, such as removing itself from active add-ons, <strong>please think twice before applying changes</strong>.</p>
 
 {if !empty($pageList)}
-<form enctype="application/x-www-form-urlencoded" method="post" action="./?action=change">
+<form enctype="application/x-www-form-urlencoded" method="post" action="./">
 <table class="nested_table">
 <caption>Pages in database</caption>
 <tr>
@@ -57,6 +57,7 @@ No menu found.
 {/foreach}
 
 </table>
+<div><input type="hidden" name="action" value="change" /></div>
 </form>
 {/if}
 
@@ -64,7 +65,7 @@ No menu found.
 <p>Lorem ipsum</p>
 
 {if isset($pageData)}
-<form enctype="application/x-www-form-urlencoded" method="post" action="./?action=change">
+<form enctype="application/x-www-form-urlencoded" method="post" action="./">
 <div><input type="hidden" name="change" value="{$pageData.id}" /></div>
 <p>Request Path</p>
 <p><input type="text" name="requestPath" value="{$pageData.requestPath}" /></p>
@@ -80,6 +81,7 @@ No menu found.
 {/foreach}
 </select></p>
 {/if}
+<div><input type="hidden" name="action" value="change" /></div>
 <div><input type="hidden" name="key_name" value="{$keyName}" /></div>
 <div><input type="hidden" name="{$keyName}" value="{$keyValue}" /></div>
 <p><input type="submit" name="submit" value="Save Changes" /><input type="submit" name="cancel" value="Cancel" /></p>

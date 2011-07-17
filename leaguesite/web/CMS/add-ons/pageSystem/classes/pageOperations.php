@@ -3,13 +3,13 @@
 	{
 		public function changeRequested($id, $requestPath, $title, $addon)
 		{
-			// FIXME: lock CMS table!
-			
+			$this->lockTable('CMS');
 			
 			// check if id set in db
 			$curAddon = $this->getAddonUsed($id);
 			if (!$curAddon)
 			{
+				$this->unlockTables();
 				return 'Change of id ' . $id . ' in pageSystem requested but id does not exist in db.';
 			}
 			
@@ -23,6 +23,7 @@
 				&& strcmp($row['title'], $title) === 0
 				&& strcmp($row['addon'], $addon) === 0))
 			{
+				$this->unlockTables();
 				return 'No data to be changed. Aborting save.';
 			}
 			
@@ -31,6 +32,7 @@
 				&& (strcmp($row['requestPath'], $requestPath) !== 0
 				|| strcmp($row['addon'], $addon) !== 0))
 			{
+				$this->unlockTables();
 				return ('Removing pageSystem from any URL is not supported by this add-on. '
 						.'Reason: It could really confuse people and cause plenty of trouble. '
 						.'If you really want to do this, you must edit database directly instead.');
@@ -39,7 +41,7 @@
 			// remove illegal characters from request path
 			if (strlen($requestPath) > strlen($this->cleanRequestPath($requestPath)))
 			{
-				echo('<br><br>' . $requestPath . '<br>' . $this->cleanRequestPath($requestPath));
+				$this->unlockTables();
 				return 'Invalid characters in request path detected. Please check your input.';
 			}
 			
@@ -50,6 +52,7 @@
 			$this->free($query);
 			if ($row)
 			{
+				$this->unlockTables();
 				return 'Request path already in use, request path must be unique in db';
 			}
 			
@@ -57,6 +60,7 @@
 			$query = $this->prepare('UPDATE `CMS` SET `requestPath`=?,`title`=?,`addon`=? WHERE `id`=? LIMIT 1');
 			$this->execute($query, array($requestPath, $title, $addon, $id));
 			
+			$this->unlockTables();
 			return 'Changes written successfully.';
 		}
 		

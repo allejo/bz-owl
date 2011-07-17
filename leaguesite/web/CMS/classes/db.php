@@ -108,6 +108,21 @@
 			}
 		}
 		
+		
+		public function lockTable($tableName, $writeLock=true)
+		{
+			$this->SQL('LOCK TABLES `' . $tableName . '` ' . ($writeLock ? 'WRITE' : 'READ'));
+			$this->SQL('SET AUTOCOMMIT = 0');
+		}
+		
+		public function unlockTables()
+		{
+			$this->SQL('UNLOCK TABLES');
+			$this->SQL('COMMIT');
+			$this->SQL('SET AUTOCOMMIT = 1');
+		}
+		
+		
 		// deprecated function
 		// use config->getValue('debugSQL') instead
 		function getDebugSQL()

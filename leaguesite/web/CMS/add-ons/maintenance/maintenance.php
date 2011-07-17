@@ -86,21 +86,14 @@
 		{
 			global $db;
 			
-			if (isset($db))
-			{
-				$db->SQL('UNLOCK TABLES');
-				$db->SQL('COMMIT');
-				$db->SQL('SET AUTOCOMMIT = 1');
-			}
+			$db->unlockTables();
 		}
 		
 		function lockTable($tableName, $write=true)
 		{
 			global $db;
 			
-			
-			$db->SQL('LOCK TABLES `' . $tableName . '` ' . ($write ? 'WRITE' : 'READ'));
-			$db->SQL('SET AUTOCOMMIT = 0');
+			$db->lockTable($tableName, $write);
 		}
 		
 		
