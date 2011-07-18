@@ -57,6 +57,6 @@ Updates
 -----------
 
 By using svn up you should get a new version of the source code, if available.
-However the database structure may has changed. We provide an updater between major stable versions in Utilities/bz-owl-db-updater.php (requires command line php installation).
+However the database structure and the required settings may have changed. We provide an updater between major stable versions in Utilities/bz-owl-db-updater.php (requires command line php installation). Most settings of config are not stored in database but as a file that probably needs manual updating. You may use bz-owl's reference settings as default values for new config keys.
 
 If you upgrade your BBCode library it is recommended to run the bbcode-library-updater.php (requires the website to be in the web dir) but keep in mind this will break legacy data in the database.
