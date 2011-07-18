@@ -4,7 +4,7 @@
 	// NOTE: This does not update tables by add-ons!
 	
 	// current db version
-	define('MAX_DB_VERSION', 2);
+	define('MAX_DB_VERSION', 3);
 	
 	
 	
@@ -345,6 +345,8 @@
 	
 	function updateVersion2()
 	{
+		global $db;
+		
 		// find out if pageSystem add-on is added
 		$query = $db->SQL("SELECT `requestPath` FROM `CMS` WHERE `addon`='pageSystem' LIMIT 1");
 		if (count($db->fetchAll($query)) < 1)
@@ -356,7 +358,7 @@
 			('Pages/', 'Page assignments', 'pageSystem')");
 			if (count($db->fetchAll($query)) < 1)
 			{
-				$db->SQL(pageSystemInsertionQuery);
+				$db->SQL($pageSystemInsertionQuery);
 			} else
 			{
 				// print out an error message and log the problem

@@ -86,7 +86,11 @@
 		{
 			global $db;
 			
-			$db->unlockTables();
+			// $db won't be set if called from old code
+			if (isset($db))
+			{
+				$db->unlockTables();
+			}
 		}
 		
 		function lockTable($tableName, $write=true)
