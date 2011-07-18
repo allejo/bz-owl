@@ -10,6 +10,7 @@
 			
 			
 			$this->xhtml = $config->getValue('useXhtml');
+			require_once(dirname(dirname(__FILE__)) . '/bzbb/index.php');
 		}
 		
 		
@@ -122,7 +123,9 @@
 		
 		public function validateLogin(&$output)
 		{
+			global $config;
 			global $user;
+			global $db;
 			
 			// initialise permissions
 			$user->removeAllPermissions();
@@ -194,8 +197,9 @@
 				$modules = loginSystem::getModules();
 				if (array_search('bzbb', $modules) !== false)
 				{
-					$url = urlencode($config->getValue('baseaddress') . 'Login/' . '?bzbbauth=%TOKEN%,%USERNAME%');
-					$msg .= '<a href="' . htmlspecialchars('http://my.bzflag.org/weblogin.php?action=weblogin&url=') . $url;						
+					$url = urlencode($config->getValue('baseaddress')
+									 . 'Login/?module=bzbb&action=login&auth=%TOKEN%,%USERNAME%');
+					$msg .= '<a href="' . htmlspecialchars('http://my.bzflag.org/weblogin.php?action=weblogin&url=') . $url;
 					$msg .= '">global (my.bzflag.org/bb/) login</a>';
 				} else
 				{
@@ -222,17 +226,25 @@
 					{
 						if (strlen($moduleConvertMsg) > 0)
 						{
-							$output[] = ('Module bzbb has returned the following error on convertAccount: '
+							$output .= ('Module bzbb has returned the following error on convertAccount: '
 										 . $moduleConvertMsg);
 						}
 						return false;
 					}
 					if (strlen($moduleConvertMsg) > 0)
 					{
-						$output[] = ('Module bzbb has returned the success message on convertAccount: '
-									 . $moduleConvertMsg);
+						// Module bzbb has returned the following success message on convertAccount
+						$output .= $moduleConvertMsg . ' ';
 					}
 					unset($moduleConvertMsg);
+					
+					// stop here if local login not allowed
+					if ($config->getValue('forceExternalLoginOnly'))
+					{
+						$output .= ('Local login is disabled by the site admin, though. '
+									. 'You must use the bzbb login instead.');
+						return false;
+					}
 				}
 			}
 			
@@ -335,7 +347,7 @@
 			// standard permissions for user
 			$_SESSION['username'] = $this->info['username'];
 			$_SESSION['user_logged_in'] = true;
-			$internal_login_id = $userid;
+			$internal_login_id = $this->info['id'];
 			
 			// permissions for private messages
 			$user->setPermission('allow_add_messages');

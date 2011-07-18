@@ -12,9 +12,9 @@
 			// abort process if user already logged in
 			if ($user->getID() > 0)
 			{
-				$this->moduleOutput = ('<p>You are already logged in. '
+				$this->moduleOutput[] = ('You are already logged in. '
 									  . 'If you want to login with a different account '
-									  . 'you must first logout.</p>');
+									  . 'you must first logout.');
 				return;
 			}
 			
@@ -30,14 +30,14 @@
 			// append module login text to provide a choice to continue
 			if (($module = $this->getRequestedModule($_GET['module'])) === false)
 			{
-				$this->moduleOutput = '<p>An error occurred, module name not accepted.</p>';
+				$this->moduleOutput[] = 'An error occurred, module name not accepted.';
 				$this->getLoginText($modules);
 				return;
 			}
 			
 			if (isset($_GET['action']) === false)
 			{
-				$this->moduleOutput = '<p>An error occurred, module action not specified.</p>';
+				$this->moduleOutput[] = 'An error occurred, module action not specified.';
 				return;
 			}
 			
@@ -195,7 +195,10 @@
 					
 					if ($config->getValue('login.welcome.summary'))
 					{
-						$this->moduleOutput[] = $config->getValue('login.welcome.summary');
+						$this->moduleOutput[] = strval($config->getValue('login.welcome.summary'));
+						echo 'debug:' . $config->getValue('login.welcome.summary');
+						echo ' ; ';
+						print_r($this->moduleOutput);
 					} else
 					{
 						$this->moduleOutput[] = 'Welcome and thanks for registering on this website.';
@@ -216,7 +219,7 @@
 					$this->moduleOutput[] = ('This account does not have any external logins enabled. '
 											 . 'You may try using '
 											 . '<a href="./?module=local&amp;action=form">local login</a>'
-											 . ' instead.');
+											 . ' first.');
 					
 					// login failed without any possibility to recover from user error
 					return false;
@@ -242,17 +245,17 @@
 				case 'active' : break;
 				case 'deleted':	$userOperations->activateAccount($uid); break;
 				case 'login disabled' :
-					$this->moduleOutput .= '<p>Your account is disabled: No login possible.</p>';
+					$this->moduleOutput[] = 'Your account is disabled: No login possible.';
 					return false;
 					break;
 				// TODO: implement site wide ban list
 				case 'banned' :
-					$this->moduleOutput .= '<p>You have been banned from this website.</p>';
+					$this->moduleOutput[] = 'You have been banned from this website.';
 					return false;
 					break;
 				default:
-					$this->moduleOutput .= ('<p>The impossible happened: Account status is'
-											. htmlent($status) . '.</p>');
+					$this->moduleOutput[] = ('The impossible happened: Account status is'
+											. htmlent($status) . '.');
 					return false;
 			}
 			
@@ -263,7 +266,7 @@
 				$userOperations->updateLastLogin($uid);
 				$userOperations->addToOnlineUserList($moduleInstance->getName(), $uid);
 				
-				$this->moduleOutput .= '<p>Login was successful!</p>';
+				$this->moduleOutput[] = 'Login was successful!';
 				return true;
 			} else
 			{

@@ -142,6 +142,7 @@
 		
 		static public function convertAccount($userid, $loginname, &$output)
 		{
+			global $config;
 			global $db;
 			
 			
@@ -194,8 +195,11 @@
 							   . '). Please report this to an admin.');
 					return false;
 				}
-				$output = ('Congratulations, you enabled the <a href="my.bzflag.org/bb/"> '
-						   . 'my.bzflag.org/bb/ (global) login</a> for this account.' . "\n");
+				$output = ('Congratulations, you enabled the <a href="'
+						   .  htmlspecialchars('http://my.bzflag.org/weblogin.php?action=weblogin&url=')
+						   . urlencode($config->getValue('baseaddress')
+									   . 'Login/?module=bzbb&action=login&auth=%TOKEN%,%USERNAME%')
+						   . '">my.bzflag.org/bb/ (global) login</a> for this account.' . "\n");
 			} else
 			{
 				$output = ('Unfortunately the bzidtools2.php script failed'
