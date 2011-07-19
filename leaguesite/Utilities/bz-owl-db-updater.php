@@ -51,6 +51,7 @@
 	
 	if (count($rows) < 1)
 	{
+		// if CMS table exists, assume db is at newest version, 0 otherwise
 		$query = $db->prepare('SHOW TABLES LIKE ?');
 		$db->execute($query, 'CMS');
 		$rows = $db->fetchAll($query);
@@ -59,15 +60,36 @@
 		$dbVersion = (count($rows) >= 1) ? MAX_DB_VERSION : 0;
 	} else
 	{
-		$query = $db->SQL('SELECT `db.Version` FROM `misc_data` LIMIT 1');
-		$rows = $db->fetchAll($query);
+		// check version from looking at table entries
+		$query = $db->SQL('SELECT `db.Version` FROM `misc_data`');
+		$numRows = 0;
+		$newestVersionFound = 0;
+		while ($row = $db->fetchRow($query))
+		{
+			// if more than 1 row has been found, set $numRows to 2
+			if ($numRows !== 2)
+			{
+				$numRows = ($numRows > 1) ? 2 : $numRows+1;
+			}
+			
+			// update newest version if newer version found than in last row
+			if ($row['db.Version'] > $newestVersionFound)
+			{
+				$newestVersionFound = $row['db.Version'];
+			}
+		}
 		$db->free($query);
 		
-		$dbVersion = (count($rows) < 1) ? MAX_DB_VERSION : $rows[0]['db.Version'];
+		$dbVersion = ($numRows < 1) ? MAX_DB_VERSION : $newestVersionFound;
 		
-		if (($dbVersion > 0) && (count($rows) < 1))
+		// if $dbVersion is 0, updateVersion0 will create the table in question instead
+		if (($dbVersion > 0) && ($numRows < 1))
 		{
-			$db->SQL('INSERT INTO `misc_data` (`db.Version`) VALUES (' . MAX_DB_VERSION . ')');
+			$db->SQL('INSERT INTO `misc_data` (`db.Version`) VALUES (' . $dbVersion . ')');
+		} elseif (($dbVersion > 0) && $numRows > 1)
+		{
+			$db->SQL('DELETE FROM `misc_data`');
+			$db->SQL('INSERT INTO `misc_data` (`db.Version`) VALUES (' . $dbVersion . ')');
 		}
 	}
 	
@@ -81,6 +103,7 @@
 	echo ('The used database (' . $config->getValue('dbName')
 		  . ') is up to date (version ' . $dbVersion . ').' . "\n");
 	exit();
+	
 	
 	function status($message='')
 	{
