@@ -107,6 +107,7 @@
 			if (isset($this->groups['VERIFIED']))
 			{
 				$this->applyPermissions($this->groups['VERIFIED']);
+//				echo '<p>Applying permissions of group VERIFIED</p>';
 			}
 			
 			foreach ($this->groups as $group)
@@ -116,7 +117,7 @@
 					// case insensitive comparison of group names
 					if (strcmp($memberOfGroup, $group['name']) === 0)
 					{
-						echo '<p>Applying permissions of group ' . $group['name'] . '</p>';
+//						echo '<p>Applying permissions of group ' . $group['name'] . '</p>';
 						$this->applyPermissions($group);
 						
 						// TODO: consider removing matched entry from array using array_splice
