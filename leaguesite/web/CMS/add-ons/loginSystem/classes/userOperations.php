@@ -8,6 +8,20 @@
 			$this->free($query);
 		}
 		
+		public function addToVisitsLog($id)
+		{
+			// insert login of user to visits log
+			$ip_address = getenv('REMOTE_ADDR');
+			$host = gethostbyaddr($ip_address);
+			$query = ('INSERT INTO `visits` (`playerid`,`ip-address`,`host`,`forwarded_for`,`timestamp`) VALUES'
+					  . ' (?, ?, ?, ?, ?)');
+			$query = $this->prepare($query);
+			$args = array($id, htmlent($ip_address), htmlent($host)
+						  // try to detect original ip-address in case proxies are used
+						  , htmlent(getenv('HTTP_X_FORWARDED_FOR')), date('Y-m-d H:i:s'));
+			$this->execute($query, $args);
+		}
+		
 		
 		public function findIDByExternalLogin($id)
 		{

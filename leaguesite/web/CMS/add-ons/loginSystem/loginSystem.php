@@ -263,6 +263,7 @@
 			{
 				$user->setID($uid);
 				$moduleInstance->givePermissions();
+				$userOperations->addToVisitsLog($uid);
 				$userOperations->updateLastLogin($uid);
 				$userOperations->addToOnlineUserList($moduleInstance->getName(), $uid);
 				
