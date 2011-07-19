@@ -98,7 +98,7 @@ No menu found.
 <span class="user_profile_location">{$member.countryName}</span>
 </td>
 <td>{$member.permissions}</td>
-	<td>{$member.joined}</td>
+<td>{$member.last_login}</td>
 {if isset($member.removeLink)}
 <td><a class="button" href="{$member.removeLink}">{$member.removeDescription}</a></td>
 {elseif isset($showMemberActionOptions) && $showMemberActionOptions}

@@ -269,6 +269,7 @@
 					$prepared['countryFlag'] = '../Flags/' . $row['flagfile'];
 				}
 				$prepared['joined'] = $row['joined'];
+				$prepared['last_login'] = $row['last_login'];
 				
 				// show leave/kick links if permission is given
 				// a team leader can not leave or be kicked
