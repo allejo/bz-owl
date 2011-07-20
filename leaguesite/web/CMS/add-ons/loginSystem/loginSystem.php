@@ -239,6 +239,7 @@
 			
 			// re-activate deleted accounts
 			// stop processing disabled/banned or broken accounts
+			// call logout as bandaid for erroneous login modules
 			$status = $userOperations->getAccountStatus($uid);
 			switch ($status)
 			{
@@ -246,16 +247,19 @@
 				case 'deleted':	$userOperations->activateAccount($uid); break;
 				case 'login disabled' :
 					$this->moduleOutput[] = 'Your account is disabled: No login possible.';
+					$user->logout();
 					return false;
 					break;
 				// TODO: implement site wide ban list
 				case 'banned' :
 					$this->moduleOutput[] = 'You have been banned from this website.';
+					$user->logout();
 					return false;
 					break;
 				default:
 					$this->moduleOutput[] = ('The impossible happened: Account status is'
 											. htmlent($status) . '.');
+					$user->logout();
 					return false;
 			}
 			
