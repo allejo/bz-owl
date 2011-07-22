@@ -18,7 +18,7 @@
 			$this->pageOperations = new pageOperations();
 			
 			
-			// FIXME: check for permission only in final version!!
+			// check for permission and abort if user has none
 			$this->hasPermission = $this->pageOperations->hasPermission();
 			if (!$this->hasPermission)
 			{
@@ -180,7 +180,7 @@
 		{
 			global $tmpl;
 			
-			if (isset($this->hasPermission))
+			if ($this->hasPermission)
 			{
 				$tmpl->display('pageSystem');
 			}

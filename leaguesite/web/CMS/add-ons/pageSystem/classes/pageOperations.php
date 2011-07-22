@@ -204,7 +204,7 @@
 			global $config;
 			
 			
-			if (!$config->getValue('debugSQL') && !$user->getPermission('allow_admin_pageSystem'))
+			if (!$user->getPermission('allow_admin_pageSystem'))
 			{
 				return false;
 			}
