@@ -4,7 +4,8 @@
 		public function activateAccount($id)
 		{
 			$query = $this->prepare('UPDATE `players` SET `status`=:status WHERE `id`=:id');
-			$this->execute($query, array(':status' => array('active', PDO::PARAM_STR, 6)));
+			$this->execute($query, array(':status' => array('active', PDO::PARAM_STR, 6),
+										 ':id' => array($id, PDO::PARAM_INT)));
 			$this->free($query);
 		}
 		
