@@ -1,7 +1,7 @@
 <?php
 	class pageOperations extends database
 	{
-		public function changeRequested($id, $requestPath, $title, $addon)
+		public function pageChangeRequested($id, $requestPath, $title, $addon)
 		{
 			$this->lockTable('CMS');
 			
@@ -46,11 +46,7 @@
 			}
 			
 			// check if request path is unique
-			$query = $this->prepare('SELECT `id` FROM `CMS` WHERE `id`<>? AND `requestPath`=? LIMIT 1');
-			$this->execute($query, array($id, $requestPath));
-			$row = $this->fetchRow($query);
-			$this->free($query);
-			if ($row)
+			if ($this->requestPathUnique($requestPath, $id) === false)
 			{
 				$this->unlockTables();
 				return 'Request path already in use, request path must be unique in db';
@@ -62,6 +58,42 @@
 			
 			$this->unlockTables();
 			return 'Changes written successfully.';
+		}
+		
+		
+		public function pageAddRequested($requestPath, $title, $addon)
+		{
+			$this->lockTable('CMS');
+			
+			// do not allow to add any entry of pageSystem
+			if (strcmp($addon, 'pageSystem') === 0)
+			{
+				$this->unlockTables();
+				return ('Removing pageSystem from any URL is not supported by this add-on. '
+						.'Reason: It could really confuse people and cause plenty of trouble. '
+						.'If you really want to do this, you must edit database directly instead.');
+			}
+			
+			// remove illegal characters from request path
+			if (strlen($requestPath) > strlen($this->cleanRequestPath($requestPath)))
+			{
+				$this->unlockTables();
+				return 'Invalid characters in request path detected. Please check your input.';
+			}
+			
+			// check if request path is unique
+			if ($this->requestPathUnique($requestPath) === false)
+			{
+				$this->unlockTables();
+				return 'Request path already in use, request path must be unique in db';
+			}
+			
+			// write the changes
+			$query = $this->prepare('INSERT INTO `CMS` (`requestPath`,`title`,`addon`) VALUES (?,?,?)');
+			$this->execute($query, array($requestPath, $title, $addon));
+			
+			$this->unlockTables();
+			return 'Page added successfully.';
 		}
 		
 		
@@ -205,6 +237,22 @@
 			
 			
 			if (!$user->getPermission('allow_admin_pageSystem'))
+			{
+				return false;
+			}
+			
+			return true;
+		}
+		
+		
+		private function requestPathUnique($path, $id=0)
+		{
+			// check if request path is unique
+			$query = $this->prepare('SELECT `id` FROM `CMS` WHERE `id`<>? AND `requestPath`=? LIMIT 1');
+			$this->execute($query, array($id, $path));
+			$row = $this->fetchRow($query);
+			$this->free($query);
+			if ($row)
 			{
 				return false;
 			}

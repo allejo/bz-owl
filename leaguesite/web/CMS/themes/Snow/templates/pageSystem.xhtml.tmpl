@@ -61,6 +61,30 @@ No menu found.
 </form>
 {/if}
 
+{if isset($showPageAdd)}
+<p>You may add a new page here:</p>
+<form enctype="application/x-www-form-urlencoded" method="post" action="./">
+<p>Request Path</p>
+<p><input type="text" name="requestPath" value="request/path/here/" /></p>
+<p>Title</p>
+<p><input type="text" name="title" value="page title here" /></p>
+<p>Add-on</p>
+{if !isset($showPageAdd)}
+<p><input type="text" name="addon" value="add-on here" /></p>
+{else}
+<p><select name="addon">
+{foreach item=value from=$showPageAdd}
+	<option value="{$value}">{$value}</option>
+{/foreach}
+</select></p>
+{/if}
+<div><input type="hidden" name="action" value="add" /></div>
+<div><input type="hidden" name="key_name" value="{$keyName}" /></div>
+<div><input type="hidden" name="{$keyName}" value="{$keyValue}" /></div>
+<p><input type="submit" name="submit" value="Add page" /></p>
+</form>
+{/if}
+
 {if isset($pageChange)}
 
 {if isset($pageData)}

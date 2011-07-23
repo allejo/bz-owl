@@ -34,12 +34,17 @@
 			if (!isset($_POST['action']) || count($_POST) < 1 || isset($_POST['cancel']))
 			{
 				$this->showOverview();
+				$this->showAddPage();
 				die();
 			}
 			
 			// call the event handlers to process the requested task
 			switch($_POST['action'])
 			{
+				case 'add':
+					$this->handleAddPageRequest();
+					break;
+				
 				case 'change':
 					$this->handleChangePageRequest();
 					break;
@@ -61,6 +66,63 @@
 			$tmpl->assign('pageList', $pages);
 		}
 		
+		
+		private function showAddPage()
+		{
+			global $tmpl;
+			
+			
+			$this->generateKey();
+			$tmpl->assign('showPageAdd', $this->pageOperations->getAddonList());
+		}
+		
+		
+		private function handleAddPageRequest()
+		{
+			global $tmpl;
+			
+			
+			// check validity of data if write change requested
+			if (isset($_POST['requestPath'])
+				&& isset($_POST['title'])
+				&& isset($_POST['addon']))
+			{
+				// initialise guards
+				$keyName = '';
+				$keyValue = '';
+				
+				if (isset($_POST['key_name']))
+				{
+					$keyName = $_POST['key_name'];
+				}
+				
+				if (isset($_POST[$keyName]))
+				{
+					$keyValue = $_POST[$keyName];
+				}
+				
+				if (strlen($keyName) > 0
+					&& strlen($keyValue) > 0
+					&& $this->validateKey($keyName, $keyValue))
+				{
+					// pass this to the pageOperations class which will do db sanity checks and apply changes
+					// it needs id, request path, title and add-on to be used
+					$changeOutcome = ($this->pageOperations->pageAddRequested($_POST['requestPath'],
+																			  $_POST['title'],
+																			  $_POST['addon']));
+					if ($changeOutcome !== true && $changeOutcome !== false && strlen($changeOutcome) > 0)
+					{
+						$tmpl->assign('operationMessage', $changeOutcome);
+					}
+				} else
+				{
+					echo('error: request illegal: Could not confirm key data');
+				}
+			}
+			$this->showOverview();
+			$this->showAddPage();
+			die();
+		}
 		
 		private function handleChangePageRequest()
 		{
@@ -104,7 +166,7 @@
 				{
 					// pass this to the pageOperations class which will do db sanity checks and apply changes
 					// it needs id, request path, title and add-on to be used
-					$changeOutcome = ($this->pageOperations->changeRequested($_POST['change'],
+					$changeOutcome = ($this->pageOperations->pageChangeRequested($_POST['change'],
 																			 $_POST['requestPath'],
 																			 $_POST['title'],
 																			 $_POST['addon']));
@@ -117,8 +179,8 @@
 					echo('error: request illegal: Could not confirm key data');
 				}
 				$this->showOverview();
+				$this->showAddPage();
 				die();
-				
 			}
 			
 			// write request logic finished
