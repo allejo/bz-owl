@@ -176,8 +176,10 @@
 			$this->SQL('SET AUTOCOMMIT = 1');
 			
 			// create empty profile connected to new user id
-			$query = $this->prepare('INSERT INTO `players_profile` (`playerid`) VALUES (?)');
-			$this->execute($query, $uid);
+			$query = $this->prepare('INSERT INTO `players_profile` (`playerid`, `joined`) VALUES (?,?)');
+			$date = new DateTime('now', new DateTimeZone('UTC'));
+			$curDate = $date->format('Y-m-d H:i:s');
+			$this->execute($query, array($uid, $curDate));
 			
 			return $uid;
 		}
