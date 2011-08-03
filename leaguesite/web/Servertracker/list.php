@@ -263,17 +263,17 @@ function formatbzfquery_last($server, $connection)
 			echo '</td>' . "\n";
             // Mehl
             marke('td','mehl');
-            if (! strcmp($data['player'][$key]['email'], '') == 0)
+            if (! strcmp($data['player'][$key]['motto'], '') == 0)
             {
-				$email = $data['player'][$key]['email'];
-				// Email ziemlich lang
-				if (strlen($email) > 17)
+				$motto = $data['player'][$key]['motto'];
+				// motto ziemlich lang
+				if (strlen($motto) > 17)
 				{
-					$email = (str_split($email,14));
-					$email = htmlent($email[0])  . '...';
+					$motto = (str_split($motto,14));
+					$motto = htmlent($motto[0])  . '...';
 				}
 				echo '('
-                  . htmlent($email)
+                  . htmlent($motto)
                   . ')';
             }
             echo '</td>' . "\n";
