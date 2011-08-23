@@ -18,16 +18,16 @@
 			{
 				$theme = $_GET['theme'];
 				
-				// clean theme name
-				if (!preg_match('/^[0-9A-Za-z]+$/', $theme))
+				// clean theme name: numbers, a-Z and space are allowed
+				if (!preg_match('/^[0-9A-Za-z ]+$/', $theme))
 				{
 					$theme = '';
 				}
 				
 				// check if theme stylesheet file does exist
 				if (!file_exists(dirname(dirname(dirname(dirname(__FILE__)))) .'/themes/'
-								 . str_replace(' ', '%20', htmlspecialchars($theme) . '/')
-								 . str_replace(' ', '%20', htmlspecialchars($theme) . '.css')))
+								 . htmlspecialchars($theme) . '/'
+								 . htmlspecialchars($theme) . '.css'))
 				{
 					$theme = '';
 				}
