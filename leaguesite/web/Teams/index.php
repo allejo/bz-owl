@@ -798,7 +798,7 @@
 		mysql_free_result($result);
 		
 		// FIXME: collects way too much info?
-		$query = 'SELECT `teams`.`id`,  `teams`.`name`, `teams_overview`.`any_teamless_player_can_join` FROM `teams`, `teams_overview`';
+		$query = 'SELECT `teams`.`id`,  `teams`.`name`, `teams_overview`.`any_teamless_player_can_join`, `teams_overview`.`deleted` FROM `teams`, `teams_overview`';
 		$query .= ' WHERE `teams`.`id`=' . "'" . sqlSafeString($join_team_id) . "'";
 		$query .= ' AND `teams`.`id`=`teams_overview`.`teamid`';
 		if (!($result = @$site->execute_query('teams', $query, $connection)))
@@ -816,6 +816,7 @@
 			while($row = mysql_fetch_array($result))
 			{
 				$allowed_to_join = (int) $row['any_teamless_player_can_join'];
+				$team_active = ((int) $row['deleted']) != 2;
 				$team_name = $row['name'];
 			}
 			mysql_free_result($result);
@@ -843,6 +844,13 @@
 					echo '<p>You have no permission to join that team</p>';
 					$site->dieAndEndPage('');
 				}
+			}
+			
+			// team was deleted
+			if (!$team_active)
+			{
+				echo '<p>You can not join a deleted team team</p>';
+				$site->dieAndEndPage('');
 			}
 		} else
 		{
