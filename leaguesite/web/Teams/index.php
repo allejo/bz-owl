@@ -816,7 +816,7 @@
 			while($row = mysql_fetch_array($result))
 			{
 				$allowed_to_join = (int) $row['any_teamless_player_can_join'];
-				$team_active = ((int) $row['deleted']) != 2;
+				$team_deleted = ((int) $row['deleted']) === 2;
 				$team_name = $row['name'];
 			}
 			mysql_free_result($result);
@@ -847,7 +847,7 @@
 			}
 			
 			// team was deleted
-			if (!$team_active)
+			if ($team_deleted)
 			{
 				echo '<p>You can not join a deleted team team</p>';
 				$site->dieAndEndPage('');
