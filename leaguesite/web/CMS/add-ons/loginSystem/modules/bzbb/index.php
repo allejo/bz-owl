@@ -192,7 +192,7 @@
 				{
 					$output = ('Unfortunately there seems to be a database problem'
 							   . ' which prevents the system from setting your external playerid (id='
-							   . htmlent($user_id)
+							   . htmlent($userid)
 							   . '). Please report this to an admin.');
 					return false;
 				}
@@ -205,7 +205,7 @@
 			{
 				$output = ('Unfortunately the bzidtools2.php script failed'
 						   . ' which prevents the system from setting your external playerid (id='
-						   . htmlent($user_id)
+						   . htmlent($userid)
 						   . '). The bzidtool2.php call was '
 						   . htmlent($url)
 						   . '. Please report this to an admin.');
