@@ -226,12 +226,12 @@
 				}
 				
 				
-				if (isset($_POST['subject']) && (strlen($_POST['subject']) > 0))
+				if (isset($_POST['subject']) && (strlen(strval($_POST['subject'])) > 0))
 				{
 					$this->PMComposer->setSubject(strval($_POST['subject']));
 				}
 				
-				if (isset($_POST['content']) && (strlen($_POST['content']) > 0))
+				if (isset($_POST['content']) && (strlen(strval($_POST['content'])) > 0))
 				{
 					$this->PMComposer->setContent(strval($_POST['content']));
 				}
