@@ -49,6 +49,7 @@
 			return $row ? $row['name'] : false;
 		}
 		
+		
 		function getSubject()
 		{
 			return $this->subject;
@@ -56,7 +57,23 @@
 		
 		function setSubject($subject)
 		{
-			$this->subject = $subject;
+			// remove whitespace from beginning and end of subject
+			$cleanedSubject = trim(strval($subject));
+			
+			// no empty subjects accepted
+			if (strlen($cleanedSubject) > 0)
+			{
+				$this->subject = $cleanedSubject;
+			}
+			
+			// return problem definition if there were any
+			if (strlen($this->subject) !== strlen($subject))
+			{
+				return 'whitespace';
+			}
+			
+			// otherwise return true (complete success)
+			return true;
 		}
 		
 		

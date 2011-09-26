@@ -228,7 +228,7 @@
 				
 				if (isset($_POST['subject']) && (strlen(strval($_POST['subject'])) > 0))
 				{
-					$this->PMComposer->setSubject(strval($_POST['subject']));
+					$this->PMComposer->setSubject($_POST['subject']);
 				}
 				
 				if (isset($_POST['content']) && (strlen(strval($_POST['content'])) > 0))
