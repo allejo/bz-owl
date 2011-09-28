@@ -108,11 +108,15 @@
 			
 			$menu[] = $this->writeLink('News/', 'News', (strcmp($name, 'News') == 0));
 			
-			$menu[] = $this->writeLink('Matches/', 'Matches', (strcmp($name, 'Matches') == 0));
 			
-			$menu[] = $this->writeLink('Teams/', 'Teams', (strcmp($name, 'Teams') == 0));
+			$menu[] = '<li><img src="' . $config->getValue('baseaddress') . 'themes/Simple%20orange/img/matches.png" /></li>';
+			$menu[] = '<li><img src="' . $config->getValue('baseaddress') . 'themes/Simple%20orange/img/teams.png" /></li>';
+			$menu[] = '<li><img src="' . $config->getValue('baseaddress') . 'themes/Simple%20orange/img/players.png" /></li>';
+			$menu[] = '<li><img src="' . $config->getValue('baseaddress') . 'themes/Simple%20orange/img/settings.png" /></li>';
+//			$menu[] = $this->writeLink('Matches/', 'Matches', (strcmp($name, 'Matches') == 0));			
+//			$menu[] = $this->writeLink('Teams/', 'Teams', (strcmp($name, 'Teams') == 0));
 			
-			$menu[] = $this->writeLink('Players/', 'Players', (strcmp($name, 'Players') == 0));
+//			$menu[] = $this->writeLink('Players/', 'Players', (strcmp($name, 'Players') == 0));
 			
 			if ($logged_in && ($user->getPermission('allow_view_user_visits')))
 			{
@@ -134,7 +138,7 @@
 				$menu[] = $this->writeLink('Servertracker/', 'Servers', (strcmp($name, 'Servertracker') == 0));
 			}
 			
-			$menu[] = $this->writeLink('Config/', 'Config', (strcmp($name, 'Config') == 0));
+//			$menu[] = $this->writeLink('Config/', 'Config', (strcmp($name, 'Config') == 0));
 			
 			$menu[] = '</ul></div>';
 			

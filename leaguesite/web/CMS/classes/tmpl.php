@@ -130,7 +130,7 @@
 			}
 			
 			// clean theme name
-			if (!preg_match('/^[0-9A-Za-z]+$/', $theme))
+			if (!preg_match('/^[0-9A-Za-z ]+$/', $theme))
 			{
 				$theme = '';
 			}
