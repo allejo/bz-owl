@@ -21,25 +21,27 @@
 	 * Vertical bar chart demonstration
 	 *
 	 */
-
+	
 	if (!isset($site))
 	{
 		die('this file is not meant to be called directly');
 	}
-
-	include "../CMS/libchart-1.2.1/libchart/classes/libchart.php";
-
+	
+	echo 'yearBar' . "\n";
+	require_once('libchart/libchart/classes/libchart.php');
+	
 	// get stats from database
 	$query = 'SELECT `timestamp` FROM `matches` ORDER BY `timestamp`';
-	if (!$result = $site->execute_query('matches', $query, $connection))
+	if (!$result = $db->SQL($query))
 	{
 		die('Could not grab history of all matches ever played.');
 	}
-
+	
 	// interpret results
+	$oldestYear = '';
 	$oldTimestamp = '';
 	$matches = array();
-	while ($row = mysql_fetch_array($result))
+	while ($row = $db->fetchRow($result))
 	{
 		// raw database result
 		// e.g. 2005-01-23 22:42:20  
@@ -48,6 +50,12 @@
 		// assume year has always 4 digits
 		// e.g. 2005
 		$curTimestamp = substr($curTimestamp, 0, 4);
+		
+		// $curTimestamp is oldest year, if $oldestYear is not set
+		if (strlen($oldestYear) === 0)
+		{
+			$oldestYear = $curTimestamp;
+		}
 		
 		if (!isset($matches[$curTimestamp]['year']))
 		{
@@ -68,9 +76,9 @@
 		$oldTimestamp = $curTimestamp;
 	}
 	
-	$chart = new PieChart(450,250);
+	$chart = new VerticalBarChart(450,250);
 	$dataSet = new XYDataSet();
-	$chart->getPlot()->setGraphPadding(new Padding(0, 15, 15, 50));	
+/* 	$chart->getPlot()->setGraphPadding(new Padding(0, 15, 25, 50));	 */
 	// add a data point for each month
 	foreach ($matches AS $matchesPerYear)
 	{
@@ -78,6 +86,8 @@
 	}
 
 	$chart->setDataSet($dataSet);
-	$chart->setTitle("Official GU Matches [ 2005 - 2010 ]");
-	$chart->render("img/demo2.png");
+	$chart->setTitle('Official GU Matches [ ' . $oldestYear . ' - ' . date('Y') . ' ]');
+	
+	// FIXME: Where should the graph be saved?
+	$chart->render(dirname(__FILE__) . '/img/yearBar.png');
 ?>

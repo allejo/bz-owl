@@ -1,27 +1,32 @@
 <?php
 	if (!isset($site))
 	{
-		die('this file is not meant to be called directly');
+		// init common classes
+		require(dirname(dirname(dirname(__FILE__))) . '/site.php');
+		$site = new site();
+/* 		die('this file is not meant to be called directly'); */
 	}
 	
-	set_include_path( "../CMS/ezcomponents-2009.2.1/" . PATH_SEPARATOR .  get_include_path());
+	set_include_path( 'ezcomponents/' . PATH_SEPARATOR .  get_include_path());
 	
-	require_once "../CMS/ezcomponents-2009.2.1/Base/src/base.php";
+	require_once 'ezcomponents/Base/src/base.php';
 	function __autoload( $className )
 	{
         	ezcBase::autoload( $className );
 	}
 
+/*
 	if (!isset($site))
 	{
 		die('this file is not meant to be called directly');
 	}
+*/
 
 //	include "../CMS/libchart-1.2.1/libchart/classes/libchart.php";
 
 	// get stats from database
 	$query = 'SELECT `timestamp` FROM `matches` ORDER BY `timestamp`';
-	if (!$result = $site->execute_query('matches', $query, $connection))
+	if (!$result = $db->SQL($query))
 	{
 		die('Could not grab history of all matches ever played.');
 	}
@@ -29,7 +34,7 @@
 	// interpret results
 	$oldTimestamp = '';
 	$matches = array();
-	while ($row = mysql_fetch_array($result))
+	while ($row = $db->fetchRow($result))
 	{
 		// raw database result
 		// e.g. 2005-01-23 22:42:20  

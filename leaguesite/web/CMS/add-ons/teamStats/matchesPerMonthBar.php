@@ -27,19 +27,21 @@
 		die('this file is not meant to be called directly');
 	}
 
-	include "../CMS/libchart-1.2.1/libchart/classes/libchart.php";
+	echo 'matchesPerMonthBar' . "\n";
+	require_once('libchart/libchart/classes/libchart.php');
 
 	// get stats from database
 	$query = 'SELECT `timestamp` FROM `matches` ORDER BY `timestamp`';
-	if (!$result = $site->execute_query('matches', $query, $connection))
+	if (!$result = $db->SQL($query))
 	{
 		die('Could not grab history of all matches ever played.');
 	}
 
 	// interpret results
+	$oldestDate = '';
 	$oldTimestamp = '';
 	$matches = array();
-	while ($row = mysql_fetch_array($result))
+	while ($row = $db->fetchRow($result))
 	{
 		// raw database result
 		// e.g. 2005-01-23 22:42:20  
@@ -49,6 +51,14 @@
 		// e.g. 2005-01
 		$curTimestamp = substr($curTimestamp, 0, 7);
 		
+		// $curTimestamp is oldest month and year, if $oldestDate is not set
+		if (strlen($oldestDate) === 0)
+		{
+			// e.g. 01
+			$oldestDate = substr($curTimestamp, 5);
+			// e.g. 01/2005
+			$oldestDate .= '/' . substr($curTimestamp, 0, 4);
+		}
 		
 		if (strcmp($curTimestamp, $oldTimestamp) === 0)		
 		{
@@ -92,6 +102,13 @@
 	}
 	
 	$chart->setDataSet($dataSet);
-	$chart->setTitle("Official GU Matches [ 01/2005 - $curTimestamp ]");
-	$chart->render("img/demo1.png");
+	
+	// compute oldest month in a nice formatting for chart
+	$oldestMonth = substr($curTimestamp, 5);
+	$oldestMonth .=  '/' . substr($curTimestamp, 0, 4);
+	
+	$chart->setTitle('Official GU Matches [ ' . $oldestDate . ' - ' . $oldestMonth . ' ]');
+	
+	// FIXME: Where should the graph be saved?
+	$chart->render(dirname(__FILE__) . '/img/matchesPerMonthBar.png');
 ?>
