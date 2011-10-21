@@ -21,21 +21,21 @@
 	 * Vertical bar chart demonstration
 	 *
 	 */
-
+	
 	if (!isset($site))
 	{
 		die('this file is not meant to be called directly');
 	}
 	
 	include dirname(dirname(dirname(__FILE))) . '/libchart-1.2.1/libchart/classes/libchart.php';
-
+	
 	// get stats from database
 	$query = 'SELECT `timestamp` FROM `matches` ORDER BY `timestamp`';
 	if (!$result = $site->execute_query('matches', $query, $connection))
 	{
 		die('Could not grab history of all matches ever played.');
 	}
-
+	
 	// interpret results
 	$oldTimestamp = '';
 	$matches = array();
