@@ -141,40 +141,6 @@
 			}
 		}
 		
-		static public function updateUserName($bzid, &$callsign)
-		{
-			// checks bzid with BZFlag's bzidtools2 API and returns the new callsign
-			
-			$ch = curl_init();
-			
-			// set URL and other appropriate options
-			curl_setopt($ch, CURLOPT_URL, 'http://my.bzflag.org/bzidtools2.php?action=name&value=' . strval($bzid));
-			curl_setopt($ch, CURLOPT_HEADER, 0);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-			
-			// grab URL and pass it to the browser
-			$output = curl_exec($ch);
-			
-			// close cURL resource, and free up system resources
-			curl_close($ch);
-			
-			// update the entry with the result from the bzidtools2.php script
-			if ((strlen($output) > 10) && (strcmp(substr($output, 0, 9), 'SUCCESS: ') === 0))
-			{
-				// API call was successful
-				$callsign = substr($output, 9);
-			} else
-			{
-				// API call was not successful
-				
-				// set callsign to the error message provided by interface
-				$callsign = $output;
-				// abort function because of service failure
-				return false;
-			}
-			
-			return true;
-		}
 		
 		static public function convertAccount($userid, $loginname, &$output)
 		{
@@ -251,6 +217,42 @@
 			}
 			
 			// converting account to use bzbb login was successful :)
+			return true;
+		}
+		
+		
+		static public function updateUserName($bzid, &$callsign)
+		{
+			// checks bzid with BZFlag's bzidtools2 API and returns the new callsign
+			
+			$ch = curl_init();
+			
+			// set URL and other appropriate options
+			curl_setopt($ch, CURLOPT_URL, 'http://my.bzflag.org/bzidtools2.php?action=name&value=' . strval($bzid));
+			curl_setopt($ch, CURLOPT_HEADER, 0);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			
+			// grab URL and pass it to the browser
+			$output = curl_exec($ch);
+			
+			// close cURL resource, and free up system resources
+			curl_close($ch);
+			
+			// update the entry with the result from the bzidtools2.php script
+			if ((strlen($output) > 10) && (strcmp(substr($output, 0, 9), 'SUCCESS: ') === 0))
+			{
+				// API call was successful
+				$callsign = substr($output, 9);
+			} else
+			{
+				// API call was not successful
+				
+				// set callsign to the error message provided by interface
+				$callsign = $output;
+				// abort function because of service failure
+				return false;
+			}
+			
 			return true;
 		}
 	}

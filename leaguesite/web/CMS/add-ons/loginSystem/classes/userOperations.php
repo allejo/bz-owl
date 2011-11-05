@@ -46,17 +46,19 @@
 		
 		public function findIDByName($name)
 		{
-			// internal id is an integer of length 11 by definition
-			$internalID = 0;
+			// internal id is an array of integers of length 11 by database definition
+			$internalID = array('id' => intval(0),
+								'external_id' => strval('0'));
 			
-			$query = $this->prepare('SELECT `id` FROM `players` WHERE `name`=:name LIMIT 1');
+			$query = $this->prepare('SELECT `id`, `external_id` FROM `players` WHERE `name`=:name LIMIT 1');
 			// the id can be of any data type and of any length
 			// just assume it's a 50 characters long string
 			$this->execute($query, array(':name' => array($name, PDO::PARAM_STR, 50)));
 			
 			if ($row = $this->fetchRow($query))
 			{
-				$internalID = intval($row['id']);
+				$internalID = array('id' => intval($row['id']),
+									'external_id' => strval($row['external_id']));
 			}
 			$this->free($query);
 			
@@ -70,7 +72,7 @@
 			$this->execute($query, array(':uid' => array($id, PDO::PARAM_INT)));
 			
 			// init status to "login disabled" to block login on error
-			$status = 'login disableds';
+			$status = 'login disabled';
 			
 			if ($row = $this->fetchRow($query))
 			{

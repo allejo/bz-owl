@@ -183,6 +183,23 @@
 				// try to recover uid by username based db lookup
 				$uid = $userOperations->findIDByName($moduleInstance->getName());
 				
+				// check uid for match against imported accounts with no external id set
+
+				// check external login id for match with external login module id
+				// $moduleInstance->getID() must have a valid value if login got approved
+				// by the external login module used
+				if ($externalLogin)
+				{
+					if ($uid['external_id'] !== $moduleInstance->getID())
+					{
+						$uid = 0;
+					} else
+					{
+						$uid = $uid['id'];
+					}
+				}
+				
+				
 				// init newUser to false (do not send welcome message by default)
 				$newUser = false;
 				
