@@ -285,6 +285,8 @@
 			
 			if ($uid > 0)
 			{
+				// update username first because online user list uses the name directly instead of an id
+				$userOperations->updateUserName($uid, $moduleInstance->getID(), $moduleInstance->getName());
 				$user->setID($uid);
 				$moduleInstance->givePermissions();
 				$userOperations->addToVisitsLog($uid);
