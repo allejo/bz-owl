@@ -47,18 +47,19 @@
 		public function findIDByName($name)
 		{
 			// internal id is an array of integers of length 11 by database definition
-			$internalID = array('id' => intval(0),
-								'external_id' => strval('0'));
+			$internalID = array();
 			
-			$query = $this->prepare('SELECT `id`, `external_id` FROM `players` WHERE `name`=:name LIMIT 1');
+			// search for name in player database, there can be several matches
+			$query = $this->prepare('SELECT `id`, `external_id` FROM `players` WHERE `name`=:name');
+			
 			// the id can be of any data type and of any length
 			// just assume it's a 50 characters long string
 			$this->execute($query, array(':name' => array($name, PDO::PARAM_STR, 50)));
 			
-			if ($row = $this->fetchRow($query))
+			while ($row = $this->fetchRow($query))
 			{
-				$internalID = array('id' => intval($row['id']),
-									'external_id' => strval($row['external_id']));
+				$internalID[] = array('id' => intval($row['id']),
+									  'external_id' => strval($row['external_id']));
 			}
 			$this->free($query);
 			
@@ -211,6 +212,40 @@
 			
 			// send it
 			$pmComposer->send();
+		}
+		
+		
+		public function updateUserName($internalID, $externalID=0, $name='')
+		{
+			// update usernames based on data frome external logins
+			
+			// usernames based on internal login can not be updated
+			if ($externalID === 0)
+			{
+				return;
+			}
+			
+			// copy name so we have original name if an error occurs
+			$newName = $name;
+			
+			// currently only bzbb module allowed as external login
+			// so hardwire it until we have a database field for
+			// external login module used
+			$result = bzbb::updateUserName($externalID, $newName);
+			
+			$query = $this->prepare('UPDATE `players` SET `name`=:name WHERE `id`=:id LIMIT 1');
+			$this->execute($query, array(':name' => array($newName, PDO::PARAM_STR, 50),
+										 ':id' => array($internalID, PDO::PARAM_INT)));
+			$this->free($query);
+			
+			
+			// report error if module failed doing its job
+			if ($result === false)
+			{
+				$this->logError('login/classes/userOperations.php: updateUserName:'
+								. ' bzbb::updateUserName(' . $externalID . ', ' . $name . ')'
+								. ' returned false (unknown error).');
+			}
 		}
 	}
 ?>

@@ -13,8 +13,8 @@
 			if ($user->getID() > 0)
 			{
 				$this->moduleOutput[] = ('You are already logged in. '
-									  . 'If you want to login with a different account '
-									  . 'you must first logout.');
+										 . 'If you want to login with a different account '
+										 . 'you must first logout.');
 				return;
 			}
 			
@@ -122,14 +122,14 @@
 				{
 					include_once(dirname(__FILE__) . '/modules/' . $module . '/index.php');
 					$class = new $module();
-
+					
 					if ($firstLoginModuleText === false)
 					{
 						$this->moduleOutput[] = '<p><strong>or</strong></p>';
 					}
 					
 					$this->moduleOutput[] = $class->showLoginText();
-
+					
 					$firstLoginModuleText = false;
 				}
 			}
@@ -144,7 +144,7 @@
 			return (isset($moduleName)
 					&& preg_match('/^[0-9A-Za-z]+$/', $moduleName)
 					&& file_exists(dirname(__FILE__) . '/modules/' . $moduleName))
-					? $moduleName : false;
+			? $moduleName : false;
 		}
 		
 		
@@ -180,22 +180,28 @@
 			// or user already registered using local login
 			if ($uid === 0)
 			{
-				// try to recover uid by username based db lookup
-				$uid = $userOperations->findIDByName($moduleInstance->getName());
-				
-				// check uid for match against imported accounts with no external id set
-
-				// check external login id for match with external login module id
-				// $moduleInstance->getID() must have a valid value if login got approved
-				// by the external login module used
 				if ($externalLogin)
 				{
-					if ($uid['external_id'] !== $moduleInstance->getID())
+					// try to recover uid by username based db lookup
+					$uid_list = $userOperations->findIDByName($moduleInstance->getName());
+					
+					// iterate through the list, trying to update old callsigns
+					// and hoping to find the proper user account for this login attempt
+					foreach ($uid_list as $one_uid)
 					{
-						$uid = 0;
-					} else
-					{
-						$uid = $uid['id'];
+						// check external login id for match with external login module id
+						// $moduleInstance->getID() must have a valid value if login got approved
+						// by the external login module used
+						if ($one_uid['external_id'] !== $moduleInstance->getID())
+						{
+							// try to resolve the conflict by updating a username that might be forgotten
+							$userOperations->updateUserName($one_uid['id'], $one_uid['external_id'],
+															$moduleInstance->getName());
+						} else
+						{
+							$uid = $one_uid['id'];
+							break;
+						}
 					}
 				}
 				
@@ -213,9 +219,6 @@
 					if ($config->getValue('login.welcome.summary'))
 					{
 						$this->moduleOutput[] = strval($config->getValue('login.welcome.summary'));
-						echo 'debug:' . $config->getValue('login.welcome.summary');
-						echo ' ; ';
-						print_r($this->moduleOutput);
 					} else
 					{
 						$this->moduleOutput[] = 'Welcome and thanks for registering on this website.';
@@ -267,7 +270,7 @@
 					$user->logout();
 					return false;
 					break;
-				// TODO: implement site wide ban list
+					// TODO: implement site wide ban list
 				case 'banned' :
 					$this->moduleOutput[] = 'You have been banned from this website.';
 					$user->logout();
@@ -275,7 +278,7 @@
 					break;
 				default:
 					$this->moduleOutput[] = ('The impossible happened: Account status is'
-											. htmlent($status) . '.');
+											 . htmlent($status) . '.');
 					$user->logout();
 					return false;
 			}
@@ -298,4 +301,4 @@
 			return false;
 		}
 	}
-?>
+	?>
