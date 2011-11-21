@@ -48,10 +48,10 @@
 		
 //		formatbzfquery("longdon.guleague.org:5158", $connection);
 //      
-		formatbzfquery("destroyer.guleague.org:5157", $connection);
-		
-        formatbzfquery("destroyer.guleague.org:5158", $connection);
-		
+//		formatbzfquery("destroyer.guleague.org:5157", $connection);
+//		
+//		formatbzfquery("destroyer.guleague.org:5158", $connection);
+//		
 		formatbzfquery("dub.guleague.org:59997", $connection);
 		
 //		formatbzfquery("trb.guleague.org:5158", $connection);
@@ -66,7 +66,7 @@
 		
 		formatbzfquery("quol.guleague.org:5158", $connection);
 		
-		formatbzfquery_last("bzflag.enuffsaid.co.nz:5158", $connection);
+		formatbzfquery_last("bzflag.enuffsaid.co.nz:5151", $connection);
 	}
 ?>
 

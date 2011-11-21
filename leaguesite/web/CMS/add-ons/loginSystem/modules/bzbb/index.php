@@ -211,7 +211,7 @@
 						   . htmlent($url)
 						   . '. Please report this to an admin.');
 				// log the problem
-				$db->logError($db->quote($output));
+				$db->logError($output);
 				
 				return false;
 			}
