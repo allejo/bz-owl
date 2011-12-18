@@ -174,7 +174,18 @@
 					
 					if (strcmp($_GET['reply'], 'all') === 0)
 					{
-						// prepare recipients queries
+						// add original author to recipients
+						$origAuthorQuery = $db->prepare('SELECT `name` FROM `players`'
+											  . ' WHERE `id`=(SELECT `author_id` FROM `pmsystem_msg_storage`'
+											  . ' WHERE `id`=? LIMIT 1) LIMIT 1');
+						$db->execute($origAuthorQuery, intval($_GET['id']));
+						while ($row = $db->fetchRow($origAuthorQuery))
+						{
+							$this->PMComposer->addUserName($row['name']);
+						}
+						$db->free($origAuthorQuery);
+						
+						// prepare further recipients queries
 						$usersQuery = $db->prepare('SELECT `name`'
 												   . ' FROM `pmsystem_msg_recipients_users` LEFT JOIN `players`'
 												   . ' ON `pmsystem_msg_recipients_users`.`userid`=`players`.`id`'
