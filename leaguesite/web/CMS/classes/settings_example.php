@@ -43,57 +43,63 @@
 						 'login.modules.bzbb.disableCheckIP' => false,
 						 // accepted bzbb login groups
 						 'login.modules.bzbb.groups' => array('VERIFIED' => array('name' => 'VERIFIED',
-																		  'permissions' => array('allow_add_messages' => true,
-																								 'allow_delete_messages' => true,
-																								 'allow_watch_servertracker' => true)),
-													  'GU-LEAGUE.REFEREES' => array('name' => 'GU-LEAGUE.REFEREES',
-																					'permissions' => array('allow_add_messages' => true,
-																										   'allow_delete_messages' => true,
-																										   'allow_watch_servertracker' => true,
-																										   'allow_add_match' => true,
-																										   'allow_edit_match' => true)),
-													  'GU-LEAGUE.ADMINS' => array('name' => 'GU-LEAGUE.ADMINS',
 																				  'permissions' => array('allow_add_messages' => true,
 																										 'allow_delete_messages' => true,
-																										 'allow_watch_servertracker' => true,
-																										 'allow_add_match' => true,
-																										 'allow_edit_match' => true,
-																										 // permissions for news page
-																										 'allow_add_news' => true,
-																										 'allow_edit_news' => true,
-																										 'allow_delete_news' => true,
-																										 // permissions for all static pages
-																										 'allow_edit_static_pages' => true,
-																										 // permissions for bans page
-																										 'allow_add_bans' => true,
-																										 'allow_edit_bans' => true,
-																										 'allow_delete_bans' => true,
-																										 'allow_edit_bans' => true,
-																										 // permissions for team page
-																										 'allow_kick_any_team_members' => true,
-																										 'allow_edit_any_team_profile' => true,
-																										 'allow_invite_in_any_team' => true,
-																										 'allow_delete_any_team' => true,
-																										 'allow_reactivate_teams' => true,
-																										 // user permissions
-																										 'allow_edit_any_user_profile' => true,
-																										 'allow_add_admin_comments_to_user_profile' => true,
-																										 'allow_ban_any_user' => true,
-																										 // visits log permissions
-																										 'allow_view_user_visits' => true,
-																										 // match permissions
-																										 'allow_add_match' => true,
-																										 'allow_edit_match' => true,
-																										 'allow_delete_match' => true,
-																										 // server tracker permissions
-																										 'allow_watch_servertracker' => true,
-																										 // TODO permissions
-																										 'allow_view_todo' => true,
-																										 'allow_edit_todo' => true,
-																										 // pageSystem permissions
-																										 'allow_admin_pageSystem' => true,
-																										 // aux permissions
-																										 'is_admin' => true))),
+																										 'allow_watch_servertracker' => true)),
+															  'GU-LEAGUE.REFEREES' => array('name' => 'GU-LEAGUE.REFEREES',
+																							'permissions' => array('allow_add_messages' => true,
+																												   'allow_delete_messages' => true,
+																												   'allow_watch_servertracker' => true,
+																												   'allow_add_match' => true,
+																												   'allow_edit_match' => true)),
+															  'GU-LEAGUE.COPS' => array('name' => 'GU-LEAGUE.COPS',
+																						'permissions' => array('allow_add_messages' => true,
+																											   'allow_delete_messages' => true,
+																											   'allow_watch_servertracker' => true,
+																											   'allow_add_match' => true,
+																											   'allow_edit_match' => true)),															  
+															  'GU-LEAGUE.ADMINS' => array('name' => 'GU-LEAGUE.ADMINS',
+																						  'permissions' => array('allow_add_messages' => true,
+																												 'allow_delete_messages' => true,
+																												 'allow_watch_servertracker' => true,
+																												 'allow_add_match' => true,
+																												 'allow_edit_match' => true,
+																												 // permissions for news page
+																												 'allow_add_news' => true,
+																												 'allow_edit_news' => true,
+																												 'allow_delete_news' => true,
+																												 // permissions for all static pages
+																												 'allow_edit_static_pages' => true,
+																												 // permissions for bans page
+																												 'allow_add_bans' => true,
+																												 'allow_edit_bans' => true,
+																												 'allow_delete_bans' => true,
+																												 'allow_edit_bans' => true,
+																												 // permissions for team page
+																												 'allow_kick_any_team_members' => true,
+																												 'allow_edit_any_team_profile' => true,
+																												 'allow_invite_in_any_team' => true,
+																												 'allow_delete_any_team' => true,
+																												 'allow_reactivate_teams' => true,
+																												 // user permissions
+																												 'allow_edit_any_user_profile' => true,
+																												 'allow_add_admin_comments_to_user_profile' => true,
+																												 'allow_ban_any_user' => true,
+																												 // visits log permissions
+																												 'allow_view_user_visits' => true,
+																												 // match permissions
+																												 'allow_add_match' => true,
+																												 'allow_edit_match' => true,
+																												 'allow_delete_match' => true,
+																												 // server tracker permissions
+																												 'allow_watch_servertracker' => true,
+																												 // TODO permissions
+																												 'allow_view_todo' => true,
+																												 'allow_edit_todo' => true,
+																												 // pageSystem permissions
+																												 'allow_admin_pageSystem' => true,
+																												 // aux permissions
+																												 'is_admin' => true))),
 						 // subject of welcome message
 						 'login.welcome.subject' => 'Welcome',
 						 // content of welcome message
