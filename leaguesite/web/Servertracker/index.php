@@ -30,6 +30,10 @@
 		formatbzfquery_last($server, $connection);
 	} else
 	{
+		formatbzfquery("bzbattleground.com:5157", $connection);
+
+		formatbzfquery("bzbattleground.com:5158", $connection);
+
 		formatbzfquery("bzf.guleague.org:5154", $connection);
 		
 		formatbzfquery("bzf.guleague.org:5155", $connection);
@@ -44,6 +48,8 @@
 		
 		formatbzfquery("bzf.guleague.org:5158", $connection);
 		
+		formatbzfquery("brad.guleague.org:5157", $connection);
+		
 		formatbzfquery("brad.guleague.org:5158", $connection);
 		
 //		formatbzfquery("longdon.guleague.org:5158", $connection);
@@ -57,6 +63,8 @@
 //		formatbzfquery("trb.guleague.org:5158", $connection);
 		
 		formatbzfquery("brl.arpa.net:5158", $connection);
+		
+		formatbzfquery("brl.arpa.net:5160", $connection);
 //		
 //		formatbzfquery("fairserve.bzflag.net:5157", $connection);
 //		
@@ -66,7 +74,7 @@
 		
 		formatbzfquery("quol.guleague.org:5158", $connection);
 		
-		formatbzfquery_last("bzflag.enuffsaid.co.nz:5151", $connection);
+		formatbzfquery_last("bzflag.enuffsaid.co.nz:5158", $connection);
 	}
 ?>
 
