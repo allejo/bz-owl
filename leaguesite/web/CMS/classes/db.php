@@ -145,7 +145,7 @@
 			}
 		}
 		
-		/* deprecated function: use prepared instead */
+		/* deprecated function: use prepare instead */
 		function quote($string)
 		{
 			return $this->pdo->quote($string);

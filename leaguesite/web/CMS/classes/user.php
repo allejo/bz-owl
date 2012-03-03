@@ -89,6 +89,42 @@
 			return false;
 		}
 		
+		function getName($userid = 0)
+		{
+			global $config;
+			global $db;
+			
+			// returns current user if no userid specified, otherwise name of user of supplied userid
+			if ($userid === 0)
+			{
+				$id = self::getID();
+			} else
+			{
+				$id = $userid;
+			}
+			
+			
+			if ($id === 0)
+			{
+				return $config->getValue('displayedSystemUsername');
+			}
+			
+			
+			// collect name from database
+			$query = $db->prepare('SELECT `name` FROM `players` WHERE `id`=:id LIMIT 1');
+			if ($db->execute($query, array(':id' => array($id, PDO::PARAM_INT))))
+			{
+				$userName = $db->fetchRow($query);
+				$db->free($query);
+			
+				return $userName['name'];
+			}
+			
+			// error handling: log error and show it in end user visible result
+			$db->logError((__FILE__) . ': getName(' . strval($userid) . ') failed: transformed into (.' . $id . ').'); 
+			return '$user->getName(' . strval($userid) . ') failed.';
+		}
+		
 		function setPermission($permission, $value=true)
 		{
 			$_SESSION[$permission] = $value;

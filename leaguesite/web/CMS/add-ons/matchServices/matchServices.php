@@ -25,8 +25,8 @@
 			if ($user->getID() < 1)
 			{
 				$matchClass->displayMatches();
-				$tmpl->display();
-				die();
+ 				$tmpl->display();
+				return;
 			}
 			
 			
