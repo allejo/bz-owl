@@ -4,7 +4,7 @@
 	// NOTE: This does not update tables by add-ons!
 	
 	// current db version
-	define('MAX_DB_VERSION', 3);
+	define('MAX_DB_VERSION', 4);
 	
 	
 	
@@ -389,6 +389,38 @@
 				$db->logError('bz-owl-db-updater: ' . $pageSystemInsertionQuery . ' failed: Pages/ already set.');
 				return false;
 			}
+		}
+		
+		return true;
+	}
+	
+	function updateVersion3()
+	{
+		global $db;
+		
+		// find out if pageSystem add-on is added
+		$query = $db->SQL('ALTER TABLE `matches` DROP FOREIGN KEY `matches_ibfk_1`');
+		if (!query)
+		{
+			status('Could not change drop foreign key matches_ibfk_1 in matches table.');
+			$db->logError('bz-owl-db-updater: Could not change drop foreign key matches_ibfk_1 in matches table.');
+			return false;
+		}
+		
+		$query = $db->SQL('ALTER TABLE `matches` CHANGE `playerid` `userid` INT(11)  UNSIGNED  NOT NULL');
+		if (!query)
+		{
+			status('Could not change field playerid in matches table to userid.');
+			$db->logError('bz-owl-db-updater: Could not change field playerid in matches table to userid.');
+			return false;
+		}
+		
+		$query = $db->SQL('ALTER TABLE `matches` ADD FOREIGN KEY (`userid`) REFERENCES `players` (`id`) ON DELETE CASCADE ON UPDATE CASCADE');
+		if (!query)
+		{
+			status('Could not re-add foreign key matches_ibfk_1 in matches table.');
+			$db->logError('bz-owl-db-updater: Could not re-add foreign key matches_ibfk_1 in matches table.');
+			return false;
 		}
 		
 		return true;
