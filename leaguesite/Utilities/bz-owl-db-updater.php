@@ -398,7 +398,7 @@
 	{
 		global $db;
 		
-		// find out if pageSystem add-on is added
+		// rename playerid to userid in matches table
 		$query = $db->SQL('ALTER TABLE `matches` DROP FOREIGN KEY `matches_ibfk_1`');
 		if (!query)
 		{
@@ -406,7 +406,6 @@
 			$db->logError('bz-owl-db-updater: Could not change drop foreign key matches_ibfk_1 in matches table.');
 			return false;
 		}
-		
 		$query = $db->SQL('ALTER TABLE `matches` CHANGE `playerid` `userid` INT(11)  UNSIGNED  NOT NULL');
 		if (!query)
 		{
@@ -414,7 +413,6 @@
 			$db->logError('bz-owl-db-updater: Could not change field playerid in matches table to userid.');
 			return false;
 		}
-		
 		$query = $db->SQL('ALTER TABLE `matches` ADD FOREIGN KEY (`userid`) REFERENCES `players` (`id`) ON DELETE CASCADE ON UPDATE CASCADE');
 		if (!query)
 		{
@@ -422,6 +420,23 @@
 			$db->logError('bz-owl-db-updater: Could not re-add foreign key matches_ibfk_1 in matches table.');
 			return false;
 		}
+		
+		// rename team1_teamid to team1ID and team2_teamid to team2ID in matches table
+		$query = $db->SQL("ALTER TABLE `matches` CHANGE `team1_teamid` `team1ID` INT(11)  UNSIGNED  NOT NULL  DEFAULT '0'");
+		if (!query)
+		{
+			status('Could not change team1_teamid to team1ID in matches table.');
+			$db->logError('bz-owl-db-updater: Could not change team1_teamid to team1ID in matches table.');
+			return false;
+		}
+		$query = $db->SQL("ALTER TABLE `matches` CHANGE `team2_teamid` `team2ID` INT(11)  UNSIGNED  NOT NULL  DEFAULT '0'");
+		if (!query)
+		{
+			status('Could not change team2_teamid to team2ID in matches table.');
+			$db->logError('bz-owl-db-updater: Could not change team2_teamid to team2ID in matches table.');
+			return false;
+		}
+		
 		
 		return true;
 	}
