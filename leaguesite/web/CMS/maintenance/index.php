@@ -132,8 +132,8 @@
 					// team marked as active (deleted === 1) has 6 months to match before being deleted
 					$query .= ' WHERE `timestamp`>' . sqlSafeStringQuotes($six_months_in_past);
 				}
-				$query .= ' AND (`team1_teamid`=' . sqlSafeStringQuotes($curTeam);
-				$query .= ' OR `team2_teamid`=' . sqlSafeStringQuotes($curTeam) . ')';
+				$query .= ' AND (`team1ID`=' . sqlSafeStringQuotes($curTeam);
+				$query .= ' OR `team2ID`=' . sqlSafeStringQuotes($curTeam) . ')';
 				// only one match is sufficient to be considered active
 				$query .= ' LIMIT 1';
 				// execute query

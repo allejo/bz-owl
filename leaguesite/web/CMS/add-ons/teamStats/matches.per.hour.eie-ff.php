@@ -30,11 +30,11 @@
 	include "../CMS/libchart-1.2.1/libchart/classes/libchart.php";
 
 	// get stats from database
-	$query = 'SELECT `timestamp`, `team1_teamid`, `team2_teamid`'
+	$query = 'SELECT `timestamp`, `team1ID`, `team2ID`'
 		. ' FROM `matches`'
 		. ' WHERE `timestamp` LIKE ' . sqlSafeStringQuotes('%')
-		. ' AND (`team1_teamid` = 40  AND `team2_teamid` = 10'
-		. ' OR (`team2_teamid` = 40 AND `team1_teamid` = 10))'
+		. ' AND (`team1ID` = 40  AND `team2ID` = 10'
+		. ' OR (`team2ID` = 40 AND `team1ID` = 10))'
 		. ' ORDER BY `timestamp`';
 	if (!$result = $site->execute_query('matches', $query, $connection))
 	{

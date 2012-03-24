@@ -123,7 +123,7 @@
 			// collect team opponent informations for specified teamid
 			$teamOpponents = array();
 			$query = $db->prepare('SELECT * FROM `matches` '
-								  . 'WHERE `team1_teamid`=:teamid OR `team2_teamid`=:teamid');
+								  . 'WHERE `team1ID`=:teamid OR `team2ID`=:teamid');
 			$db->execute($query, $params);
 			while ($row = $db->fetchRow($query))
 			{
@@ -252,16 +252,16 @@
 			
 			// get match data
 			// sort the data by id to find out if abusers entered data a loong time in the past
-			$query = $db->prepare('SELECT `timestamp`,`team1_teamid`,`team2_teamid`,'
-								  . '(SELECT `name` FROM `teams` WHERE `id`=`team1_teamid`) AS `team1_name`'
-								  . ',(SELECT `name` FROM `teams` WHERE `id`=`team2_teamid`) AS `team2_name`'
-								  . ',`team1_points`,`team2_points`,`playerid`'
+			$query = $db->prepare('SELECT `timestamp`,`team1ID`,`team2ID`,'
+								  . '(SELECT `name` FROM `teams` WHERE `id`=`team1ID`) AS `team1_name`'
+								  . ',(SELECT `name` FROM `teams` WHERE `id`=`team2ID`) AS `team2_name`'
+								  . ',`team1_points`,`team2_points`,`userid`'
 								  . ',(SELECT `players`.`name` FROM `players`'
-								  . ' WHERE `players`.`id`=`matches`.`playerid`)'
+								  . ' WHERE `players`.`id`=`matches`.`userid`)'
 								  . ' AS `playername`'
 								  . ',`matches`.`id`'
-								  . ' FROM `matches` WHERE `matches`.`team1_teamid`=?'
-								  . ' OR `matches`.`team2_teamid`=?'
+								  . ' FROM `matches` WHERE `matches`.`team1ID`=?'
+								  . ' OR `matches`.`team2ID`=?'
 								  . ' ORDER BY `id` DESC LIMIT 0,10');
 			$db->execute($query, array($teamid, $teamid));
 			while ($row = $db->fetchRow($query))
@@ -270,8 +270,8 @@
 				// use a temporary array for better readable (but slower) code
 				$prepared = array();
  				$prepared['time'] = $row['timestamp'];
-				$prepared['team1Link'] = '../Teams/?profile=' . $row['team1_teamid'];
-				$prepared['team2Link'] = '../Teams/?profile=' . $row['team2_teamid'];
+				$prepared['team1Link'] = '../Teams/?profile=' . $row['team1ID'];
+				$prepared['team2Link'] = '../Teams/?profile=' . $row['team2ID'];
 				$prepared['teamName1'] = $row['team1_name'];
 				$prepared['teamName2'] = $row['team2_name'];
 				$prepared['score1'] = $row['team1_points'];

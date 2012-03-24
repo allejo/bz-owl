@@ -438,6 +438,17 @@
 		}
 		
 		
+		// add timestamp to ERROR_LOG table
+		$query = $db->SQL("ALTER TABLE `ERROR_LOG` ADD `timestamp` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00'  AFTER `msg`");
+				if (!query)
+		{
+			status('Could not add timestamp column to ERROR_LOG table.');
+			$db->logError('bz-owl-db-updater: Could not add timestamp column to ERROR_LOG table.');
+			return false;
+		}
+		
+		
+		
 		return true;
 	}
 ?>

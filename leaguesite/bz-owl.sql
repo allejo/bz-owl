@@ -1,13 +1,13 @@
-﻿# ************************************************************
+# ************************************************************
 # Sequel Pro SQL dump
-# Version 3348
+# Version 3408
 #
 # http://www.sequelpro.com/
 # http://code.google.com/p/sequel-pro/
 #
-# Host: localhost (MySQL 5.1.57)
-# Database: bz-owl
-# Generation Time: 2011-07-13 16:40:27 +0200
+# Host: localhost (MySQL 5.1.61)
+# Datenbank: bz-owl
+# Erstellungsdauer: 2012-03-24 13:02:49 +0100
 # ************************************************************
 
 
@@ -20,7 +20,7 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 
-# Dump of table CMS
+# Export von Tabelle CMS
 # ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `CMS`;
@@ -32,7 +32,7 @@ CREATE TABLE `CMS` (
   `addon` varchar(256) NOT NULL DEFAULT 'staticPageEditor',
   PRIMARY KEY (`id`),
   KEY `requestPath` (`requestPath`(255))
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 LOCK TABLES `CMS` WRITE;
 /*!40000 ALTER TABLE `CMS` DISABLE KEYS */;
@@ -55,7 +55,7 @@ VALUES
 UNLOCK TABLES;
 
 
-# Dump of table countries
+# Export von Tabelle countries
 # ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `countries`;
@@ -70,20 +70,21 @@ CREATE TABLE `countries` (
 
 
 
-# Dump of table ERROR_LOG
+# Export von Tabelle ERROR_LOG
 # ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `ERROR_LOG`;
 
 CREATE TABLE `ERROR_LOG` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `timestamp` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00',
   `msg` varchar(2000) DEFAULT 'Something went wrong. You should see an actual error message instead.',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 
-# Dump of table invitations
+# Export von Tabelle invitations
 # ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `invitations`;
@@ -102,30 +103,30 @@ CREATE TABLE `invitations` (
 
 
 
-# Dump of table matches
+# Export von Tabelle matches
 # ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `matches`;
 
 CREATE TABLE `matches` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `playerid` int(11) unsigned NOT NULL,
+  `userid` int(11) unsigned NOT NULL,
   `timestamp` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `team1_teamid` int(11) unsigned NOT NULL DEFAULT '0',
-  `team2_teamid` int(11) unsigned NOT NULL DEFAULT '0',
+  `team1ID` int(11) unsigned NOT NULL DEFAULT '0',
+  `team2ID` int(11) unsigned NOT NULL DEFAULT '0',
   `team1_points` int(11) NOT NULL DEFAULT '0',
   `team2_points` int(11) NOT NULL DEFAULT '0',
   `team1_new_score` int(11) NOT NULL DEFAULT '1200',
   `team2_new_score` int(11) NOT NULL DEFAULT '1200',
   PRIMARY KEY (`id`),
   KEY `timestamp` (`timestamp`),
-  KEY `playerid` (`playerid`),
-  CONSTRAINT `matches_ibfk_1` FOREIGN KEY (`playerid`) REFERENCES `players` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `playerid` (`userid`),
+  CONSTRAINT `matches_ibfk_1` FOREIGN KEY (`userid`) REFERENCES `players` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The played matches in the league';
 
 
 
-# Dump of table matches_edit_stats
+# Export von Tabelle matches_edit_stats
 # ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `matches_edit_stats`;
@@ -147,7 +148,7 @@ CREATE TABLE `matches_edit_stats` (
 
 
 
-# Dump of table misc_data
+# Export von Tabelle misc_data
 # ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `misc_data`;
@@ -160,7 +161,7 @@ CREATE TABLE `misc_data` (
 
 
 
-# Dump of table newssystem
+# Export von Tabelle newssystem
 # ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `newssystem`;
@@ -178,7 +179,7 @@ CREATE TABLE `newssystem` (
 
 
 
-# Dump of table online_users
+# Export von Tabelle online_users
 # ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `online_users`;
@@ -195,7 +196,7 @@ CREATE TABLE `online_users` (
 
 
 
-# Dump of table players
+# Export von Tabelle players
 # ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `players`;
@@ -214,7 +215,7 @@ CREATE TABLE `players` (
 
 
 
-# Dump of table players_passwords
+# Export von Tabelle players_passwords
 # ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `players_passwords`;
@@ -231,7 +232,7 @@ CREATE TABLE `players_passwords` (
 
 
 
-# Dump of table players_profile
+# Export von Tabelle players_profile
 # ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `players_profile`;
@@ -255,7 +256,7 @@ CREATE TABLE `players_profile` (
 
 
 
-# Dump of table pmsystem_msg_recipients_teams
+# Export von Tabelle pmsystem_msg_recipients_teams
 # ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `pmsystem_msg_recipients_teams`;
@@ -269,7 +270,7 @@ CREATE TABLE `pmsystem_msg_recipients_teams` (
 
 
 
-# Dump of table pmsystem_msg_recipients_users
+# Export von Tabelle pmsystem_msg_recipients_users
 # ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `pmsystem_msg_recipients_users`;
@@ -283,7 +284,7 @@ CREATE TABLE `pmsystem_msg_recipients_users` (
 
 
 
-# Dump of table pmsystem_msg_storage
+# Export von Tabelle pmsystem_msg_storage
 # ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `pmsystem_msg_storage`;
@@ -300,7 +301,7 @@ CREATE TABLE `pmsystem_msg_storage` (
 
 
 
-# Dump of table pmsystem_msg_users
+# Export von Tabelle pmsystem_msg_users
 # ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `pmsystem_msg_users`;
@@ -321,7 +322,7 @@ CREATE TABLE `pmsystem_msg_users` (
 
 
 
-# Dump of table servertracker
+# Export von Tabelle servertracker
 # ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `servertracker`;
@@ -337,7 +338,7 @@ CREATE TABLE `servertracker` (
 
 
 
-# Dump of table static_pages
+# Export von Tabelle static_pages
 # ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `static_pages`;
@@ -354,7 +355,7 @@ CREATE TABLE `static_pages` (
 
 
 
-# Dump of table teams
+# Export von Tabelle teams
 # ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `teams`;
@@ -368,7 +369,7 @@ CREATE TABLE `teams` (
 
 
 
-# Dump of table teams_overview
+# Export von Tabelle teams_overview
 # ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `teams_overview`;
@@ -389,7 +390,7 @@ CREATE TABLE `teams_overview` (
 
 
 
-# Dump of table teams_permissions
+# Export von Tabelle teams_permissions
 # ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `teams_permissions`;
@@ -404,7 +405,7 @@ CREATE TABLE `teams_permissions` (
 
 
 
-# Dump of table teams_profile
+# Export von Tabelle teams_profile
 # ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `teams_profile`;
@@ -425,7 +426,7 @@ CREATE TABLE `teams_profile` (
 
 
 
-# Dump of table visits
+# Export von Tabelle visits
 # ------------------------------------------------------------
 
 DROP TABLE IF EXISTS `visits`;

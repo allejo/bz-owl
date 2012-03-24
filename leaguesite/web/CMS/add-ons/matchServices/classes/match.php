@@ -78,7 +78,7 @@
 			die();
 		}
 		
-		function enter($teamID1, $teamID2, $team1Score, $team2score)
+		function enter($timestamp, $teamID1, $teamID2, $team1Score, $team2score)
 		{
 			
 		}

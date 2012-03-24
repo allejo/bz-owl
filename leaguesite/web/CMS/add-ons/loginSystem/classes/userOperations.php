@@ -243,7 +243,7 @@
 			if ($result === false)
 			{
 				$this->logError('login/classes/userOperations.php: updateUserName:'
-								. ' bzbb::updateUserName(' . $externalID . ', ' . $name . ')'
+								. ' bzbb::updateUserName(' . strval($externalID) . ', ' . strval($name) . ')'
 								. ' returned false (unknown error).');
 			}
 		}

@@ -1888,13 +1888,13 @@
 		// show last entered matches		
 		// get match data
 		// sort the data by id to find out if abusers entered data a loong time in the past
-		$query = ('SELECT `timestamp`,`team1_teamid`,`team2_teamid`,'
-				  . '(SELECT `name` FROM `teams` WHERE `id`=`team1_teamid`) AS `team1_name`'
-				  . ',(SELECT `name` FROM `teams` WHERE `id`=`team2_teamid`) AS `team2_name`'
-				  . ',`team1_points`,`team2_points`,`playerid`'
-				  . ',(SELECT `players`.`name` FROM `players` WHERE `players`.`id`=`matches`.`playerid`) AS `playername`,`matches`.`id`'
-				  . ' FROM `matches` WHERE `matches`.`team1_teamid`=' . sqlSafeStringQuotes($profile)
-				  . ' OR `matches`.`team2_teamid`=' . sqlSafeStringQuotes($profile)
+		$query = ('SELECT `timestamp`,`team1ID`,`team2ID`,'
+				  . '(SELECT `name` FROM `teams` WHERE `id`=`team1ID`) AS `team1_name`'
+				  . ',(SELECT `name` FROM `teams` WHERE `id`=`team2ID`) AS `team2_name`'
+				  . ',`team1_points`,`team2_points`,`userid`'
+				  . ',(SELECT `players`.`name` FROM `players` WHERE `players`.`id`=`matches`.`userid`) AS `playername`,`matches`.`id`'
+				  . ' FROM `matches` WHERE `matches`.`team1ID`=' . sqlSafeStringQuotes($profile)
+				  . ' OR `matches`.`team2ID`=' . sqlSafeStringQuotes($profile)
 				  . ' ORDER BY `id` DESC LIMIT 0,10');
 		if (!($result = @$site->execute_query('matches (subquery players)', $query, $connection)))
 		{
@@ -1950,13 +1950,13 @@
 				echo '</td>' . "\n" . '<td>';
 				
 				// get name of first team
-				echo '<a href="../Teams/?profile=' . ((int) $row['team1_teamid']) . '">' . $row['team1_name'] . '</a>';
+				echo '<a href="../Teams/?profile=' . ((int) $row['team1ID']) . '">' . $row['team1_name'] . '</a>';
 				
 				// seperator showing that opponent team will be named soon
 				echo ' - ';
 				
 				// get name of second team
-				echo '<a href="../Teams/?profile=' . ((int) $row['team2_teamid']) . '">' . $row['team2_name'] . '</a>';
+				echo '<a href="../Teams/?profile=' . ((int) $row['team2ID']) . '">' . $row['team2_name'] . '</a>';
 				
 				// done with the table field, go to next field
 				echo '</td>' . "\n" . '<td>';
@@ -2068,8 +2068,8 @@
 		}
 		mysql_free_result($result);
 		
-		$query = 'SELECT * FROM `matches` WHERE `team1_teamid`=' . sqlSafeStringQuotes($profile) . '  OR `team2_teamid`=' . sqlSafeStringQuotes($profile);
-		if (!($result = @$site->execute_query('teams', $query, $connection)))
+		$query = 'SELECT * FROM `matches` WHERE `team1ID`=' . sqlSafeStringQuotes($profile) . '  OR `team2ID`=' . sqlSafeStringQuotes($profile);
+		if (!($result = @$site->execute_query('matches', $query, $connection)))
 		{
 			echo '<div class="static_page_box">' . "\n";
 			$site->dieAndEndPage('Could not get team stats for team with id ' . sqlSafeString($profile));
@@ -2088,12 +2088,12 @@
 		
 		while ($row = mysql_fetch_array($result))
 		{
-			if (intval($row['team1_teamid']) === $profile)
+			if (intval($row['team1ID']) === $profile)
 			{
 				// look up name if needed
-				if (!(isset($match_stats[$row['team2_teamid']]['name'])))
+				if (!(isset($match_stats[$row['team2ID']]['name'])))
 				{
-					$query = 'SELECT `name` FROM `teams` WHERE `id`=' . sqlSafeStringQuotes($row['team2_teamid']) .' LIMIT 1';
+					$query = 'SELECT `name` FROM `teams` WHERE `id`=' . sqlSafeStringQuotes($row['team2ID']) .' LIMIT 1';
 					if (!($result_foreign_team = @$site->execute_query('teams', $query, $connection)))
 					{
 						echo '<div class="static_page_box">' . "\n";
@@ -2101,7 +2101,7 @@
 					}
 					while ($row_foreign_team = mysql_fetch_array($result_foreign_team))
 					{
-						$match_stats[$row['team2_teamid']]['name'] = $row_foreign_team['name'];
+						$match_stats[$row['team2ID']]['name'] = $row_foreign_team['name'];
 					}
 					mysql_free_result($result_foreign_team);
 				}
@@ -2109,40 +2109,40 @@
 				if (intval($row['team1_points']) > intval($row['team2_points']))
 				{
 					// team 1 won
-					if (isset($match_stats[$row['team2_teamid']]['won']))
+					if (isset($match_stats[$row['team2ID']]['won']))
 					{
-						$match_stats[$row['team2_teamid']]['won'] += 1;
+						$match_stats[$row['team2ID']]['won'] += 1;
 					} else
 					{
-						$match_stats[$row['team2_teamid']]['won'] = 1;
+						$match_stats[$row['team2ID']]['won'] = 1;
 					}
 				} elseif (intval($row['team1_points']) < intval($row['team2_points']))
 				{
 					// team 1 lost
-					if (isset($match_stats[$row['team2_teamid']]['lost']))
+					if (isset($match_stats[$row['team2ID']]['lost']))
 					{
-						$match_stats[$row['team2_teamid']]['lost'] += 1;
+						$match_stats[$row['team2ID']]['lost'] += 1;
 					} else
 					{
-						$match_stats[$row['team2_teamid']]['lost'] = 1;
+						$match_stats[$row['team2ID']]['lost'] = 1;
 					}
 				} else
 				{
 					// team 1 tied
-					if (isset($match_stats[$row['team2_teamid']]['tied']))
+					if (isset($match_stats[$row['team2ID']]['tied']))
 					{
-						$match_stats[$row['team2_teamid']]['tied'] += 1;
+						$match_stats[$row['team2ID']]['tied'] += 1;
 					} else
 					{
-						$match_stats[$row['team2_teamid']]['tied'] = 1;
+						$match_stats[$row['team2ID']]['tied'] = 1;
 					}
 				}
 			} else
 			{
 				// look up name if needed
-				if (!(isset($match_stats[$row['team1_teamid']]['name'])))
+				if (!(isset($match_stats[$row['team1ID']]['name'])))
 				{
-					$query = 'SELECT `name` FROM `teams` WHERE `id`=' . sqlSafeStringQuotes($row['team1_teamid']) .' LIMIT 1';
+					$query = 'SELECT `name` FROM `teams` WHERE `id`=' . sqlSafeStringQuotes($row['team1ID']) .' LIMIT 1';
 					if (!($result_foreign_team = @$site->execute_query('teams', $query, $connection)))
 					{
 						echo '<div class="static_page_box">' . "\n";
@@ -2150,7 +2150,7 @@
 					}
 					while ($row_foreign_team = mysql_fetch_array($result_foreign_team))
 					{
-						$match_stats[$row['team1_teamid']]['name'] = $row_foreign_team['name'];
+						$match_stats[$row['team1ID']]['name'] = $row_foreign_team['name'];
 					}
 					mysql_free_result($result_foreign_team);
 				}
@@ -2158,32 +2158,32 @@
 				if (intval($row['team1_points']) > intval($row['team2_points']))
 				{
 					// team 2 won
-					if (isset($match_stats[$row['team1_teamid']]['lost']))
+					if (isset($match_stats[$row['team1ID']]['lost']))
 					{
-						$match_stats[$row['team1_teamid']]['lost'] += 1;
+						$match_stats[$row['team1ID']]['lost'] += 1;
 					} else
 					{
-						$match_stats[$row['team1_teamid']]['lost'] = 1;
+						$match_stats[$row['team1ID']]['lost'] = 1;
 					}
 				} elseif (intval($row['team1_points']) < intval($row['team2_points']))
 				{
 					// team 2 lost
-					if (isset($match_stats[$row['team1_teamid']]['won']))
+					if (isset($match_stats[$row['team1ID']]['won']))
 					{
-						$match_stats[$row['team1_teamid']]['won'] += 1;
+						$match_stats[$row['team1ID']]['won'] += 1;
 					} else
 					{
-						$match_stats[$row['team1_teamid']]['won'] = 1;
+						$match_stats[$row['team1ID']]['won'] = 1;
 					}
 				} else
 				{
 					// team 2 tied
-					if (isset($match_stats[$row['team1_teamid']]['tied']))
+					if (isset($match_stats[$row['team1ID']]['tied']))
 					{
-						$match_stats[$row['team1_teamid']]['tied'] += 1;
+						$match_stats[$row['team1ID']]['tied'] += 1;
 					} else
 					{
-						$match_stats[$row['team1_teamid']]['tied'] = 1;
+						$match_stats[$row['team1ID']]['tied'] = 1;
 					}
 				}
 			}

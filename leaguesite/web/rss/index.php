@@ -19,7 +19,7 @@ $row = mysql_fetch_object($res);
 $pubDate = date("Y-m-d\TH:i:s+00:00", convert_datetime($row->timestamp));
 	
 $query = 'SELECT timestamp,team1_points,team2_points,t1.name team1_name,t2.name team2_name ';
-$query .= 'FROM matches LEFT JOIN teams t1 ON matches.team1_teamid = t1.id LEFT JOIN teams t2 ON matches.team2_teamid = t2.id ';
+$query .= 'FROM matches LEFT JOIN teams t1 ON matches.team1ID = t1.id LEFT JOIN teams t2 ON matches.team2ID = t2.id ';
 $query .= 'ORDER BY timestamp DESC LIMIT 5';
 
 $res = mysql_query($query);

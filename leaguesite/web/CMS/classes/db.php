@@ -91,9 +91,9 @@
 			{
 				// use PDO directly to avoid an infinite error reporting loop
 				// in case logError contains invalid SQL
-				if ($query = $this->pdo->prepare('INSERT INTO `ERROR_LOG` (`msg`) VALUES (?)'))
+				if ($query = $this->pdo->prepare('INSERT INTO `ERROR_LOG` (`msg`, `timestamp`) VALUES (?, ?)'))
 				{
-					if ($query->execute(array($error)))
+					if ($query->execute(array($error, strval(date('Y-m-d H:i:s T')))))
 					{
 						return;
 					}
@@ -105,13 +105,14 @@
 			if (strlen($logfile) > 0 && file_exists($logfile) && is_writable($logfile))
 			{
 				$handle = @fopen($logfile, 'a');
-				if (!@fwrite($handle, $error))
+				// try to write timestamp with error into file
+				if (!@fwrite($handle, (strval(date('Y-m-d H:i:s T') . ': ' . $error))))
 				{
 					die('ERROR: Writing into log failed');
 				}
 			} else
 			{
-				die('ERROR: DB connection not available and problem with logfile encountered.');
+				die('ERROR: DB connection not available and permission problem with logfile encountered.');
 			}
 		}
 		
