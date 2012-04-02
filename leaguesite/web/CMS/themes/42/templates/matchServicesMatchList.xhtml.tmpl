@@ -34,6 +34,10 @@ No menu found.
 </div>
 </form>
 
+{if isset($canEnterMatch) && ($canEnterMatch === true)}
+<a class="button" href="./?enter">Enter a new match</a>
+{/if}
+
 <table id="table_matches_played" class="big">
 <caption>Matches played</caption>
 <tr>
@@ -50,6 +54,21 @@ No menu found.
 <td><a href="../Teams/?profile={$match.team1ID}">{$match.team1Name}</a> - <a href="../Teams/?profile={$match.team2ID}">{$match.team2Name}</a></td>
 <td>{$match.team1Score} - {$match.team2Score}</td>
 <td><a href="../Players/?profile={$match.lastModUserID}">{$match.lastModUserName}</a></td>
+
+{if (isset($canEditMatch) && ($canEditMatch === true)) || (isset($canDeleteMatch) && ($canDeleteMatch === true))}
+<td>
+{/if}
+
+{if isset($canEditMatch) && ($canEditMatch === true)}
+<a class="button" href="./?edit={$match.id}">Edit match result</a>
+{/if}
+{if isset($canDeleteMatch) && ($canDeleteMatch === true)}
+ <a class="button" href="./?delete={$match.id}">Delete match</a>
+{/if}
+{if (isset($canEditMatch) && ($canEditMatch === true)) || (isset($canDeleteMatch) && ($canDeleteMatch === true))}
+</td>
+{/if}
+
 </tr>
 {/foreach}
 

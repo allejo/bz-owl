@@ -30,6 +30,11 @@
 			}
 			
 			
+			// setup permissions for templates
+			$tmpl->assign('canEnterMatch', $user->getPermission('allow_add_match'));
+			$tmpl->assign('canEditMatch', $user->getPermission('allow_edit_match'));
+			$tmpl->assign('canDeleteMatch', $user->getPermission('allow_delete_match'));
+			
 			
 			if (isset($_GET['enter']))
 			{
