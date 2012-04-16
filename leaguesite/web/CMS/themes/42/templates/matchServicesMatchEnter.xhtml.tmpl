@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="content-type" />
+	<link href="{$baseURL}themes/{$curTheme}/{$curTheme}.css" rel="stylesheet" type="text/css" />
+	<link rel="icon" type="image/png" href="{$faviconURL}" />
+<title>{if isset($title)}{$title}{else}Enter a new match{/if}</title>
+</head>
+<body>
+<div class="logo"></div>
+
+{foreach $menu as $menuItem}{$menuItem}{foreachelse}
+No menu found.
+{/foreach}
+
+
+<div class="userbuttons">
+	<span class="date">{$date}</span>
+	<span class="Servers">Match servers: <a href="{$baseURL}Servertracker/">{$onlinePlayers}</a></span>
+	<span class="onlineUsers">Website: <a href="{$baseURL}Online/">{$onlineUsers}</a></span>
+	{if isset($logoutURL)}<span class="logout"><a href="{$logoutURL}">Logout</a></span>{/if}
+</div>
+
+<div class="static_page_box">
+{if !isset($teamList)}
+No teams exist. A match must be played by two different teams.
+{else}
+<form enctype="application/x-www-form-urlencoded" method="post" action="?enter"><div><input type="hidden" name="confirmed" value="1" />
+</div>
+<p><label for="match_team_id1">First team: </label>
+<span><select id="match_team_id1" name="match_team_id1">
+{foreach item="team" from=$teamList}
+<option value="{$team.id}">{$team.name}</option>
+{/foreach}
+</select></span>
+<label for="match_points_team1">Points: </label>
+<span><input type="text" class="small_input_field" id="match_points_team1" name="team1_points" value="{$team1CurPoints}" />
+</span></p>
+
+<p><label for="match_team_id2">Second team: </label>
+<span><select id="match_team_id2" name="match_team_id2">
+{foreach item="team" from=$teamList}
+<option value="{$team.id}">{$team.name}</option>
+{/foreach}
+</select></span>
+<label for="match_points_team2">Points: </label>
+<span><input type="text" class="small_input_field" id="match_points_team2" name="team2_points" value="{$team2CurPoints}" />
+</span></p>
+
+<p>Current day and time is: {$curDay} {$curTime}</p>
+<p><label for="match_day">Day: </label>
+<span><input type="text" class="small_input_field" id="match_day" name="match_day" value="{$matchDay}" />
+</span></p>
+
+<p><label for="match_time">Time: </label>
+<span><input type="text" class="small_input_field" id="match_time" name="match_time" value="{$matchTime}" />
+</span></p>
+
+<div><input type="submit" name="match_enter_unconfirmed" value="Enter the new match" id="send" />
+</div>
+</form>
+{/if}
+
+</div>
+</body>
+</html>

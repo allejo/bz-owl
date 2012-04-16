@@ -22,7 +22,7 @@
 			
 			// accessible by public (show..)
 			// find out which template should be used
-			if ($user->getID() < 1)
+			if ($user->getID() < 0)
 			{
 				$matchClass->displayMatches();
  				$tmpl->display();
