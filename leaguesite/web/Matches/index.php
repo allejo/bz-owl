@@ -39,7 +39,7 @@
 			$allow_delete_match = true;
 		}
 	}
-
+	
 	
 	function get_table_checksum($site, $connection)
 	{
@@ -82,9 +82,9 @@
 		
 		require('match_form.php');
 		$site->dieAndEndPage();
-//		include_once('match_list_changing_logic.php');
-//		// all the operations requested have been dealt with
-//		$site->dieAndEndPage();
+		//		include_once('match_list_changing_logic.php');
+		//		// all the operations requested have been dealt with
+		//		$site->dieAndEndPage();
 	}
 	
 	
@@ -249,16 +249,16 @@
 		$query = 'SELECT `matches`.`timestamp`';
 	}
 	// get name of team 1
-	$query .= ',(SELECT `name` FROM `teams` WHERE `matches`.`team1_teamid`=`teams`.`id` LIMIT 1) AS `team1_name`';
+	$query .= ',(SELECT `name` FROM `teams` WHERE `matches`.`team1ID`=`teams`.`id` LIMIT 1) AS `team1_name`';
 	// get name of team 2
-	$query .= ',(SELECT `name` FROM `teams` WHERE `matches`.`team2_teamid`=`teams`.`id` LIMIT 1) AS `team2_name`';
+	$query .= ',(SELECT `name` FROM `teams` WHERE `matches`.`team2ID`=`teams`.`id` LIMIT 1) AS `team2_name`';
 	// also need the id's for quick links to team profiles
-	$query .= ',`matches`.`team1_teamid`,`matches`.`team2_teamid`';
+	$query .= ',`matches`.`team1ID`,`matches`.`team2ID`';
 	// the rest of the needed data
-	$query .= ',`matches`.`team1_points`,`matches`.`team2_points`,`matches`.`playerid`';
-	$query .= ',`players`.`name` AS `playername`,`matches`.`id`';
+	$query .= ',`matches`.`team1_points`,`matches`.`team2_points`,`matches`.`userid`';
+	$query .= ',`players`.`name` AS `playername`,`matches`.`id`, `matches`.`duration`';
 	// the tables in question
-	$query .= ' FROM `matches`,`players` WHERE `players`.`id`=`matches`.`playerid`';
+	$query .= ' FROM `matches`,`players` WHERE `players`.`id`=`matches`.`userid`';
 	if (isset($_GET['search']))
 	{
 		// Every derived table must have its own alias
@@ -346,13 +346,14 @@
 	{
 		$id = (int) $row['id'];
 		$matchid_list[$id]['timestamp'] = $row['timestamp'];
+		$matchid_list[$id]['duration'] = $row['duration'];
 		$matchid_list[$id]['team1_name'] = $row['team1_name'];
 		$matchid_list[$id]['team2_name'] = $row['team2_name'];
-		$matchid_list[$id]['team1_teamid'] = $row['team1_teamid'];
-		$matchid_list[$id]['team2_teamid'] = $row['team2_teamid'];
+		$matchid_list[$id]['team1ID'] = $row['team1ID'];
+		$matchid_list[$id]['team2ID'] = $row['team2ID'];
 		$matchid_list[$id]['team1_points'] = $row['team1_points'];
 		$matchid_list[$id]['team2_points'] = $row['team2_points'];
-		$matchid_list[$id]['playerid'] = $row['playerid'];
+		$matchid_list[$id]['userid'] = $row['userid'];
 		$matchid_list[$id]['playername'] = $row['playername'];
 		$matchid_list[$id]['id'] = $row['id'];
 	}
@@ -374,17 +375,17 @@
 	{
 		echo '<tr class="matches_overview">' . "\n";
 		echo '<td>';
-		echo $match_entry['timestamp'];
+		echo $match_entry['timestamp'] . ' [' . $match_entry['duration'] . ']';
 		echo '</td>' . "\n" . '<td>';
 		
 		// get name of first team
-		team_name_from_id($match_entry['team1_teamid'], $match_entry['team1_name']);
+		team_name_from_id($match_entry['team1ID'], $match_entry['team1_name']);
 		
 		// seperator showing that opponent team will be named soon
 		echo ' - ';
 		
 		// get name of second team
-		team_name_from_id($match_entry['team2_teamid'], $match_entry['team2_name']);
+		team_name_from_id($match_entry['team2ID'], $match_entry['team2_name']);
 		
 		// done with the table field, go to next field
 		echo '</td>' . "\n" . '<td>';
@@ -396,9 +397,9 @@
 		
 		echo '<td>';
 		// get name of first team
-		player_name_from_id($match_entry['playerid'], $match_entry['playername']);		
+		player_name_from_id($match_entry['userid'], $match_entry['playername']);		
 		echo '</td>' . "\n";
-
+		
 		
 		// show allowed actions based on permissions
 		if ($allow_edit_match || $allow_delete_match)
@@ -485,7 +486,7 @@
 		}
 		echo '</p>' . "\n";
 	}
-		
+	
 	if (isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'])
 	{
 		setTableUnchanged($site, $connection);

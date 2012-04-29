@@ -41,12 +41,12 @@
 		
 		
 		// user got sent back because of wrong data in the form for instance
-		if (isset($_POST['team_id1']) && isset($_POST['team_id2']) && isset($_POST['team1_points']) && isset($_POST['team2_points']))
+		if (isset($_POST['team_id1']) && isset($_POST['team_id2']) && isset($_POST['team1_points']) && isset($_POST['team2_points']) && isset($_POST['duration']))
 		{
-			show_form($_POST['team_id1'], $_POST['team_id2'], $_POST['team1_points'], $_POST['team2_points'], $readonly=false);
+			show_form($_POST['team_id1'], $_POST['team_id2'], $_POST['team1_points'], $_POST['team2_points'], $readonly=false, $_POST['duration']);
 		} elseif (isset($_GET['edit']) || isset($_GET['delete']))
 		{
-			$query = ('SELECT `timestamp`, `team1_teamid`, `team2_teamid`, `team1_points`, `team2_points`'
+			$query = ('SELECT `timestamp`, `team1ID`, `team2ID`, `team1_points`, `team2_points`, `duration`'
 					  . ' FROM `matches` WHERE `id`=' . sqlSafeStringQuotes($match_id)
 					  . ' LIMIT 1');
 			if (!($result = @$site->execute_query('matches', $query, $connection)))
@@ -69,15 +69,19 @@
 				$match_day = substr($timestamp, 0, $offset);
 				$match_time = substr($timestamp, ($offset+1));
 				
-				$team_id1 = intval($row['team1_teamid']);
-				$team_id2 = intval($row['team2_teamid']);
+				$duration = $row['duration'];
+				
+				$team_id1 = intval($row['team1ID']);
+				$team_id2 = intval($row['team2ID']);
 				
 				$team1_caps = intval($row['team1_points']);
 				$team2_caps = intval($row['team2_points']);
+				
+				$duration = intval($row['duration']);
 			}
 			mysql_free_result($result);
 			
-			show_form($team_id1, $team_id2, $team1_caps, $team2_caps, $readonly=isset($_GET['delete']));
+			show_form($team_id1, $team_id2, $team1_caps, $team2_caps, $readonly=isset($_GET['delete']), $duration);
 		} else
 		{
 			// fill unknown values with zeros
@@ -123,13 +127,14 @@
 									  . htmlspecialchars($team_id1) . '"');
 		$site->write_self_closing_tag('input type="hidden" name="team_id2" value="'
 									  . htmlspecialchars($team_id2) . '"');
-		
+		$site->write_self_closing_tag('input type="hidden" name="duration" value="'
+									  . htmlspecialchars($duration) . '"');
 		echo '<div>';
 		$site->write_self_closing_tag('input type="hidden" name="confirmed" value="2"');
 		echo '</div>' . "\n";
 		
 		// fill in the data submitted
-		show_form($team_id1, $team_id2, $team1_caps, $team2_caps, $readonly=true);
+		show_form($team_id1, $team_id2, $team1_caps, $team2_caps, $readonly=true, $duration);
 		
 		
 		generate_confirmation_key();
@@ -155,15 +160,15 @@
 		if (isset($_GET['enter']))
 		{
 			// match entering logic
-			enter_match($team_id1, $team_id2, $team1_caps, $team2_caps, $timestamp);
+			enter_match($team_id1, $team_id2, $team1_caps, $team2_caps, $timestamp, $duration);
 		} elseif (isset($_GET['edit']))
 		{
-			edit_match($team_id1, $team_id2, $team1_caps, $team2_caps, $timestamp, $match_id);
+			edit_match($team_id1, $team_id2, $team1_caps, $team2_caps, $timestamp, $match_id, $duration);
 		} elseif (isset($_GET['delete']))
 		{
 			delete_match($match_id);
 		}
-
+		
 		
 		// done with entering the match
 		$site->dieAndEndPage();
@@ -224,7 +229,7 @@
 		
 		// similar match entered already?
 		// strategy: ask for one match before the entered one and one after the one to be entered and do not let the database engine do the comparison
-		$query = 'SELECT `id`,`timestamp`,`team1_teamid`,`team2_teamid`,`team1_points`,`team2_points` FROM `matches`';
+		$query = 'SELECT `id`,`timestamp`,`team1ID`,`team2ID`,`team1_points`,`team2_points`, `duration` FROM `matches`';
 		$query .= ' WHERE (`timestamp`' . sqlSafeString($comparisonOperator) . sqlSafeStringQuotes($_POST['match_day'] . $_POST['match_time']);
 		// sorting needed
 		$query .= ') ORDER BY `timestamp` DESC';
@@ -241,6 +246,8 @@
 		// casting the values to 0 is important
 		// (a post variable having no value means it has to be set to 0 to successfully compare values here)
 		$timestamp = '';
+		print_r($_POST);
+		$duration = (int) $_POST['duration'];
 		$team_id1 = (int) $_POST['team_id1'];
 		$team_id2 = (int) $_POST['team_id2'];
 		$team_id1_matches = false;
@@ -255,19 +262,20 @@
 			// we can save comparisons using a helper variable
 			$team_ids_swapped = false;
 			$timestamp = $row['timestamp'];
-			$team_id1_matches = (intval($row['team1_teamid']) === $team_id1);
+			$duration_matches = (intval($row['duration'])) === $duration;
+			$team_id1_matches = (intval($row['team1ID']) === $team_id1);
 			if (!$team_id1_matches)
 			{
 				$team_ids_swapped = true;
-				$team_id1_matches = (intval($row['team1_teamid']) === $team_id2);
+				$team_id1_matches = (intval($row['team1ID']) === $team_id2);
 			}
 			
 			if ($team_ids_swapped)
 			{
-				$team_id2_matches = (intval($row['team2_teamid']) === $team_id1);
+				$team_id2_matches = (intval($row['team2ID']) === $team_id1);
 			} else
 			{
-				$team_id2_matches = (intval($row['team2_teamid']) === $team_id2);
+				$team_id2_matches = (intval($row['team2ID']) === $team_id2);
 			}
 			
 			// use helper variable to save some comparisons of points
@@ -284,7 +292,7 @@
 		mysql_free_result($result);
 		
 		// if similar match was found warn the user
-		if ($team_id1_matches && $team_id2_matches && $team1_points_matches && $team2_points_matches)
+		if ($team_id1_matches && $team_id2_matches && $team1_points_matches && $team2_points_matches && $duration_matches)
 		{
 			echo '<p>The nearest ';
 			if ($newerMatches)
@@ -296,7 +304,7 @@
 			}
 			echo ' match in the database is quite similar:</p>';
 			// use the post data as much as possible instead of looking up the same data in the database
-			echo '<p><strong>' . $timestamp . '</strong> ';
+			echo '<p><strong>' . $timestamp . ' [' . $duration . ']  </strong> ';
 			
 			$query = 'SELECT `name` FROM `teams` WHERE `id`=' . sqlSafeStringQuotes($team_id1) . ' LIMIT 1';
 			if (!($result = @$site->execute_query('teams', $query, $connection)))
@@ -388,6 +396,7 @@
 		global $team1_caps;
 		global $team2_caps;
 		global $timestamp;
+		global $duration;
 		global $match_id;
 		global $similarMatchFound;
 		
@@ -529,10 +538,20 @@
 			$confirmed = 0;
 		}
 		
+		
 		if (isset($_POST['$match_id']))
 		{
 			$match_id = intval($_POST['$match_id']);
 		}
+		
+		if (isset($_POST['duration']))
+		{
+			$duration = intval($_POST['duration']);
+		} else
+		{
+			$duration = 15;
+		}
+		
 		
 		// does the match exit?
 		if (isset($match_id))
@@ -600,9 +619,9 @@
 		$eightWeeksAgo = (int) strtotime('now -8 weeks');
 		if (((int) $specifiedTime) <= $eightWeeksAgo)
 		{
-				echo ('<p>You tried to enter, edit or delete a match that is older than 8 weeks.'
-					  . 'Only matches played in the last 8 weeks can be entered, edited or deleted.</p>' . "\n");
-				$confirmed = 0;
+			echo ('<p>You tried to enter, edit or delete a match that is older than 8 weeks.'
+				  . 'Only matches played in the last 8 weeks can be entered, edited or deleted.</p>' . "\n");
+			$confirmed = 0;
 		}
 		
 		// check if there is already a match entered at that time
@@ -631,7 +650,7 @@
 			
 			
 			// pass the match values to the next page so the previously entered data can be set default for the new form
-			show_form($team_id1, $team_id2, $team1_caps, $team2_caps, $readonly=false);
+			show_form($team_id1, $team_id2, $team1_caps, $team2_caps, $readonly=false, $duration);
 			
 			echo '<div>';
 			$site->write_self_closing_tag('input type="submit" name="match_cancel" value="Cancel and change match data" id="send"');

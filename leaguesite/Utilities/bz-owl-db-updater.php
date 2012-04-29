@@ -400,21 +400,43 @@
 		
 		// rename playerid to userid in matches table
 		$query = $db->SQL('ALTER TABLE `matches` DROP FOREIGN KEY `matches_ibfk_1`');
-		if (!query)
+		if (!$query)
 		{
 			status('Could not change drop foreign key matches_ibfk_1 in matches table.');
-			$db->logError('bz-owl-db-updater: Could not change drop foreign key matches_ibfk_1 in matches table.');
+			$db->logError('bz-owl-db-updater: Could not drop foreign key matches_ibfk_1 in matches table.');
 			return false;
 		}
 		$query = $db->SQL('ALTER TABLE `matches` CHANGE `playerid` `userid` INT(11)  UNSIGNED  NOT NULL');
-		if (!query)
+		if (!$query)
 		{
 			status('Could not change field playerid in matches table to userid.');
 			$db->logError('bz-owl-db-updater: Could not change field playerid in matches table to userid.');
 			return false;
 		}
 		$query = $db->SQL('ALTER TABLE `matches` ADD FOREIGN KEY (`userid`) REFERENCES `players` (`id`) ON DELETE CASCADE ON UPDATE CASCADE');
-		if (!query)
+		if (!$query)
+		{
+			status('Could not re-add foreign key matches_ibfk_1 in matches table.');
+			$db->logError('bz-owl-db-updater: Could not re-add foreign key matches_ibfk_1 in matches table.');
+			return false;
+		}
+		
+		$query = $db->SQL('ALTER TABLE `matches_edit_stats` DROP FOREIGN KEY `matches_edit_stats_ibfk_1`');
+		if (!$query)
+		{
+			status('Could not change drop foreign key matches_edit_stats_ibfk_1 in matches_edit_stats table.');
+			$db->logError('bz-owl-db-updater: Could not drop foreign key matches_edit_stats_ibfk_1 in matches_edit_stats table.');
+			return false;
+		}
+		$query = $db->SQL('ALTER TABLE `matches_edit_stats` CHANGE `playerid` `userid` INT(11)  UNSIGNED  NOT NULL');
+		if (!$query)
+		{
+			status('Could not change field playerid in matches_edit_stats table to userid.');
+			$db->logError('bz-owl-db-updater: Could not change field matches_edit_stats in matches table to userid.');
+			return false;
+		}
+		$query = $db->SQL('ALTER TABLE `matches_edit_stats` ADD FOREIGN KEY (`userid`) REFERENCES `players` (`id`) ON DELETE CASCADE ON UPDATE CASCADE');
+		if (!$query)
 		{
 			status('Could not re-add foreign key matches_ibfk_1 in matches table.');
 			$db->logError('bz-owl-db-updater: Could not re-add foreign key matches_ibfk_1 in matches table.');
@@ -423,24 +445,59 @@
 		
 		// rename team1_teamid to team1ID and team2_teamid to team2ID in matches table
 		$query = $db->SQL("ALTER TABLE `matches` CHANGE `team1_teamid` `team1ID` INT(11)  UNSIGNED  NOT NULL  DEFAULT '0'");
-		if (!query)
+		if (!$query)
 		{
 			status('Could not change team1_teamid to team1ID in matches table.');
 			$db->logError('bz-owl-db-updater: Could not change team1_teamid to team1ID in matches table.');
 			return false;
 		}
 		$query = $db->SQL("ALTER TABLE `matches` CHANGE `team2_teamid` `team2ID` INT(11)  UNSIGNED  NOT NULL  DEFAULT '0'");
-		if (!query)
+		if (!$query)
 		{
 			status('Could not change team2_teamid to team2ID in matches table.');
 			$db->logError('bz-owl-db-updater: Could not change team2_teamid to team2ID in matches table.');
 			return false;
 		}
 		
+		$query = $db->SQL("ALTER TABLE `matches_edit_stats` CHANGE `team1_teamid` `team1ID` INT(11)  UNSIGNED  NOT NULL  DEFAULT '0'");
+		if (!$query)
+		{
+			status('Could not change team1_teamid to team1ID in matches_edit_stats table.');
+			$db->logError('bz-owl-db-updater: Could not change team1_teamid to team1ID in matches_edit_stats table.');
+			return false;
+		}
+		$query = $db->SQL("ALTER TABLE `matches_edit_stats` CHANGE `team2_teamid` `team2ID` INT(11)  UNSIGNED  NOT NULL  DEFAULT '0'");
+		if (!$query)
+		{
+			status('Could not change team2_teamid to team2ID in matches_edit_stats table.');
+			$db->logError('bz-owl-db-updater: Could not change team2_teamid to team2ID in matches_edit_stats table.');
+			return false;
+		}
+		
+		// add duration column to matches
+		$query = $db->SQL("ALTER TABLE `matches` ADD `duration` int(11) unsigned NOT NULL DEFAULT '30'");
+		if (!$query)
+		{
+			status('Could not add duration to matches table.');
+			$db->logError('bz-owl-db-updater: Could not add duration to matches table.');
+			return false;
+		}
+		$query = $db->SQL("ALTER TABLE `matches_edit_stats` ADD `duration` int(11) unsigned NOT NULL DEFAULT '30'");
+		if (!$query)
+		{
+			status('Could not add duration to matches_edit_stats table.');
+			$db->logError('bz-owl-db-updater: Could not add duration to matches_edit_stats table.');
+			return false;
+		}
+		
+		// set all old durations to 30 minutes
+		$db->SQL('UPDATE `matches` SET `duration`=30');
+		$db->SQL('UPDATE `matches_edit_stats` SET `duration`=30');
+		
 		
 		// add timestamp to ERROR_LOG table
 		$query = $db->SQL("ALTER TABLE `ERROR_LOG` ADD `timestamp` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00'  AFTER `msg`");
-				if (!query)
+		if (!$query)
 		{
 			status('Could not add timestamp column to ERROR_LOG table.');
 			$db->logError('bz-owl-db-updater: Could not add timestamp column to ERROR_LOG table.');

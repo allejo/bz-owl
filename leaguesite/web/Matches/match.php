@@ -4,7 +4,7 @@
 		die('This file is meant to be only included by other files!');
 	}
 	
-	function enter_match($team_id1, $team_id2, $team1_caps, $team2_caps, $timestamp)
+	function enter_match($team_id1, $team_id2, $team1_caps, $team2_caps, $timestamp, $duration)
 	{
 		global $site;
 		global $connection;
@@ -26,16 +26,16 @@
 		compute_scores($team_id1, $team_id2,
 					   $team1_score, $team2_score,
 					   $team1_caps, $team2_caps,
-					   $diff, $team_stats_changes);
+					   $diff, $team_stats_changes, $duration);
 		
 		// insert new entry
-		$query = ('INSERT INTO `matches` (`playerid`, `timestamp`, `team1_teamid`,'
-				  . ' `team2_teamid`, `team1_points`, `team2_points`, `team1_new_score`, `team2_new_score`)'
+		$query = ('INSERT INTO `matches` (`userid`, `timestamp`, `team1ID`,'
+				  . ' `team2ID`, `team1_points`, `team2_points`, `team1_new_score`, `team2_new_score`, `duration`)'
 				  . ' VALUES (' . sqlSafeStringQuotes($viewerid) . ', ' . sqlSafeStringQuotes($timestamp)
 				  . ', ' . sqlSafeStringQuotes($team_id1) .', ' . sqlSafeStringQuotes($team_id2)
 				  . ', ' . sqlSafeStringQuotes($team1_caps) . ', ' . sqlSafeStringQuotes($team2_caps)
 				  . ', ' . sqlSafeStringQuotes($team1_score) . ', ' . sqlSafeStringQuotes($team2_score)
-				  . ')');
+				  . ', ' . sqlSafeStringQuotes($duration) . ')');
 		if (!($result = $site->execute_query('matches', $query, $connection)))
 		{
 			unlock_tables();
@@ -52,7 +52,7 @@
 		update_later_matches($team_id1, $team_id2,
 							 $team1_caps, $team2_caps,
 							 $timestamp, $team_stats_changes,
-							 $viewerid);
+							 $viewerid,  $duration);
 		
 		show_score_changes($team_stats_changes, array_keys($team_stats_changes));
 		
@@ -69,7 +69,7 @@
 	}
 	
 	
-	function edit_match($team_id1, $team_id2, $team1_caps, $team2_caps, $timestamp, $match_id)
+	function edit_match($team_id1, $team_id2, $team1_caps, $team2_caps, $timestamp, $match_id, $duration)
 	{
 		global $site;
 		global $connection;
@@ -82,7 +82,7 @@
 		// prepare to update win/draw/loose count
 		
 		// who entered/edited the match before?
-		$playerid_old = 0;
+		$userid_old = 0;
 		// when was the match in question
 		$timestamp_old = '';
 		
@@ -93,7 +93,7 @@
 		$team2_points_old = 0;
 		
 		// find out the appropriate team id list for the edited match (to modify total/win/draw/loose count)
-		$query = ('SELECT `playerid`, `timestamp`, `team1_teamid`, `team2_teamid`, `team1_points`, `team2_points` FROM `matches`'
+		$query = ('SELECT `userid`, `timestamp`, `team1ID`, `team2ID`, `team1_points`, `team2_points`, `duration` FROM `matches`'
 				  . ' WHERE `id`=' . sqlSafeStringQuotes($match_id));
 		if (!($result = $site->execute_query('matches', $query, $connection)))
 		{
@@ -103,13 +103,14 @@
 		}
 		while ($row = mysql_fetch_array($result))
 		{
-			$playerid_old =  intval($row['playerid']);
+			$userid_old =  intval($row['userid']);
 			$timestamp_old = $row['timestamp'];
 			
-			$team1_id_old = intval($row['team1_teamid']); // team id 1 before
-			$team2_id_old = intval($row['team2_teamid']); // team id 2 before
+			$team1_id_old = intval($row['team1ID']); // team id 1 before
+			$team2_id_old = intval($row['team2ID']); // team id 2 before
 			$team1_points_old = intval($row['team1_points']);
 			$team2_points_old = intval($row['team2_points']);
+			$duration_old = intval($row['duration']);
 		}
 		mysql_free_result($result);
 		
@@ -121,12 +122,12 @@
 		$team_stats_changes[$team2_id_old] = '';
 		
 		// save old match into edit history table
-		$query = ('INSERT INTO `matches_edit_stats` (`match_id`, `playerid`, `timestamp`, `team1_teamid`,'
-				  . ' `team2_teamid`, `team1_points`, `team2_points`) VALUES ('
-				  . sqlSafeStringQuotes($match_id) . ', ' . sqlSafeStringQuotes($playerid_old) . ', '
+		$query = ('INSERT INTO `matches_edit_stats` (`match_id`, `userid`, `timestamp`, `team1ID`,'
+				  . ' `team2ID`, `team1_points`, `team2_points`, `duration`) VALUES ('
+				  . sqlSafeStringQuotes($match_id) . ', ' . sqlSafeStringQuotes($userid_old) . ', '
 				  . sqlSafeStringQuotes($timestamp_old) . ', ' . sqlSafeStringQuotes($team1_id_old) .', '
 				  . sqlSafeStringQuotes($team2_id_old) . ', ' . sqlSafeStringQuotes($team1_points_old) . ', '
-				  . sqlSafeStringQuotes($team2_points_old) . ')');
+				  . sqlSafeStringQuotes($team2_points_old) . ', ' . sqlSafeStringQuotes($duration) . ')');
 		
 		if (!($result = $site->execute_query('matches_edit_stats', $query, $connection)))
 		{
@@ -143,7 +144,7 @@
 		update_team_match_edit($team1_points_old, $team2_points_old,
 							   $team1_caps, $team2_caps,
 							   $team1_id_old, $team2_id_old,
-							   $team_id1, $team_id2);
+							   $team_id1, $team_id2, $duration_old);
 		
 		
 		// find out oldest timestamp involved
@@ -154,13 +155,14 @@
 		}
 		
 		// old match data variables no longer needed
-		unset($playerid_old);
+		unset($userid_old);
 		unset($timestamp_old);
 		
 		unset($team1_id_old);
 		unset($team2_id_old);
 		unset($team1_points_old);
 		unset($team2_points_old);
+		unset($duration_old);
 		
 		
 		// find out old score
@@ -173,19 +175,20 @@
 		compute_scores($team_id1, $team_id2,
 					   $team1_score, $team2_score,
 					   $team1_caps, $team2_caps,
-					   $diff, $team_stats_changes);
+					   $diff, $team_stats_changes, $duration);
 		
 		// update match table (perform the actual editing)
 		// use current row id to access the entry
 		// only one row needs to be updated
-		$query = ('UPDATE `matches` SET `playerid`=' . sqlSafeStringQuotes($viewerid)
+		$query = ('UPDATE `matches` SET `userid`=' . sqlSafeStringQuotes($viewerid)
 				  . ',`timestamp`=' . sqlSafeStringQuotes($timestamp)
-				  . ',`team1_teamid`=' . sqlSafeStringQuotes($team_id1)
-				  . ',`team2_teamid`=' . sqlSafeStringQuotes($team_id2)
+				  . ',`team1ID`=' . sqlSafeStringQuotes($team_id1)
+				  . ',`team2ID`=' . sqlSafeStringQuotes($team_id2)
 				  . ',`team1_points`=' . sqlSafeStringQuotes($team1_caps)
 				  . ',`team2_points`=' . sqlSafeStringQuotes($team2_caps)
 				  . ',`team1_new_score`=' . sqlSafeStringQuotes($team1_score)
 				  . ',`team2_new_score`=' . sqlSafeStringQuotes($team2_score)
+				  . ',`duration`=' . sqlSafeStringQuotes($duration)
 				  . ' WHERE `id`=' . sqlSafeStringQuotes($match_id)
 				  . ' LIMIT 1');
 		
@@ -201,7 +204,7 @@
 		update_later_matches($team_id1, $team_id2,
 							 $team1_caps, $team2_caps,
 							 $oldest_timestamp, $team_stats_changes,
-							 $viewerid);
+							 $viewerid, $duration);
 		
 		show_score_changes($team_stats_changes, array_keys($team_stats_changes));
 		
@@ -226,10 +229,10 @@
 		
 		
 		// who entered/edited the match before?
-		$playerid = 0;
+		$userid = 0;
 		
 		// find out the appropriate team id list for the edited match (to modify total/win/draw/loose count)
-		$query = ('SELECT `playerid`, `timestamp`, `team1_teamid`, `team2_teamid`,'
+		$query = ('SELECT `userid`, `timestamp`, `team1ID`, `team2ID`,'
 				  . ' `team1_points`, `team2_points`, `team1_new_score`, `team2_new_score` FROM `matches`'
 				  . ' WHERE `id`=' . sqlSafeStringQuotes($match_id));
 		if (!($result = $site->execute_query('matches', $query, $connection)))
@@ -240,12 +243,13 @@
 		}
 		while ($row = mysql_fetch_array($result))
 		{
-			$playerid =  intval($row['playerid']);
+			$userid =  intval($row['userid']);
 			$timestamp = $row['timestamp'];
-			$team_id1 = intval($row['team1_teamid']);
-			$team_id2 = intval($row['team2_teamid']);
+			$team_id1 = intval($row['team1ID']);
+			$team_id2 = intval($row['team2ID']);
 			$team1_caps = intval($row['team1_points']);
 			$team2_caps = intval($row['team2_points']);
+			$duration = intval($row['duration']);
 		}
 		mysql_free_result($result);
 		
@@ -260,12 +264,12 @@
 		$team_stats_changes[$team_id2] = '';
 		
 		// save old match into edit history table
-		$query = ('INSERT INTO `matches_edit_stats` (`match_id`, `playerid`, `timestamp`, `team1_teamid`,'
-				  . ' `team2_teamid`, `team1_points`, `team2_points`) VALUES ('
-				  . sqlSafeStringQuotes($match_id) . ', ' . sqlSafeStringQuotes($playerid) . ', '
+		$query = ('INSERT INTO `matches_edit_stats` (`match_id`, `userid`, `timestamp`, `team1ID`,'
+				  . ' `team2ID`, `team1_points`, `team2_points`, `duration`) VALUES ('
+				  . sqlSafeStringQuotes($match_id) . ', ' . sqlSafeStringQuotes($userid) . ', '
 				  . sqlSafeStringQuotes($timestamp) . ', ' . sqlSafeStringQuotes($team_id1) .', '
 				  . sqlSafeStringQuotes($team_id2) . ', ' . sqlSafeStringQuotes($team1_caps) . ', '
-				  . sqlSafeStringQuotes($team2_caps) . ')');
+				  . sqlSafeStringQuotes($team2_caps) . ', ' . sqlSafeStringQuotes($duration) . ')');
 		
 		if (!($result = $site->execute_query('matches_edit_stats', $query, $connection)))
 		{
@@ -328,7 +332,7 @@
 		}
 		
 		// old match data variables no longer needed
-		unset($playerid_old);
+		unset($userid_old);
 		
 		
 		
@@ -336,7 +340,7 @@
 		update_later_matches($team_id1, $team_id2,
 							 $team1_caps, $team2_caps,
 							 $timestamp, $team_stats_changes,
-							 $viewerid);
+							 $viewerid, $duration);
 		
 		show_score_changes($team_stats_changes, array_keys($team_stats_changes));
 		
@@ -352,7 +356,7 @@
 	}
 	
 	
-	function update_later_matches($team_id1, $team_id2, $team1_caps, $team2_caps, $timestamp, &$team_stats_changes, $viewerid)
+	function update_later_matches($team_id1, $team_id2, $team1_caps, $team2_caps, $timestamp, &$team_stats_changes, $viewerid, $duration)
 	{
 		global $site;
 		global $connection;
@@ -362,7 +366,7 @@
 		$viewerid = getUserID();
 		
 		// update only newer matches
-		$query = ('SELECT `id`, `team1_teamid`, `team2_teamid`, `team1_points`, `team2_points`, `timestamp` FROM `matches`'
+		$query = ('SELECT `id`, `team1ID`, `team2ID`, `team1_points`, `team2_points`, `timestamp`, `duration` FROM `matches`'
 				  . ' WHERE `timestamp`>' . sqlSafeStringQuotes($timestamp));
 		if (!($result = $site->execute_query('matches', $query, $connection)))
 		{
@@ -372,18 +376,19 @@
 		
 		while ($row = mysql_fetch_array($result))
 		{
-			$cur_team1 = intval($row['team1_teamid']);
-			$cur_team2 = intval($row['team2_teamid']);
+			$cur_team1 = intval($row['team1ID']);
+			$cur_team2 = intval($row['team2ID']);
 			
 			$team1_score = get_score_at_that_time($cur_team1, $row['timestamp']);
 			$team2_score = get_score_at_that_time($cur_team2, $row['timestamp']);
+			$duration_old = intval($row['duration']);
 			
 			// update existing entry
 			$diff = 0;
 			compute_scores($cur_team1, $cur_team2,
 						   $team1_score, $team2_score,
 						   $row['team1_points'], $row['team2_points'],
-						   $diff, $team_stats_changes);
+						   $diff, $team_stats_changes, $duration);
 			
 			// update score if necessary
 			if (!($diff === 0))
@@ -411,13 +416,12 @@
 	}
 	
 	
-	function show_form($team_id1, $team_id2, $team1_points, $team2_points, $readonly)
+	function show_form($team_id1, $team_id2, $team1_points, $team2_points, $readonly, $duration)
 	{
 		global $site;
 		global $connection;
 		
 		global $match_day;
-		global $match_time;
 		
 		// displays match form
 		$query = ('SELECT `teams`.`id`,`teams`.`name` FROM `teams`,`teams_overview`'
@@ -490,7 +494,7 @@
 		} else
 		{
 			$site->write_self_closing_tag('input type="text" class="small_input_field" id="match_points_team1"'
-									  . ' name="team1_points" value="' . strval(intval($team1_points)) . '"');
+										  . ' name="team1_points" value="' . strval(intval($team1_points)) . '"');
 		}
 		echo '</span></p>' . "\n\n";
 		
@@ -549,7 +553,7 @@
 		if ($readonly)
 		{
 			$site->write_self_closing_tag('input type="text" class="small_input_field" id="match_day"'
-									  . ' name="match_day" value="' . htmlent($match_day) . '"readonly="readonly"');
+										  . ' name="match_day" value="' . htmlent($match_day) . '" readonly="readonly"');
 		} else
 		{
 			$site->write_self_closing_tag('input type="text" class="small_input_field" id="match_day"'
@@ -581,6 +585,37 @@
 		}
 		echo '</span></p>' . "\n\n";
 		
+		echo '<div class="formrow"><label for="match_time">Length: </label>' . "\n";
+		echo '<span>';
+		if (!isset($duration))
+		{
+			if (isset($_POST['duration']))
+			{
+				$duration = intval($_POST['duration']);
+			} else
+			{
+				$duration = 30;
+			}
+		}
+		echo '<select id="duration" name="duration"';
+		if ($readonly)
+		{
+			echo ' disabled="disabled"';
+		}
+		echo  '>';
+		echo '<option value="30" ' . (($duration == 30)? 'selected="selected"' : '') . '>30</option>';
+		echo '<option value="20" ' . (($duration == 20)? 'selected="selected"' : '') . '>20</option>';
+		echo '</select>';
+		
+		echo '</span></div>' . "\n\n";
+		
+/*
+		echo '</div>';
+		echo '</div>';
+*/
+		
+		
+		
 	}
 	
 	
@@ -604,11 +639,11 @@
 		global $site;
 		global $connection;
 		
-		$query = ('SELECT `team1_teamid`,`team2_teamid`,`team1_new_score`,`team2_new_score` FROM `matches`'
+		$query = ('SELECT `team1ID`,`team2ID`,`team1_new_score`,`team2_new_score` FROM `matches`'
 				  . ' WHERE `timestamp`<'
 				  . sqlSafeStringQuotes($timestamp)
-				  . ' AND (`team1_teamid`=' . sqlSafeStringQuotes($teamid)
-				  . ' OR `team2_teamid`=' . sqlSafeStringQuotes($teamid) . ')'
+				  . ' AND (`team1ID`=' . sqlSafeStringQuotes($teamid)
+				  . ' OR `team2ID`=' . sqlSafeStringQuotes($teamid) . ')'
 				  . ' ORDER BY `timestamp` DESC LIMIT 0,1');
 		if (!($result = $site->execute_query('matches', $query, $connection)))
 		{
@@ -624,7 +659,7 @@
 		{
 			while ($row = mysql_fetch_array($result))
 			{
-				if (((int) $row['team1_teamid']) === $teamid)
+				if (((int) $row['team1ID']) === $teamid)
 				{
 					$score = $row['team1_new_score'];
 				} else
@@ -644,7 +679,7 @@
 	}
 	
 	
-	function compute_scores($team_id1, $team_id2, &$score_a, &$score_b, $caps_a, $caps_b, &$diff, &$team_stats_changes)
+	function compute_scores($team_id1, $team_id2, &$score_a, &$score_b, $caps_a, $caps_b, &$diff, &$team_stats_changes, $duration)
 	{
 		global $site;
 		
@@ -677,7 +712,7 @@
 			}
 		}
 		
-		if (is_numeric($score_a) && is_numeric($score_b))
+		if (is_numeric($score_a) && is_numeric($score_b) && is_numeric($duration))
 		{
 			$score_a = intval($score_a);
 			$score_b = intval($score_b);
@@ -698,6 +733,12 @@
 			// do not compute absolute value of rounded difference
 			// as we need a signed integer to track score changes
 			$diff=floor(50*($score-$prob));
+			
+			$duration = intval($duration);
+			if ($duration === 20)
+			{
+			    $diff = ($diff * 2) / 3;
+			}
 			
 			// do not forget to round the values to integers
 			$score_a = $score_a + $diff;
