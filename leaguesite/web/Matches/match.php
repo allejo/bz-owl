@@ -233,7 +233,7 @@
 		
 		// find out the appropriate team id list for the edited match (to modify total/win/draw/loose count)
 		$query = ('SELECT `userid`, `timestamp`, `team1ID`, `team2ID`,'
-				  . ' `team1_points`, `team2_points`, `team1_new_score`, `team2_new_score` FROM `matches`'
+				  . ' `team1_points`, `team2_points`, `team1_new_score`, `team2_new_score`, `duration` FROM `matches`'
 				  . ' WHERE `id`=' . sqlSafeStringQuotes($match_id));
 		if (!($result = $site->execute_query('matches', $query, $connection)))
 		{
@@ -416,7 +416,7 @@
 	}
 	
 	
-	function show_form($team_id1, $team_id2, $team1_points, $team2_points, $readonly, $duration)
+	function show_form($team_id1, $team_id2, $team1_points, $team2_points, $readonly, $duration=30)
 	{
 		global $site;
 		global $connection;
