@@ -246,7 +246,7 @@
 		// casting the values to 0 is important
 		// (a post variable having no value means it has to be set to 0 to successfully compare values here)
 		$timestamp = '';
-		print_r($_POST);
+		
 		$duration = (int) $_POST['duration'];
 		$team_id1 = (int) $_POST['team_id1'];
 		$team_id2 = (int) $_POST['team_id2'];
