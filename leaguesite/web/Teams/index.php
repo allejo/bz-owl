@@ -1968,7 +1968,7 @@
 				
 				echo '<td>';
 				// get name of player that made last change
-				echo '<a href="../Players/?profile=' . ((int) $row['playerid']) . '">' . $row['playername'] . '</a>';
+				echo '<a href="../Players/?profile=' . ((int) $row['userid']) . '">' . $row['playername'] . '</a>';
 				echo '</td>' . "\n";
 				
 				
