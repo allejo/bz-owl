@@ -10,6 +10,10 @@
 						 'dbName' => 'bz-owl',
 						 // charset of non-ASCII user input stored in DB
 						 'db.userInputFieldCharset' => 'UTF-8',
+						 // set directory for file system storage of pictures
+						 'cms.addon.gallerySystem.picturePath' => realpath(dirname(__FILE__) . '/gallerySystem/'),
+						 // show postings as anon
+						 'cms.addon.newsSystem.hideIdentity' => array('path' => 'Bans/', 'anonUser' => 'GU League Council'),
 						 // show unfinished (and thus likely not properly working) themes in config chooser, too
 						 'config.themes.showUnfinished' => false,
 						 // nl2br needs php newer or equal to 4.0.5 to support xhtml
@@ -74,7 +78,7 @@
 																												 'allow_add_bans' => true,
 																												 'allow_edit_bans' => true,
 																												 'allow_delete_bans' => true,
-																												 'allow_edit_bans' => true,
+																												 'allow_see_anon_author' => true,
 																												 // permissions for team page
 																												 'allow_kick_any_team_members' => true,
 																												 'allow_edit_any_team_profile' => true,
@@ -148,19 +152,6 @@
 		{
 			return 'bzleague_guleague';
 		}
-		
-		// make posts anonymous
-		function force_username(&$section)
-		{
-			if (strcmp($section, 'bans') === 0)
-			{
-				return 'GU League Council';
-			} else
-			{
-				return '';
-			}
-		}
-		
 		
 		function maintain_inactive_teams()
 		{

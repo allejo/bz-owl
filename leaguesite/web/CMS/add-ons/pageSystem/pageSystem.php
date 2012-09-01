@@ -83,7 +83,7 @@
 			
 			
 			// check validity of data if write change requested
-			if (isset($_POST['requestPath'])
+			if (isset($_POST['request_path'])
 				&& isset($_POST['title'])
 				&& isset($_POST['addon']))
 			{
@@ -107,11 +107,36 @@
 				{
 					// pass this to the pageOperations class which will do db sanity checks and apply changes
 					// it needs id, request path, title and add-on to be used
-					$changeOutcome = ($this->pageOperations->pageAddRequested($_POST['requestPath'],
+					$changeOutcome = ($this->pageOperations->pageAddRequested($_POST['request_path'],
 																			  $_POST['title'],
 																			  $_POST['addon']));
 					if ($changeOutcome !== true && $changeOutcome !== false && strlen($changeOutcome) > 0)
 					{
+						switch($changeOutcome)
+						{
+							case 'E_REMOVE_PAGE_SYSTEM':
+							{
+								$changeOutcome = ('Removing pageSystem from any URL is not supported by this add-on. '
+												  .'Reason: It could really confuse people and cause plenty of trouble. '
+												  .'If you really want to do this, you must edit database directly instead.');
+								break;
+							}
+							case 'E_INVALID_CHARACTERS':
+							{
+								$changeOutcome = 'Invalid characters in request path detected. Please check your input.';
+								break;
+							}
+							case 'E_REQUEST_PATH_ALREADY_IN_USE':
+							{
+								$changeOutcome = 'Request path already in use, request path must be unique in db.';
+								break;
+							}
+							case 'E_SUCCESS':
+							{
+								$changeOutcome = 'Page added successfully.';
+								break;
+							}
+						}
 						$tmpl->assign('operationMessage', $changeOutcome);
 					}
 				} else
@@ -142,7 +167,7 @@
 			
 			// check validity of data if write change requested
 			if (isset($_POST['change'])
-			&& isset($_POST['requestPath'])
+			&& isset($_POST['request_path'])
 			&& isset($_POST['title'])
 			&& isset($_POST['addon']))
 			{
@@ -167,7 +192,7 @@
 					// pass this to the pageOperations class which will do db sanity checks and apply changes
 					// it needs id, request path, title and add-on to be used
 					$changeOutcome = ($this->pageOperations->pageChangeRequested($_POST['change'],
-																			 $_POST['requestPath'],
+																			 $_POST['request_path'],
 																			 $_POST['title'],
 																			 $_POST['addon']));
 					if ($changeOutcome !== true && $changeOutcome !== false && strlen($changeOutcome) > 0)

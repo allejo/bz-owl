@@ -1,0 +1,13 @@
+[2008-08-31] 1.0.2
+
+	* Switched to templated mode for the error message
+
+[2008-03-24] 1.0.1
+
+	* Changed the README and move all disclaiming there
+	* Removed the beta-tag since noone has been reported any bugs yet
+	* Starting distribution via sourceforge.net
+
+[2008-01-31] 1.0.0/beta
+
+	* First release

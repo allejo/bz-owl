@@ -2,6 +2,8 @@
 Overview
 ====================================
 
-This project is a CMS that serves as tool to provide a league website. Its name is derived from the game BZFlag and is an abbreviation for BZFlag Open Web League.
+This project is a lightweight CMS that serves as tool to provide a non-static website. Its name is derived from the game BZFlag and is an abbreviation for BZFlag Open Web League.
 
-Target audience: People with PHP/MySQL and Apache2 or lighted experience who want to host a league website.
+In essence it consists of a loader that loads an add-on for almost any address. The add-ons handle the output and are supposed to be programmed to fit the need.
+
+Target audience: People with PHP/MySQL and Apache2 or Lighttpd experience who want to host a website.

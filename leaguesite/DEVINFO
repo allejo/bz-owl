@@ -6,10 +6,12 @@ bz-owl source code lives in the following directories:
 
 often re-used code
 ------------
-CMS/				- the central storage for important files
-CMS/announcements	- the code to handle bzmails, news and ban entries
-CMS/*_login			- the modules that handle the backend login logic
-CMS/maintenance		- maintenance script to clean and to update the database
+CMS/			- the central storage for important files
+CMS/classes		- very commonly used classes
+CMS/add-ons		- installed add-ons, they handle pretty much everything
+CMS/themes		- installed theme templates, controlling html output
+themes			- installed theme css and javascript - directly accessed by end user without URL rewriting
+CMS/maintenance		- old maintenance script to clean and to update the database, partly still used
 
 pages in navigation
 ------------------------
@@ -32,7 +34,7 @@ likely to be ridiculed and rejected until they do.
 
 Code Organization
 -----------------
-PHP files use the .php extension. Include files use the .inc extension. Javascript files use the .js extension.
+PHP files use the .php extension. Javascript files use the .js extension.
 References in the outputted markup must not include the extension.
 If you link to Login/index.php the produced link in the (X)HTML must point to Login/ and NOT to Login/index.php.
 
@@ -197,7 +199,7 @@ original author or authorized licensee of derived works.
 
 Testing
 =======
-You should, of course, test if your changes do work before commiting changes.
+You should, of course, test if your changes do work before committing changes.
 
 
 Sounds

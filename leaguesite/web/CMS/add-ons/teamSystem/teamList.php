@@ -96,8 +96,8 @@
 			// get list of active, inactive and new teams (no deleted teams)
 			// TODO: move creation date in db from teams_profile to teams_overview
 			$query = $db->prepare('SELECT *'
-								  . ', (SELECT `name` FROM `players`'
-								  . ' WHERE `players`.`id`=`teams`.`leader_userid` LIMIT 1)'
+								  . ', (SELECT `name` FROM `users`'
+								  . ' WHERE `users`.`id`=`teams`.`leader_userid` LIMIT 1)'
 								  . ' AS `leader_name`'
 								  . ' FROM `teams`, `teams_overview`, `teams_profile`'
 								  . ' WHERE `teams`.`id`=`teams_overview`.`teamid`'
@@ -128,8 +128,8 @@
 			$db->free($query);
 			
 			$query = $db->prepare('SELECT *'
-								  . ', (SELECT `name` FROM `players`'
-								  . ' WHERE `players`.`id`=`teams`.`leader_userid` LIMIT 1)'
+								  . ', (SELECT `name` FROM `users`'
+								  . ' WHERE `users`.`id`=`teams`.`leader_userid` LIMIT 1)'
 								  . ' AS `leader_name`'
 								  . ' FROM `teams`, `teams_overview`, `teams_profile`'
 								  . ' WHERE `teams`.`id`=`teams_overview`.`teamid`'
@@ -173,8 +173,8 @@
 			$teamLeader = 0;
 			
 			$query = $db->prepare('SELECT *'
-								  . ', (SELECT `name` FROM `players`'
-								  . ' WHERE `players`.`id`=`teams`.`leader_userid` LIMIT 1)'
+								  . ', (SELECT `name` FROM `users`'
+								  . ' WHERE `users`.`id`=`teams`.`leader_userid` LIMIT 1)'
 								  . ' AS `leader_name`'
 								  . ' FROM `teams`, `teams_overview`, `teams_profile`'
 								  . ' WHERE `teams`.`id`=`teams_overview`.`teamid`'
@@ -235,20 +235,20 @@
 				$showMemberActionOptions = true;
 			}
 			$members = array();
-			$query = $db->prepare('SELECT `players`.`name` AS `player_name`'
-								  . ', `players`.`id` AS `userid`'
+			$query = $db->prepare('SELECT `users`.`name` AS `player_name`'
+								  . ', `users`.`id` AS `userid`'
 								  . ', (SELECT `name` FROM `countries`'
 								  . ' WHERE `countries`.`id`=`players_profile`.`location`'
-								  . ' AND `players_profile`.`playerid`=`players`.`id` LIMIT 1)'
+								  . ' AND `players_profile`.`userid`=`users`.`id` LIMIT 1)'
 								  . ' AS `country_name`'
 								  . ', (SELECT `flagfile` FROM `countries`'
 								  . ' WHERE `countries`.`id`=`players_profile`.`location`'
-								  . ' AND `players_profile`.`playerid`=`players`.`id` LIMIT 1)'
+								  . ' AND `players_profile`.`userid`=`users`.`id` LIMIT 1)'
 								  . ' AS `flagfile`'
 								  . ', `players_profile`.`joined`'
 								  . ', `players_profile`.`last_login`'
-								  . ' FROM `players`,`players_profile`'
-								  . 'WHERE `players`.`id`=`players_profile`.`playerid`'
+								  . ' FROM `users`,`players_profile`'
+								  . 'WHERE `users`.`id`=`players_profile`.`userid`'
 								  . ' AND `teamid`=?');
 			$db->execute($query, $teamid);
 			while ($row = $db->fetchRow($query))
@@ -316,8 +316,8 @@
 								  . '(SELECT `name` FROM `teams` WHERE `id`=`team1ID`) AS `team1_name`'
 								  . ',(SELECT `name` FROM `teams` WHERE `id`=`team2ID`) AS `team2_name`'
 								  . ',`team1_points`,`team2_points`,`userid`'
-								  . ',(SELECT `players`.`name` FROM `players`'
-								  . ' WHERE `players`.`id`=`matches`.`userid`)'
+								  . ',(SELECT `users`.`name` FROM `users`'
+								  . ' WHERE `users`.`id`=`matches`.`userid`)'
 								  . ' AS `playername`'
 								  . ',`matches`.`id`'
 								  . ' FROM `matches` WHERE `matches`.`team1ID`=?'

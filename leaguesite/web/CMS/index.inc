@@ -1,6 +1,9 @@
 <?php
-	require_once 'siteinfo.php';
-	$site = new siteinfo();
+	if (!isset($site))
+	{
+		require_once ('siteinfo.php');
+		$site = new siteinfo();
+	}
 
 	if ($site->use_xtml())
 	{

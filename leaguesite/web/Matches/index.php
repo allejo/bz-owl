@@ -256,9 +256,9 @@
 	$query .= ',`matches`.`team1ID`,`matches`.`team2ID`';
 	// the rest of the needed data
 	$query .= ',`matches`.`team1_points`,`matches`.`team2_points`,`matches`.`userid`';
-	$query .= ',`players`.`name` AS `playername`,`matches`.`id`, `matches`.`duration`';
+	$query .= ',`users`.`name` AS `playername`,`matches`.`id`, `matches`.`duration`';
 	// the tables in question
-	$query .= ' FROM `matches`,`players` WHERE `players`.`id`=`matches`.`userid`';
+	$query .= ' FROM `matches`,`users` WHERE `users`.`id`=`matches`.`userid`';
 	if (isset($_GET['search']))
 	{
 		// Every derived table must have its own alias

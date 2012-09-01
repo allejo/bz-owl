@@ -16,7 +16,7 @@
 	// we don't want magic quotes, do we?
 	if (magic_quotes_on())
 	{
-		echo 'PHP magic quotes are supposed to be OFF for this site. Disable them please, they are gone in PHP 6 anyway.';
+		echo 'PHP magic quotes are supposed to be OFF for this site. Disable them please, they are gone in PHP 5.4 anyway.';
 		die (' Please also read <a href="http://www.php.net/manual/en/info.configuration.php#ini.magic-quotes-gpc">the manual</a>.');
 	}
 	
@@ -538,7 +538,7 @@
 			date_default_timezone_set($this->used_timezone());
 			
 			// remove expired sessions from the list of online users
-			$query ='SELECT `playerid`, `last_activity` FROM `online_users`';
+			$query ='SELECT `userid`, `last_activity` FROM `online_users`';
 			$result = $this->execute_silent_query('online_users', $query, $connection, __FILE__, 'Could not get list of online users from database');
 			
 			if (((int) mysql_num_rows($result)) > 0)
@@ -570,7 +570,7 @@
 			{
 				// the execution of the query is not that time critical and it happens often -> LOW_PRIORITY
 				$query = 'UPDATE LOW_PRIORITY `online_users` SET `last_activity`=';
-				$query .= sqlSafeStringQuotes(date('Y-m-d H:i:s')) . ' WHERE `playerid`=' . sqlSafeStringQuotes(getUserID());
+				$query .= sqlSafeStringQuotes(date('Y-m-d H:i:s')) . ' WHERE `userid`=' . sqlSafeStringQuotes(getUserID());
 				@mysql_select_db($this->db_used_name(), $connection);
 				@mysql_query($query, $connection);
 				
@@ -578,7 +578,7 @@
 				// are there unread messages?
 				$query = ('SELECT `id` FROM `messages_users_connection` WHERE `msg_status`='
 						  . sqlSafeStringQuotes('new')
-						  . ' AND `playerid`=' . sqlSafeStringQuotes(getUserID())
+						  . ' AND `userid`=' . sqlSafeStringQuotes(getUserID())
 						  . ' LIMIT 1');
 				$result = @mysql_query($query, $connection);
 				$rows = (int) @mysql_num_rows($result);

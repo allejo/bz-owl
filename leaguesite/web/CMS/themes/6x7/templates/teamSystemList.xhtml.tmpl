@@ -17,13 +17,15 @@ No menu found.
 
 <div class="userbuttons">
 	<span class="date">{$date}</span>
-	<span class="Servers">Match servers: <a href="{$baseURL}Servertracker/">{$onlinePlayers}</a></span>
 	<span class="onlineUsers">Website: <a href="{$baseURL}Online/">{$onlineUsers}</a></span>
 	{if isset($logoutURL)}<span class="logout"><a href="{$logoutURL}">Logout</a></span>{/if}
 </div>
 
 <div class="content">
 {if isset($showReactivateButton)}<a class="button" href="?reactivate">Reactivate a team</a>{/if}
+{if !isset($activeTeams) || empty($activeTeams) || !isset($inactiveTeams) || empty($inactiveTeams)}
+There are no active teams.
+{/if}
 
 {if isset($activeTeams) && !empty($activeTeams)}
 <table id="table_team_members_active_teams" class="big">

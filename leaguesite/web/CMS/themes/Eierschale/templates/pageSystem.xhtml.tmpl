@@ -42,7 +42,7 @@ No menu found.
 {foreach item="page" from=$pageList}
 <tr>
 	<td>
-		{$page.requestPath}
+		{$page.request_path}
 	</td>
 	<td>
 		{$page.title}
@@ -65,7 +65,7 @@ No menu found.
 <p>You may add a new page here:</p>
 <form enctype="application/x-www-form-urlencoded" method="post" action="./">
 <p>Request Path</p>
-<p><input type="text" name="requestPath" value="request/path/here/" /></p>
+<p><input type="text" name="request_path" value="request/path/here/" /></p>
 <p>Title</p>
 <p><input type="text" name="title" value="page title here" /></p>
 <p>Add-on</p>
@@ -91,7 +91,7 @@ No menu found.
 <form enctype="application/x-www-form-urlencoded" method="post" action="./">
 <div><input type="hidden" name="change" value="{$pageData.id}" /></div>
 <p>Request Path</p>
-<p><input type="text" name="requestPath" value="{$pageData.requestPath}" /></p>
+<p><input type="text" name="request_path" value="{$pageData.request_path}" /></p>
 <p>Title</p>
 <p><input type="text" name="title" value="{$pageData.title}" /></p>
 <p>Add-on</p>

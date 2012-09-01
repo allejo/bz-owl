@@ -46,7 +46,7 @@
 			{
 				// data passed to form -> use it
 				
-				$query = $db->prepare('SELECT `name` FROM `players` WHERE `id`=? LIMIT 1');
+				$query = $db->prepare('SELECT `name` FROM `users` WHERE `id`=? LIMIT 1');
 				$db->execute($query, $user->getID());
 				$author = $db->fetchRow($query);
 				if ($author === false)
@@ -175,7 +175,7 @@
 					if (strcmp($_GET['reply'], 'all') === 0)
 					{
 						// add original author to recipients
-						$origAuthorQuery = $db->prepare('SELECT `name` FROM `players`'
+						$origAuthorQuery = $db->prepare('SELECT `name` FROM `users`'
 											  . ' WHERE `id`=(SELECT `author_id` FROM `pmsystem_msg_storage`'
 											  . ' WHERE `id`=? LIMIT 1) LIMIT 1');
 						$db->execute($origAuthorQuery, intval($_GET['id']));
@@ -187,8 +187,8 @@
 						
 						// prepare further recipients queries
 						$usersQuery = $db->prepare('SELECT `name`'
-												   . ' FROM `pmsystem_msg_recipients_users` LEFT JOIN `players`'
-												   . ' ON `pmsystem_msg_recipients_users`.`userid`=`players`.`id`'
+												   . ' FROM `pmsystem_msg_recipients_users` LEFT JOIN `users`'
+												   . ' ON `pmsystem_msg_recipients_users`.`userid`=`users`.`id`'
 												   . ' WHERE `msgid`=?');
 						$teamsQuery = $db->prepare('SELECT `name`'
 												   . ' FROM `pmsystem_msg_recipients_teams` LEFT JOIN `teams`'
@@ -213,7 +213,7 @@
 					} elseif (strcmp($_GET['reply'], 'author') === 0)
 					{
 						// only 1 author, thus no loop
-						$query = $db->prepare('SELECT `name` FROM `players`'
+						$query = $db->prepare('SELECT `name` FROM `users`'
 											  . ' WHERE `id`=(SELECT `author_id` FROM `pmsystem_msg_storage`'
 											  . ' WHERE `id`=? LIMIT 1) LIMIT 1');
 						$db->execute($query, intval($_GET['id']));

@@ -152,29 +152,29 @@
 				}
 				mysql_free_result($result_matches);
 				
-				if (!$cur_team_active && !$settings->maintain_teams_not_matching_anymore_players_still_loggin_in())
+				if (!$cur_team_active && !$settings->maintain_teams_not_matching_anymore_users_still_loggin_in())
 				{
-					$query = ('SELECT `players`.`id` AS `active_player`'
-							  . ' FROM `players`,`players_profile`'
+					$query = ('SELECT `users`.`id` AS `active_player`'
+							  . ' FROM `users`,`users_profile`'
 							  . ' WHERE `teamid` = ' . sqlSafeStringQuotes($curTeam)
-							  . ' AND `players_profile`.`last_login`>' . sqlSafeStringQuotes($six_months_in_past)
-							  . ' AND `players`.`id`=`players_profile`.`playerid`'
+							  . ' AND `users_profile`.`last_login`>' . sqlSafeStringQuotes($six_months_in_past)
+							  . ' AND `users`.`id`=`users_profile`.`userid`'
 							  // only 1 active player is enough not to deactivate the team
 							  . ' LIMIT 1');
 					// execute query
-					if (!($result_active_players = @$site->execute_query('matches', $query, $connection)))
+					if (!($result_active_users = @$site->execute_query('matches', $query, $connection)))
 					{
 						$site->dieAndEndPage('MAINTENANCE ERROR: getting list of recent logged in player from team'
 											 . sqlSafeStringQuotes($curTeam)
 											 . ' failed.');
 					}
-					if ((int) mysql_num_rows($result_active_players) > 0)
+					if ((int) mysql_num_rows($result_active_users) > 0)
 					{
 						// at least one player logged in during the last 6 months
 						// in settings it was specified to count the current team as active then
 						$cur_team_active = true;
 					}
-					mysql_free_result($result_active_players);
+					mysql_free_result($result_active_users);
 				}
 				
 				if (((int) $row['member_count']) === 0)
@@ -186,11 +186,11 @@
 				// if team not active and is not new, delete it for real (do not mark as deleted but actually do it!)
 				if (!$cur_team_active && $curTeamNew)
 				{
-					// set players belonging to the deleted team to teamless
-					$query = 'UPDATE `players` SET `last_teamid`=' . sqlSafeStringQuotes($curTeam);
+					// set users belonging to the deleted team to teamless
+					$query = 'UPDATE `users` SET `last_teamid`=' . sqlSafeStringQuotes($curTeam);
 					$query .= ', `teamid`=' . sqlSafeStringQuotes('0');
 					$query .= ' WHERE `teamid`=' . sqlSafeStringQuotes($curTeam);
-					@$site->execute_query('players', $query, $connection);
+					@$site->execute_query('users', $query, $connection);
 					
 					// delete (for real) the new team
 					$query = 'DELETE FROM `teams` WHERE `id`=' . "'" . ($curTeam) . "'";
@@ -231,10 +231,10 @@
 					@$site->execute_query('teams_overview', $query, $connection);
 					
 					// mark who was where, to easily restore an unwanted team deletion
-					$query = 'UPDATE `players` SET `last_teamid`=' . sqlSafeStringQuotes($curTeam);
+					$query = 'UPDATE `users` SET `last_teamid`=' . sqlSafeStringQuotes($curTeam);
 					$query .= ', `teamid`=' . sqlSafeStringQuotes('0');
 					$query .= ' WHERE `teamid`=' . sqlSafeStringQuotes($curTeam);
-					if (!($result_update = @$site->execute_query('players', $query, $connection)))
+					if (!($result_update = @$site->execute_query('users', $query, $connection)))
 					{
 						$site->dieAndEndPage();
 					}
@@ -256,57 +256,57 @@
 			$two_months_in_past = strftime('%Y-%m-%d %H:%M:%S', $two_months_in_past);
 			
 			// clean teams first
-			// if team gets deleted players will be maintained later
+			// if team gets deleted users will be maintained later
 			$this->cleanup_teams($two_months_in_past);
 			
 			
-			// maintain players now
+			// maintain users now
 			
-			// get player id of teamless players that have not been logged-in in the last 2 months
-			$query = 'SELECT `playerid` FROM `players`, `players_profile`';
-			$query .= ' WHERE `players`.`teamid`=' . sqlSafeStringQuotes('0');
-			$query .= ' AND `players`.`status`=' . sqlSafeStringQuotes('active');
-			$query .= ' AND `players_profile`.`playerid`=`players`.`id`';
-			$query .= ' AND `players_profile`.`last_login`<' . sqlSafeStringQuotes($two_months_in_past);
+			// get player id of teamless users that have not been logged-in in the last 2 months
+			$query = 'SELECT `userid` FROM `users`, `users_profile`';
+			$query .= ' WHERE `users`.`teamid`=' . sqlSafeStringQuotes('0');
+			$query .= ' AND `users`.`status`=' . sqlSafeStringQuotes('active');
+			$query .= ' AND `users_profile`.`userid`=`users`.`id`';
+			$query .= ' AND `users_profile`.`last_login`<' . sqlSafeStringQuotes($two_months_in_past);
 			
 			// execute query
-			if (!($result = @$site->execute_query('players, players_profile', $query, $connection)))
+			if (!($result = @$site->execute_query('users, users_profile', $query, $connection)))
 			{
-				$site->dieAndEndPage('MAINTENANCE ERROR: getting list of 3 months long inactive players failed.');
+				$site->dieAndEndPage('MAINTENANCE ERROR: getting list of 3 months long inactive users failed.');
 			}
 			
-			// store inactive players in an array
-			$inactive_players = Array();
+			// store inactive users in an array
+			$inactive_users = Array();
 			while($row = mysql_fetch_array($result))
 			{
-				$inactive_players[] = $row['playerid'];
+				$inactive_users[] = $row['userid'];
 			}
 			mysql_free_result($result);
 			
 			// handle each inactive player seperately
-			foreach ($inactive_players as $one_inactive_player)
+			foreach ($inactive_users as $one_inactive_player)
 			{
 				// delete account data:
 				
 				// user entered comments
-				$query = 'UPDATE `players_profile` SET `user_comment`=' . "'" . "'";
+				$query = 'UPDATE `users_profile` SET `user_comment`=' . "'" . "'";
 				$query .= ', logo_url=' . "'" . "'";
-				$query .= ' WHERE `playerid`=' . sqlSafeStringQuotes($one_inactive_player);
+				$query .= ' WHERE `userid`=' . sqlSafeStringQuotes($one_inactive_player);
 				// only one player needs to be updated
 				$query .= ' LIMIT 1';
 				// execute query, ignore result
-				@$site->execute_query('players_profile', $query, $connection);
+				@$site->execute_query('users_profile', $query, $connection);
 				
 				// visits log (ip-addresses and host data)
-				$query = 'DELETE FROM `visits` WHERE `playerid`=' . sqlSafeStringQuotes($one_inactive_player);
+				$query = 'DELETE FROM `visits` WHERE `userid`=' . sqlSafeStringQuotes($one_inactive_player);
 				@$site->execute_query('visits', $query, $connection);
 				
 				// mark account as deleted
-				$query = 'UPDATE `players` SET `status`=' . sqlSafeStringQuotes('deleted');
+				$query = 'UPDATE `users` SET `status`=' . sqlSafeStringQuotes('deleted');
 				$query .= ' WHERE `id`=' . sqlSafeStringQuotes($one_inactive_player);
 				// and again only one player needs to be updated
 				$query .= ' LIMIT 1';
-				@$site->execute_query('players', $query, $connection);
+				@$site->execute_query('users', $query, $connection);
 				
 				// FIXME: if user marked deleted check if he was leader of a team
 				$query = 'SELECT `id` FROM `teams` WHERE `leader_userid`=' . sqlSafeStringQuotes($one_inactive_player);
@@ -331,7 +331,7 @@
 					// update member count of team
 					$member_count_modified = true;
 					$teamid = $row['id'];
-					$query = 'UPDATE `teams_overview` SET `member_count`=(SELECT COUNT(*) FROM `players` WHERE `players`.`teamid`=';
+					$query = 'UPDATE `teams_overview` SET `member_count`=(SELECT COUNT(*) FROM `users` WHERE `users`.`teamid`=';
 					$query .= sqlSafeStringQuotes($teamid) . ') WHERE `teamid`=';
 					$query .= sqlSafeStringQuotes($teamid);
 					// execute query, ignore result

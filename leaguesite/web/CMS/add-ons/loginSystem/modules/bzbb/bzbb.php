@@ -84,6 +84,12 @@
 				return false;
 			}
 			
+			// check if username is not empty or does only consist of whitespace
+			if (strlen(ltrim($this->getName())) === 0)
+			{
+				$output = ('Login failed: Username empty. This is likely a problem with the bzbb api.');
+				return false;
+			}
 			
 			// code ran successfully
 			return true;
@@ -137,7 +143,7 @@
 			// and apply them individually
 			foreach ($group['permissions'] as $name => $value)
 			{
-				$user->setPermission($name, $value === true);
+				$user->setPermission($name, $value);
 			}
 		}
 		

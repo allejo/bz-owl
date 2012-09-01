@@ -10,15 +10,17 @@
 			global $user;
 			global $tmpl;
 			
-			// setup session
-			ini_set ('session.use_trans_sid', 0);
-			ini_set ('session.name', 'SID');
-			ini_set('session.gc_maxlifetime', '7200');
-			session_start();
 			
 			// site config information
 			include dirname(__FILE__) . '/classes/config.php';
 			$config = new config();
+			
+			// setup session
+			ini_set('session.use_trans_sid', 0);
+			ini_set('session.name', 'SID');
+			ini_set('session.gc_maxlifetime', '7200');
+			ini_set('session.cookie_path', $config->getValue('basepath'));
+			session_start();
 			
 			// set the date and time
 			// suppress warning on invalid value to keep output well-formed

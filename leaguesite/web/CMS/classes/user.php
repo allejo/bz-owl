@@ -2,6 +2,19 @@
 	// handle user related data
 	class user
 	{
+		public function __construct()
+		{
+			// set default permissions for all users one time
+			// make sure not to do it more than once because it would reset perms then
+			// TODO: getPermission should return default permission instead
+			if (!isset($_SESSION['defaultPermissionsSet']))
+			{
+				$this->setDefaultPermissions();
+				$_SESSION['defaultPermissionsSet'] = true;
+			}
+		}
+		
+		
 		// id > 0 means a user is logged in
 		function getID()
 		{
@@ -26,6 +39,7 @@
 		{
 			global $config;
 			
+			// set default theme based on site preferences
 			if ($this->getMobile())
 			{
 				$default_theme = $config->getValue('defaultMobileTheme');
@@ -34,6 +48,7 @@
 				$default_theme = $config->getValue('defaultTheme');
 			}
 			
+			// find out which theme to use
 			$theme = $default_theme;
 			if (isset($_SESSION['theme']))
 			{
@@ -116,7 +131,7 @@
 			{
 				$userName = $db->fetchRow($query);
 				$db->free($query);
-			
+				
 				return $userName['name'];
 			}
 			
@@ -129,6 +144,75 @@
 		{
 			$_SESSION[$permission] = $value;
 		}
+		
+		
+		function setDefaultPermissions()
+		{
+			// sets user's permisssions to default ones
+			
+			// can change debug sql setting
+			$this->setPermission('allow_change_debug_sql', false);
+			
+			// set all permission to default values
+			// permissions for news page
+			$this->setPermission('allow_set_different_news_author', false);
+			$this->setPermission('allow_add_news', false);
+			$this->setPermission('allow_edit_news', false);
+			$this->setPermission('allow_delete_news', false);
+			
+			// permissions for all static pages
+			$this->setPermission('allow_edit_static_pages', false);
+			
+			// permissions for gallery pages
+			$this->setPermission('allow_list_gallery', true);
+			$this->setPermission('allow_view_gallery', true);
+			$this->setPermission('allow_add_gallery', false);
+			$this->setPermission('allow_edit_gallery', false);
+			$this->setPermission('allow_delete_gallery', false);
+
+			// permissions for bans page
+			$this->setPermission('allow_set_different_bans_author', false);
+			$this->setPermission('allow_add_bans', false);
+			$this->setPermission('allow_edit_bans', false);
+			$this->setPermission('allow_delete_bans', false);
+			
+			// permissions for private messages
+			$this->setPermission('allow_add_messages', false);
+			// private messages are never supposed to be edited at all by a 3rd person
+			$this->setPermission('allow_edit_messages', false);
+			$this->setPermission('allow_delete_messages', false);
+			
+			// team permissions
+			$this->setPermission('allow_kick_any_team_members', false);
+			$this->setPermission('allow_edit_any_team_profile', false);
+			$this->setPermission('allow_delete_any_team', false);
+			$this->setPermission('allow_invite_in_any_team', false);
+			$this->setPermission('allow_reactivate_teams', false);
+			
+			// user permissions
+			$this->setPermission('allow_edit_any_user_profile', false);
+			$this->setPermission('allow_add_admin_comments_to_user_profile', false);
+			$this->setPermission('allow_ban_any_user', false);
+			
+			// visits log permissions
+			$this->setPermission('allow_view_user_visits', false);
+			
+			// match permissions
+			$this->setPermission('allow_add_match', false);
+			$this->setPermission('allow_edit_match', false);
+			$this->setPermission('allow_delete_match', false);
+			
+			// server tracker permissions
+			$this->setPermission('allow_watch_servertracker', false);
+			
+			// TODO permissions
+			$this->setPermission('allow_view_todo', false);
+			$this->setPermission('allow_edit_todo', false);
+			
+			// aux permissions
+			$this->setPermission('IsAdmin', false);
+		}
+		
 		
 		function saveTheme($theme)
 		{
@@ -175,12 +259,43 @@
 		// logout the user
 		function logout()
 		{
-			// reset all session variables of this session
-			session_unset();
+			global $db;
+/*
+			// does session exist? session_status() and PHP_SESSION_ACTIVE are >= PHP 5.4
+			if (version_compare(PHP_VERSION, '5.4.0', '<') || session_status() === PHP_SESSION_ACTIVE)
+			{
+				
+				// gather session data
+				$sessionName = session_name();
+				$sessionCookie = session_get_cookie_params();
+				
+*/
+/*
+				// destroy the session
+				session_destroy();
+				
+				// delete session cookie, if possible
+				@setcookie($sessionName, '', time() - 3600, $sessionCookie['path'], $sessionCookie['domain'], $sessionCookie['secure']);
+				
+				
+				// start a new session
+				session_start();
+*/
+			// remove user from online user list
+			$query = $db->prepare('DELETE FROM `online_users` WHERE `userid`=:uid');
+			$db->execute($query, array(':uid' => array($this->getID(), PDO::PARAM_INT)));
 			
 			// fill login related session variables with default data
 			$_SESSION['user_logged_in'] = false;
 			$_SESSION['viewerid'] = -1;
+			
+			
+			// reset all session variables of this session
+			// session_unset();	
+
+			// reset permissions back to standard
+			$this->setDefaultPermissions();
+/* 			} */
 		}
 		
 		function removeAllPermissions()

@@ -89,8 +89,8 @@
 		}
 		
 		// is player banned and does he exist?
-		$query = 'SELECT `status` FROM `players` WHERE `id`=' . sqlSafeStringQuotes($profile) . ' LIMIT 1';
-		if (!($result = @$site->execute_query('players', $query, $connection)))
+		$query = 'SELECT `status` FROM `users` WHERE `id`=' . sqlSafeStringQuotes($profile) . ' LIMIT 1';
+		if (!($result = @$site->execute_query('users', $query, $connection)))
 		{
 			show_overview_and_profile_button();
 			$site->dieAndEndPage('It seems like the player profile can not be accessed for an unknown reason.');
@@ -122,12 +122,12 @@
 		$profile = (int) urldecode($_GET['invite']);
 		
 		// was the player deleted during maintenance
-		$query = 'SELECT `status` FROM `players` WHERE `id`=' . "'" . (urlencode($profile)) ."'";
+		$query = 'SELECT `status` FROM `users` WHERE `id`=' . "'" . (urlencode($profile)) ."'";
 		// 1 means maintenance-deleted
 		$query .= ' AND `status`<>' . sqlSafeStringQuotes('deleted');
 		// only information about one player needed
 		$query .= ' LIMIT 1';
-		if (!($result = @$site->execute_query('players', $query, $connection)))
+		if (!($result = @$site->execute_query('users', $query, $connection)))
 		{
 			// query was bad, error message was already given in $site->execute_query(...)
 			$site->dieAndEndPage('');
@@ -267,7 +267,7 @@
 			}
 			
 			// invitate the player to team
-			$query = 'INSERT INTO `invitations` (`invited_playerid`, `teamid`, `expiration`) VALUES ';
+			$query = 'INSERT INTO `invitations` (`invited_userid`, `teamid`, `expiration`) VALUES ';
 			$query .= '(' . sqlSafeStringQuotes($profile) . ', ' . sqlSafeStringQuotes($invited_to_team);
 			$sevendayslater = strtotime('+7 days');
 			$sevendayslater = strftime('%Y-%m-%d %H:%M:%S', $sevendayslater);
@@ -294,8 +294,8 @@
 			
 			// get player name
 			$player_name = '(no player name)';
-			$query = 'SELECT `name` FROM `players` WHERE `id`=' . "'" . sqlSafeString($viewerid) . "'" . ' LIMIT 1';
-			if (!($result = @$site->execute_query('players', $query, $connection)))
+			$query = 'SELECT `name` FROM `users` WHERE `id`=' . "'" . sqlSafeString($viewerid) . "'" . ' LIMIT 1';
+			if (!($result = @$site->execute_query('users', $query, $connection)))
 			{
 				// query was bad, error message was already given in $site->execute_query(...)
 				$site->dieAndEndPage('');
@@ -408,8 +408,8 @@
 			echo '</div>' . "\n";
 			
 			// find out the player's name
-			$query = 'SELECT `name` FROM `players` WHERE `id`=' . sqlSafeStringQuotes($profile) . ' LIMIT 1';
-			if (!($result = @$site->execute_query('players', $query, $connection)))
+			$query = 'SELECT `name` FROM `users` WHERE `id`=' . sqlSafeStringQuotes($profile) . ' LIMIT 1';
+			if (!($result = @$site->execute_query('users', $query, $connection)))
 			{
 				echo '</form>' . "\n";
 				$site->dieAndEndPage('A database related problem prevented to find out the name of the player.');
@@ -459,10 +459,10 @@
 		}
 		
 		// need name for player for better end user experience
-		$query = 'SELECT `name` FROM `players` WHERE `id`=' . "'" . (urlencode($profile)) ."'";
+		$query = 'SELECT `name` FROM `users` WHERE `id`=' . "'" . (urlencode($profile)) ."'";
 		$query .= ' LIMIT 1';
 		// perform the query
-		if (!($result = @$site->execute_query('players', $query, $connection)))
+		if (!($result = @$site->execute_query('users', $query, $connection)))
 		{
 			// query was bad, error message was already given in $site->execute_query(...)
 			$site->dieAndEndPage('');
@@ -495,9 +495,9 @@
 			{
 				$suspended_status = 'banned';
 			}
-			$query = 'UPDATE `players` SET `status`=' .sqlSafeStringQuotes(htmlentities($suspended_status));
+			$query = 'UPDATE `users` SET `status`=' .sqlSafeStringQuotes(htmlentities($suspended_status));
 			$query .= ' WHERE `id`=' . sqlSafeStringQuotes($profile);
-			if (!($result_suspended = @$site->execute_query('players', $query, $connection)))
+			if (!($result_suspended = @$site->execute_query('users', $query, $connection)))
 			{
 				echo '<p>The new suspended status for';
 				while($row = mysql_fetch_array($result_suspended))
@@ -619,23 +619,23 @@
 		echo '<div class="p"></div>' . "\n";
 		
 		// the data we want
-		$query = 'SELECT `players`.`external_id`, `players`.`name`,`countries`.`name` AS `country_name`,`countries`.`flagfile`, `players_profile`.`UTC`';
-		$query .= ', `players_profile`.`last_login`,`players_profile`.`joined`, `players_profile`.`user_comment`';
+		$query = 'SELECT `users`.`external_id`, `users`.`name`,`countries`.`name` AS `country_name`,`countries`.`flagfile`, `users_profile`.`UTC`';
+		$query .= ', `users_profile`.`last_login`,`users_profile`.`joined`, `users_profile`.`user_comment`';
 		// optimise query by finding out whether the admin comments are needed at all (no permission to view = unnecessary)
 		if ((isset($_SESSION['allow_view_user_visits'])) && ($_SESSION['allow_view_user_visits'] === true))
 		{
-			$query .= ', `players_profile`.`admin_comments`';
+			$query .= ', `users_profile`.`admin_comments`';
 		}
-		$query .= ', `players_profile`.`logo_url`';
+		$query .= ', `users_profile`.`logo_url`';
 		// if the player is a member of team get the corresponding team name
-		$query .= ',`players`.`teamid`,IF (`players`.`teamid`<>' . sqlSafeStringQuotes('0') . ',';
-		$query .= '(SELECT `teams`.`name` FROM `teams` WHERE `teams`.`id`=`players`.`teamid`),' . "''" . ') AS `team_name`';
+		$query .= ',`users`.`teamid`,IF (`users`.`teamid`<>' . sqlSafeStringQuotes('0') . ',';
+		$query .= '(SELECT `teams`.`name` FROM `teams` WHERE `teams`.`id`=`users`.`teamid`),' . "''" . ') AS `team_name`';
 		// join the tables `teams`, `teams_overview` and `teams_profile` using the team's id
-		$query .= ' FROM `players`, `players_profile`,`countries` WHERE `players`.`id` = `players_profile`.`playerid`';
-		$query .= ' AND `players_profile`.`location`=`countries`.`id`';
-		$query .= ' AND `players`.`id`=';
+		$query .= ' FROM `users`, `users_profile`,`countries` WHERE `users`.`id` = `users_profile`.`userid`';
+		$query .= ' AND `users_profile`.`location`=`countries`.`id`';
+		$query .= ' AND `users`.`id`=';
 		$query .= sqlSafeStringQuotes($profile) . ' LIMIT 1';
-		if (!($result = @$site->execute_query('players, players_profile, countries', $query, $connection)))
+		if (!($result = @$site->execute_query('users, players_profile, countries', $query, $connection)))
 		{
 			// query was bad, error message was already given in $site->execute_query(...)
 			$site->dieAndEndPage('');
@@ -645,22 +645,22 @@
 		{
 			echo 'It seems like the flag specified by this user does not exist.';
 			// the data we want
-			$query = 'SELECT `players`.`external_id`, `players`.`name`,' . sqlSafeStringQuotes('') . ' AS `country_name`,' . sqlSafeStringQuotes('') . ' AS `flagfile`';
-			$query .= ', `players_profile`.`UTC`, `players_profile`.`last_login`, `players_profile`.`joined`, `players_profile`.`user_comment`';
+			$query = 'SELECT `users`.`external_id`, `users`.`name`,' . sqlSafeStringQuotes('') . ' AS `country_name`,' . sqlSafeStringQuotes('') . ' AS `flagfile`';
+			$query .= ', `users_profile`.`UTC`, `users_profile`.`last_login`, `users_profile`.`joined`, `users_profile`.`user_comment`';
 			// optimise query by finding out whether the admin comments are needed at all (no permission to view = unnecessary)
 			if ((isset($_SESSION['allow_view_user_visits'])) && ($_SESSION['allow_view_user_visits'] === true))
 			{
-				$query .= ', `players_profile`.`admin_comments`';
+				$query .= ', `users_profile`.`admin_comments`';
 			}
-			$query .= ', `players_profile`.`logo_url`';
+			$query .= ', `users_profile`.`logo_url`';
 			// if the player is a member of team get the corresponding team name
-			$query .= ',`players`.`teamid`,IF (`players`.`teamid`<>' . sqlSafeStringQuotes('0') . ',';
-			$query .= '(SELECT `teams`.`name` FROM `teams` WHERE `teams`.`id`=`players`.`teamid`),' . "''" . ') AS `team_name`';
+			$query .= ',`users`.`teamid`,IF (`users`.`teamid`<>' . sqlSafeStringQuotes('0') . ',';
+			$query .= '(SELECT `teams`.`name` FROM `teams` WHERE `teams`.`id`=`users`.`teamid`),' . "''" . ') AS `team_name`';
 			// join the tables `teams`, `teams_overview` and `teams_profile` using the team's id
-			$query .= ' FROM `players`, `players_profile` WHERE `players`.`id` = `players_profile`.`playerid`';
-			$query .= ' AND `players`.`id`=';
+			$query .= ' FROM `users`, `users_profile` WHERE `users`.`id` = `users_profile`.`userid`';
+			$query .= ' AND `users`.`id`=';
 			$query .= "'" . sqlSafeString($profile) . "'" . ' LIMIT 1';
-			if (!($result = @$site->execute_query('players, players_profile', $query, $connection)))
+			if (!($result = @$site->execute_query('users, players_profile', $query, $connection)))
 			{
 				// query was bad, error message was already given in $site->execute_query(...)
 				$site->dieAndEndPage('');
@@ -978,85 +978,85 @@
 	
 	// get all data at once instead of many small queries -> a lot more efficient
 	// example query:
-	// SELECT `players`.`id`,`players`.`teamid`,`players`.`name` AS `player_name`,
-	// IF (`players`.`teamid`<>'0',(SELECT `teams`.`name` FROM `teams`
-	// WHERE `teams`.`id`=`players`.`teamid` LIMIT 1),'(teamless)') AS `team_name`,
-	// `players_profile`.`joined` FROM `players`,`players_profile`
-	// WHERE `players`.`status`<>'deleted' AND `players_profile`.`playerid`=`players`.`id`
-	// ORDER BY `players`.`teamid`, `players`.`name`;
+	// SELECT `users`.`id`,`users`.`teamid`,`users`.`name` AS `player_name`,
+	// IF (`users`.`teamid`<>'0',(SELECT `teams`.`name` FROM `teams`
+	// WHERE `teams`.`id`=`users`.`teamid` LIMIT 1),'(teamless)') AS `team_name`,
+	// `users_profile`.`joined` FROM `users`,`users_profile`
+	// WHERE `users`.`status`<>'deleted' AND `users_profile`.`userid`=`users`.`id`
+	// ORDER BY `users`.`teamid`, `users`.`name`;
 	$query = 'SELECT ';
 	// the needed values
-	$query .= ' `players`.`id`,`players`.`teamid`,`players`.`name` AS `player_name`,';
+	$query .= ' `users`.`id`,`users`.`teamid`,`users`.`name` AS `player_name`,';
 	// team name only available if player belongs to a team
 	if ($search_teamless)
 	{
 		$query .= sqlSafeStringQuotes('(teamless)') . ' AS `team_name`';
 	} elseif ($search_team)
 	{
-		$query .= '(SELECT `teams`.`name` FROM `teams` WHERE `teams`.`id`=`players`.`teamid` LIMIT 1) AS `team_name`';
+		$query .= '(SELECT `teams`.`name` FROM `teams` WHERE `teams`.`id`=`users`.`teamid` LIMIT 1) AS `team_name`';
 	} else
 	{
-		$query .= 'IF (`players`.`teamid`<>' . sqlSafeStringQuotes('0') . ',(SELECT `teams`.`name` FROM `teams` WHERE `teams`.`id`=`players`.`teamid` LIMIT 1),';
+		$query .= 'IF (`users`.`teamid`<>' . sqlSafeStringQuotes('0') . ',(SELECT `teams`.`name` FROM `teams` WHERE `teams`.`id`=`users`.`teamid` LIMIT 1),';
 		$query .= sqlSafeStringQuotes('(teamless)') . ') AS `team_name`';
 	}
 	// player first joined date
-	$query .= ',`players_profile`.`joined`';
+	$query .= ',`users_profile`.`joined`';
 	// tables involved
-	$query .= ' FROM `players`, `players_profile`';
+	$query .= ' FROM `users`, `users_profile`';
 	// include table teams if team search performed
 	if ($search_team_sort && (strcmp($search_expression, '(teamless)') !== 0))
 	{
 		$query .= ', `teams`';
 	}
 	// do not display deleted players during maintenance
-	$query .= ' WHERE `players`.`status`<>' . sqlSafeStringQuotes('deleted');
+	$query .= ' WHERE `users`.`status`<>' . sqlSafeStringQuotes('deleted');
 	if ($search_teamless)
 	{
-		$query .= ' AND `players`.`teamid`=' . sqlSafeStringQuotes('0');
+		$query .= ' AND `users`.`teamid`=' . sqlSafeStringQuotes('0');
 	} elseif ($search_team)
 	{
-		$query .= ' AND `players`.`teamid`<>' . sqlSafeStringQuotes('0');
+		$query .= ' AND `users`.`teamid`<>' . sqlSafeStringQuotes('0');
 	}
 	if (isset($_GET['search_string']) && !(strcmp($search_expression, '') === 0))
 	{
 		if ($search_player_sort)
 		{
-			$query .= ' AND `players`.`name` LIKE ' . sqlSafeStringQuotes($search_expression);
+			$query .= ' AND `users`.`name` LIKE ' . sqlSafeStringQuotes($search_expression);
 		} elseif ($search_team_sort)
 		{
 			if (strcmp($search_expression, '(teamless)') === 0)
 			{
-				$query .= ' AND `players`.`teamid`=' . sqlSafeStringQuotes('0');
+				$query .= ' AND `users`.`teamid`=' . sqlSafeStringQuotes('0');
 			} else
 			{
 				$query .= ' AND `teams`.`name` LIKE ' . sqlSafeStringQuotes($search_expression);
-				$query .= ' AND `teams`.`id`=`players`.`teamid`';
+				$query .= ' AND `teams`.`id`=`users`.`teamid`';
 			}
 		} elseif ($search_bzid_sort)
 		{
-			$query .= ' AND `players`.`external_id` LIKE ' . sqlSafeStringQuotes($search_expression);
+			$query .= ' AND `users`.`external_id` LIKE ' . sqlSafeStringQuotes($search_expression);
 		} else // $search_joined_sort 
 		{
-			$query .= ' AND `players_profile`.`joined` LIKE ' . sqlSafeStringQuotes($search_expression);
+			$query .= ' AND `users_profile`.`joined` LIKE ' . sqlSafeStringQuotes($search_expression);
 		}
 	}
 	// the profile id of the player must match the actual player id (profile must belong to the same player)
-	$query .= ' AND `players_profile`.`playerid`=`players`.`id`';
+	$query .= ' AND `users_profile`.`userid`=`users`.`id`';
 	// sort the result
 	if ($search_player_sort)
 	{
-		$query .= ' ORDER BY `players`.`name`, `team_name`';
+		$query .= ' ORDER BY `users`.`name`, `team_name`';
 	} elseif ($search_bzid_sort)
 	{
-		$query .= ' ORDER BY `players`.`external_id`, `players`.`name`, `team_name`';
+		$query .= ' ORDER BY `users`.`external_id`, `users`.`name`, `team_name`';
 	} elseif ($search_joined_sort)
 	{
-		$query .= ' ORDER BY `players_profile`.`joined`, `team_name`, `players`.`name`';
+		$query .= ' ORDER BY `users_profile`.`joined`, `team_name`, `users`.`name`';
 	} else
 	{
-		$query .= ' ORDER BY `team_name`, `players`.`name`';
+		$query .= ' ORDER BY `team_name`, `users`.`name`';
 	}
-	if ($result = @$site->execute_query('players, teams', $query, $connection))
+	if ($result = @$site->execute_query('users, teams', $query, $connection))
 	{
 		$rows = (int) mysql_num_rows($result);
 		if ($rows === 0)

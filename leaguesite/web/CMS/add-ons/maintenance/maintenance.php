@@ -75,7 +75,7 @@
 		
 		function doMaintaince()
 		{
-			$this->maintainPlayers();
+			$this->maintainUsers();
 			$this->maintainTeams();
 			$this->updateCountries();
 			$this->updateTeamActivity();
@@ -101,7 +101,7 @@
 		}
 		
 		
-		function maintainPlayers()
+		function maintainUsers()
 		{
 			
 		}

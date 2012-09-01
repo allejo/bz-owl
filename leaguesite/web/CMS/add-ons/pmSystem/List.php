@@ -62,7 +62,7 @@
 			// collect the necessary data
 			$query = $db->prepare('SELECT `id`,`author_id`,`subject`,`timestamp`,`message`,`msg_status`,'
 								  . ' IF(`pmsystem_msg_storage`.`author_id`<>0,'
-								  . ' (SELECT `name` FROM `players` WHERE `id`=`author_id`),?) AS `author`'
+								  . ' (SELECT `name` FROM `users` WHERE `id`=`author_id`),?) AS `author`'
 								  . ' FROM `pmsystem_msg_storage`, `pmsystem_msg_users`'
 								  . ' WHERE `pmsystem_msg_users`.`userid`=?'
 								  . ' AND `pmsystem_msg_storage`.`id`=`pmsystem_msg_users`.`msgid`'
@@ -125,8 +125,8 @@
 			
 			// prepare recipients queries
 			$usersQuery = $db->prepare('SELECT `userid`,`name`'
-									   . ' FROM `pmsystem_msg_recipients_users` LEFT JOIN `players`'
-									   . ' ON `pmsystem_msg_recipients_users`.`userid`=`players`.`id`'
+									   . ' FROM `pmsystem_msg_recipients_users` LEFT JOIN `users`'
+									   . ' ON `pmsystem_msg_recipients_users`.`userid`=`users`.`id`'
 									   . ' WHERE `msgid`=?');
 			$teamsQuery = $db->prepare('SELECT `teamid`,`name`'
 									   . ' FROM `pmsystem_msg_recipients_teams` LEFT JOIN `teams`'
@@ -223,7 +223,7 @@
 			// userid requirement ensures user only sees the messages he's allowed to
 			$query = $db->prepare('SELECT `id`,`author_id`,`subject`,`timestamp`,`folder`,`msg_status`,'
 								  . ' IF(`pmsystem_msg_storage`.`author_id`<>0,'
-								  . ' (SELECT `name` FROM `players` WHERE `id`=`author_id`),:author) AS `author`'
+								  . ' (SELECT `name` FROM `users` WHERE `id`=`author_id`),:author) AS `author`'
 								  . ' FROM `pmsystem_msg_storage`, `pmsystem_msg_users`'
 								  . ' WHERE `pmsystem_msg_users`.`userid`=:userid'
 								  . ' AND `pmsystem_msg_storage`.`id`=`pmsystem_msg_users`.`msgid`'
@@ -253,8 +253,8 @@
 			
 			// prepare recipients queries outside of the loop
 			$usersQuery = $db->prepare('SELECT `userid`,`name`'
-									   . ' FROM `pmsystem_msg_recipients_users` LEFT JOIN `players`'
-									   . ' ON `pmsystem_msg_recipients_users`.`userid`=`players`.`id`'
+									   . ' FROM `pmsystem_msg_recipients_users` LEFT JOIN `users`'
+									   . ' ON `pmsystem_msg_recipients_users`.`userid`=`users`.`id`'
 									   . ' WHERE `msgid`=?');
 			$teamsQuery = $db->prepare('SELECT `teamid`,`name`'
 									   . ' FROM `pmsystem_msg_recipients_teams` LEFT JOIN `teams`'

@@ -13,6 +13,8 @@
 			$this->options = $settings->settings();
 		}
 		
+		// returns value of specified setting from config
+		// NOTE: NULL can be returned at any time: prefer isset instead of empty
 		function getValue($setting)
 		{
 			// lookup the value in the array 
@@ -22,8 +24,8 @@
 				return $this->options[$setting];
 			}
 			
-			// default to false
-			return false;
+			// default to NULL
+			return NULL;
 		}
 	}
 ?>

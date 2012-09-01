@@ -4,7 +4,14 @@ bz-owl release notes
 
 1.4 (current development trunk)
 --
-* nothing yet
+* /web/index.php now calls a new add-on called pathLoaderSystem
+* pathLoaderSystem add-on uses modules that can flag a user as banned
+* improved loginSystem logic and its local login module now logs invalid attempts (5 invalid attempts within 1 day disable login ability for 1 day, beginning with oldest invalid attempt during the day)
+* local login module of loginSystem can now set special permissions
+* logout now works with new logoutSystem add-on
+* match rss now built by matchServicesRSSSystem
+* renamed players* classes to users*
+* updated smarty engine
 
 1.3.2 (2011-07-25)
 --

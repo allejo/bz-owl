@@ -2,6 +2,8 @@
 	ini_set ('session.use_trans_sid', 0);
 	ini_set ('session.name', 'SID');
 	ini_set('session.gc_maxlifetime', '7200');
+	// FIXME: Not appropriate to hardcode path! Use new add-on system instead.
+	ini_set('session.cookie_path', '~spiele/Auftraege/scherenschnitte/web/');
 	@session_start();
 	$path = (pathinfo(realpath('./')));
 	$name = $path['basename'];

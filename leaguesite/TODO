@@ -1,7 +1,5 @@
 until next release:
 
-* Optimise DB size and design (big wins should be possible)
-
 * Move CMS tree and other files that are not direct URL targets out of
   the web tree.
 

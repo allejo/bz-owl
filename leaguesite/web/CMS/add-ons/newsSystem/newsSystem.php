@@ -15,10 +15,13 @@
 			global $tmpl;
 			global $user;
 			
+/*
 			if (isset($path) && (strcmp($path, 'News/') === 0
 							  || strcmp($path, 'Bans/') === 0))
 			{
+*/
 				$this->page_path = $path;
+/*
 			} else
 			{
 				$tmpl->setTemplate('404');
@@ -26,6 +29,7 @@
 				$tmpl->display();
 				die();
 			}
+*/
 			
 			$templateToUse = 'News';
 			if (!$tmpl->setTemplate($templateToUse))
@@ -37,9 +41,17 @@
 			$tmpl->assign('title', $title);
 			
 			// FIXME: fallback to default permission name until add-on system is completly implemented
-			$entry_add_permission = 'allow_add_news';
-			$entry_edit_permission = 'allow_edit_news';
-			$entry_delete_permission = 'allow_delete_news';
+			if ($path === 'Bans/')
+			{
+				$entry_add_permission = 'allow_add_bans';
+				$entry_edit_permission = 'allow_edit_banss';
+				$entry_delete_permission = 'allow_delete_bans';
+			} else
+			{
+				$entry_add_permission = 'allow_add_news';
+				$entry_edit_permission = 'allow_edit_news';
+				$entry_delete_permission = 'allow_delete_news';
+			}
 			
 			require_once (dirname(dirname(dirname(__FILE__))) . '/classes/editor.php');
 			
@@ -267,7 +279,7 @@
 				$content = array();
 				$content['raw_msg'] = $_POST['staticContent'];
 				
-				$query = $db->prepare('SELECT `name` FROM `players` WHERE `id`=? LIMIT 1');
+				$query = $db->prepare('SELECT `name` FROM `users` WHERE `id`=? LIMIT 1');
 				$db->execute($query, $user->getID());
 				$content['author'] = $db->fetchRow($query);
 				$db->free($query);
@@ -370,6 +382,7 @@
 		{
 			global $entry_edit_permission;
 			global $entry_delete_permission;
+			global $config;
 			global $tmpl;
 			global $user;
 			global $db;
@@ -453,13 +466,25 @@
 					$tmpl->assign('offsetNext', $offset+$max_per_page);
 				}
 				
+				// overwrite genuine author if requested in config
+				// can be handy for bans to avoid a single person to be critised for posting a majority decision
+				$anonAuthor = $config->getValue('cms.addon.newsSystem.hideIdentity');
+				$anonAuthor = ($anonAuthor['path'] == $path && !$user->getPermission('allow_see_anon_author')) ? $anonAuthor['anonUser'] : false;
+				
+				
 				// article box
 				for($i = 0; $i < $n; $i++)
 				{
 					$content[$i]['id'] = $rows[$i]['id'];
 					$content[$i]['title'] = (strcmp($rows[$i]['title'], '') === 0)?
 									   'News' : $rows[$i]['title'];
-					$content[$i]['author'] = $rows[$i]['author'];
+					if ($anonAuthor)
+					{
+						$content[$i]['author'] = $anonAuthor;
+					} else
+					{
+						$content[$i]['author'] = $rows[$i]['author'];
+					}
 					$content[$i]['time'] = $rows[$i]['timestamp'];
 					$content[$i]['content'] = $rows[$i][$edit ? 'raw_msg' : 'msg'];
 					
@@ -529,7 +554,7 @@
 					}
 			}
 			
-			$query = $db->prepare('SELECT `name` FROM `players` WHERE `id`=? LIMIT 1');
+			$query = $db->prepare('SELECT `name` FROM `users` WHERE `id`=? LIMIT 1');
 			$db->execute($query, $user->getID());
 			$author = $db->fetchRow($query);
 			$db->free($query);

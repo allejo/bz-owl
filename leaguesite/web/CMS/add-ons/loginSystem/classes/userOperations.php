@@ -3,7 +3,7 @@
 	{
 		public function activateAccount($id)
 		{
-			$query = $this->prepare('UPDATE `players` SET `status`=:status WHERE `id`=:id');
+			$query = $this->prepare('UPDATE `users` SET `status`=:status WHERE `id`=:id');
 			$this->execute($query, array(':status' => array('active', PDO::PARAM_STR, 6),
 										 ':id' => array($id, PDO::PARAM_INT)));
 			$this->free($query);
@@ -29,7 +29,7 @@
 			// internal id is an integer of length 11 by definition
 			$internalID = 0;
 			
-			$query = $this->prepare('SELECT `id` FROM `players` WHERE `external_id`=:id LIMIT 1');
+			$query = $this->prepare('SELECT `id` FROM `users` WHERE `external_id`=:id LIMIT 1');
 			// the id can be of any data type and of any length
 			// just assume it's a 50 characters long string
 			$this->execute($query, array(':id' => array($id, PDO::PARAM_STR, 50)));
@@ -50,7 +50,7 @@
 			$internalID = array();
 			
 			// search for name in player database, there can be several matches
-			$query = $this->prepare('SELECT `id`, `external_id` FROM `players` WHERE `name`=:name');
+			$query = $this->prepare('SELECT `id`, `external_id` FROM `users` WHERE `name`=:name');
 			
 			// the id can be of any data type and of any length
 			// just assume it's a 50 characters long string
@@ -69,7 +69,7 @@
 		
 		public function getAccountStatus($id)
 		{
-			$query = $this->prepare('SELECT `status` FROM `players` WHERE `id`=:uid LIMIT 1');
+			$query = $this->prepare('SELECT `status` FROM `users` WHERE `id`=:uid LIMIT 1');
 			$this->execute($query, array(':uid' => array($id, PDO::PARAM_INT)));
 			
 			// init status to "login disabled" to block login on error
@@ -87,7 +87,7 @@
 		
 		public function updateLastLogin($id)
 		{
-			$query = $this->prepare('UPDATE `players_profile` SET `last_login`=:lastLogin'
+			$query = $this->prepare('UPDATE `users_profile` SET `last_login`=:lastLogin'
 									. ' WHERE `playerid`=:uid LIMIT 1');
 			$this->execute($query, array(':lastLogin' => array(date('Y-m-d H:i:s'), PDO::PARAM_STR),
 										 ':uid' => array($id, PDO::PARAM_INT)));
@@ -153,22 +153,22 @@
 			$uid = false;
 			
 			// lock tables before registering
-			$this->SQL('LOCK TABLES `players` WRITE');
+			$this->SQL('LOCK TABLES `users` WRITE');
 			$this->SQL('SET AUTOCOMMIT = 0');
 			
 			if ($externalLogin)
 			{
-				$query = $this->prepare('INSERT INTO `players` (`name`, `external_id`) VALUES (?,?)');
+				$query = $this->prepare('INSERT INTO `users` (`name`, `external_id`) VALUES (?,?)');
 				$this->execute($query, array($moduleInstance->getName(), $moduleInstance->getID()));
 			} else
 			{
-				$query = $this->prepare('INSERT INTO `players` (`name`) VALUES (?)');
+				$query = $this->prepare('INSERT INTO `users` (`name`) VALUES (?)');
 				$this->execute($query, $moduleInstance->getName());
 			}
 			
 			// retrieve last insertion id database independently
 			// by asking for 1 id, beginning with last one
-			$query = $this->SQL('SELECT `id` FROM `players` ORDER BY `id` DESC LIMIT 1');
+			$query = $this->SQL('SELECT `id` FROM `users` ORDER BY `id` DESC LIMIT 1');
 			$row = $this->fetchRow($query);
 			$uid = $row['id'];
 			$this->free($query);
@@ -179,7 +179,7 @@
 			$this->SQL('SET AUTOCOMMIT = 1');
 			
 			// create empty profile connected to new user id
-			$query = $this->prepare('INSERT INTO `players_profile` (`playerid`, `joined`) VALUES (?,?)');
+			$query = $this->prepare('INSERT INTO `users_profile` (`playerid`, `joined`) VALUES (?,?)');
 			$date = new DateTime('now', new DateTimeZone('UTC'));
 			$curDate = $date->format('Y-m-d H:i:s');
 			$this->execute($query, array($uid, $curDate));
@@ -224,23 +224,27 @@
 			{
 				return;
 			}
-			
+			echo('$externalID'. $externalID);
 			// copy name so we have original name if an error occurs
 			$newName = $name;
 			
 			// currently only bzbb module allowed as external login
 			// so hardwire it until we have a database field for
 			// external login module used
-			$result = bzbb::updateUserName($externalID, $newName);
+			// check if bzbb module is loaded
+			if (array_search('bzbb', loginSystem::getModules()) === true)
+			{
+				$result = bzbb::updateUserName($externalID, $newName);
+			}
 			
-			$query = $this->prepare('UPDATE `players` SET `name`=:name WHERE `id`=:id LIMIT 1');
+			$query = $this->prepare('UPDATE `users` SET `name`=:name WHERE `id`=:id LIMIT 1');
 			$this->execute($query, array(':name' => array($newName, PDO::PARAM_STR, 50),
 										 ':id' => array($internalID, PDO::PARAM_INT)));
 			$this->free($query);
 			
 			
-			// report error if module failed doing its job
-			if ($result === false)
+			// report error if external login module (e.g. bzbb) failed doing its job
+			if (isset($result) && $result === false)
 			{
 				$this->logError('login/classes/userOperations.php: updateUserName:'
 								. ' bzbb::updateUserName(' . strval($externalID) . ', ' . strval($name) . ')'

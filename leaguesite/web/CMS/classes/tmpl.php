@@ -1,5 +1,5 @@
 <?php
-	include(dirname(__FILE__) . '/smarty/Smarty.class.php');
+	include(dirname(__FILE__) . '/smarty/libs/Smarty.class.php');
 	
 	class tmpl extends Smarty
 	{

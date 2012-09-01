@@ -14,12 +14,12 @@
 			}
 			
 			// check if no data change -> abort soon
-			$query = $this->prepare('SELECT `requestPath`,`title`,`addon` FROM `CMS` WHERE `id`=? LIMIT 1');
+			$query = $this->prepare('SELECT `request_path`,`title`,`addon` FROM `CMS` WHERE `id`=? LIMIT 1');
 			$this->execute($query, $id);
 			$row = $this->fetchRow($query);
 			$this->free($query);
 			if (!$row
-				|| (strcmp($row['requestPath'], $requestPath) === 0
+				|| (strcmp($row['request_path'], $requestPath) === 0
 				&& strcmp($row['title'], $title) === 0
 				&& strcmp($row['addon'], $addon) === 0))
 			{
@@ -29,7 +29,7 @@
 			
 			// do not allow to change any entry of pageSystem
 			if (strcmp($curAddon, 'pageSystem') === 0
-				&& (strcmp($row['requestPath'], $requestPath) !== 0
+				&& (strcmp($row['request_path'], $requestPath) !== 0
 				|| strcmp($row['addon'], $addon) !== 0))
 			{
 				$this->unlockTables();
@@ -53,7 +53,7 @@
 			}
 			
 			// write the changes
-			$query = $this->prepare('UPDATE `CMS` SET `requestPath`=?,`title`=?,`addon`=? WHERE `id`=? LIMIT 1');
+			$query = $this->prepare('UPDATE `CMS` SET `request_path`=?,`title`=?,`addon`=? WHERE `id`=? LIMIT 1');
 			$this->execute($query, array($requestPath, $title, $addon, $id));
 			
 			$this->unlockTables();
@@ -69,35 +69,33 @@
 			if (strcmp($addon, 'pageSystem') === 0)
 			{
 				$this->unlockTables();
-				return ('Removing pageSystem from any URL is not supported by this add-on. '
-						.'Reason: It could really confuse people and cause plenty of trouble. '
-						.'If you really want to do this, you must edit database directly instead.');
+				return 'E_REMOVE_PAGE_SYSTEM';
 			}
 			
 			// remove illegal characters from request path
 			if (strlen($requestPath) > strlen($this->cleanRequestPath($requestPath)))
 			{
 				$this->unlockTables();
-				return 'Invalid characters in request path detected. Please check your input.';
+				return 'E_INVALID_CHARACTERS';
 			}
 			
 			// check if request path is unique
 			if ($this->requestPathUnique($requestPath) === false)
 			{
 				$this->unlockTables();
-				return 'Request path already in use, request path must be unique in db';
+				return 'E_REQUEST_PATH_ALREADY_IN_USE';
 			}
 			
 			// write the changes
-			$query = $this->prepare('INSERT INTO `CMS` (`requestPath`,`title`,`addon`) VALUES (?,?,?)');
+			$query = $this->prepare('INSERT INTO `CMS` (`request_path`,`title`,`addon`) VALUES (?,?,?)');
 			$this->execute($query, array($requestPath, $title, $addon));
 			
 			$this->unlockTables();
-			return 'Page added successfully.';
+			return 'E_SUCCESS';
 		}
 		
 		
-		private function cleanRequestPath(&$path)
+		public function cleanRequestPath(&$path)
 		{
 			// TODO: consider using a regular expression to only allow valid chars (whitelist)
 			
@@ -214,7 +212,7 @@
 		{
 			// this function collects the list of assigned pages directly from database
 			
-			$query = $this->SQL('SELECT `id`,`requestPath`,`title`,`addon` FROM `CMS` ORDER BY `id`');
+			$query = $this->SQL('SELECT `id`,`request_path`,`title`,`addon` FROM `CMS` ORDER BY `id`');
 			$pages = $this->fetchAll($query);
 			
 			return $pages;
@@ -223,7 +221,7 @@
 		
 		public function getPageData($id)
 		{
-			$query = $this->prepare('SELECT `id`,`requestPath`,`title`,`addon` FROM `CMS` WHERE `id`=? LIMIT 1');
+			$query = $this->prepare('SELECT `id`,`request_path`,`title`,`addon` FROM `CMS` WHERE `id`=? LIMIT 1');
 			$this->execute($query, $id);
 			
 			return $this->fetchRow($query);
@@ -245,10 +243,10 @@
 		}
 		
 		
-		private function requestPathUnique($path, $id=0)
+		public function requestPathUnique($path, $id=0)
 		{
 			// check if request path is unique
-			$query = $this->prepare('SELECT `id` FROM `CMS` WHERE `id`<>? AND `requestPath`=? LIMIT 1');
+			$query = $this->prepare('SELECT `id` FROM `CMS` WHERE `id`<>? AND `request_path`=? LIMIT 1');
 			$this->execute($query, array($id, $path));
 			$row = $this->fetchRow($query);
 			$this->free($query);

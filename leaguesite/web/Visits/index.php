@@ -189,15 +189,15 @@
 		$search_expression = str_replace('*', '%', $search_expression);
 		
 		// get list of last 200 visits
-		$query = 'SELECT `visits`.`id`,`visits`.`playerid`,`players`.`name`,`visits`.`ip-address`,`visits`.`host`,`visits`.`timestamp`,`visits`.`forwarded_for` FROM `visits`,`players` ';
-		$query .= 'WHERE `visits`.`playerid`=`players`.`id`';
+		$query = 'SELECT `visits`.`id`,`visits`.`userid`,`users`.`name`,`visits`.`ip-address`,`visits`.`host`,`visits`.`timestamp`,`visits`.`forwarded_for` FROM `visits`,`users` ';
+		$query .= 'WHERE `visits`.`userid`=`users`.`id`';
 		
 		if (!($search_name))
 		{
 			$query .= ' AND `visits`.`' . sqlSafeString($search_type);
 		} else
 		{
-			$query .= ' AND `players`.`' . sqlSafeString($search_type);
+			$query .= ' AND `users`.`' . sqlSafeString($search_type);
 		}
 		
 		if ($search_name)
@@ -228,7 +228,7 @@
 			$site->dieAndEndPageNoBox('');
 		}
 		
-		$query = 'SELECT `name` FROM `players` WHERE `players`.`id`=' . sqlSafeStringQuotes($profile) . ' LIMIT 1';
+		$query = 'SELECT `name` FROM `users` WHERE `users`.`id`=' . sqlSafeStringQuotes($profile) . ' LIMIT 1';
 		if (!($result = @$site->execute_query('players', $query, $connection)))
 		{
 			$site->dieAndEndPageNoBox('<p>It seems like the name of player with id ' . sqlSafeStringQuotes(htmlent($profile)) . ' can not be accessed for an unknown reason.</p>');
@@ -248,12 +248,12 @@
 		mysql_free_result($result);
 		
 		// collect visits list of that player
-		// example query: SELECT `players`.`name`,`visits`.`ip-address`, `visits`.`host`, `visits`.`timestamp`
-		//				  FROM `visits`,`players` WHERE `visits`.`playerid`='16' AND `players`.`id`='16'
+		// example query: SELECT `users`.`name`,`visits`.`ip-address`, `visits`.`host`, `visits`.`timestamp`
+		//				  FROM `visits`,`users` WHERE `visits`.`userid`='16' AND `users`.`id`='16'
 		//				  ORDER BY `visits`.`id` DESC LIMIT 0,201
-		$query = ('SELECT `players`.`name`,`visits`.`ip-address`, `visits`.`host`, `visits`.`timestamp`,`visits`.`forwarded_for`'
-				  . ' FROM `visits`,`players` WHERE `visits`.`playerid`='
-				  . sqlSafeStringQuotes($profile) . ' AND `players`.`id`=' . sqlSafeStringQuotes($profile));
+		$query = ('SELECT `users`.`name`,`visits`.`ip-address`, `visits`.`host`, `visits`.`timestamp`,`visits`.`forwarded_for`'
+				  . ' FROM `visits`,`users` WHERE `visits`.`userid`='
+				  . sqlSafeStringQuotes($profile) . ' AND `users`.`id`=' . sqlSafeStringQuotes($profile));
 	}
 	
 	// display visits log overview
@@ -263,8 +263,8 @@
 		if (!(isset($_GET['search'])))
 		{
 			// get list of last 200 visits
-			$query = ('SELECT `visits`.`playerid`,'
-					  . '(SELECT `name` FROM `players` WHERE `id`=`visits`.`playerid`) AS `name`,'
+			$query = ('SELECT `visits`.`userid`,'
+					  . '(SELECT `name` FROM `users` WHERE `id`=`visits`.`userid`) AS `name`,'
 					  . '`visits`.`ip-address`,`visits`.`host`,`visits`.`timestamp`,`visits`.`forwarded_for`'
 					  . ' FROM `visits`');
 		}
@@ -331,10 +331,10 @@
 	{
 		if (!(isset($_GET['profile'])))
 		{
-			$visits_list[$id]['playerid'] = (int) $row['playerid'];
+			$visits_list[$id]['userid'] = (int) $row['userid'];
 		} else
 		{
-			$visits_list[$id]['playerid'] = $profile;
+			$visits_list[$id]['userid'] = $profile;
 		}
 		$visits_list[$id]['name'] = $row['name'];
 		$visits_list[$id]['ip-address'] = $row['ip-address'];
@@ -385,10 +385,10 @@
 		echo '	<td>';
 		if (!isset($_GET['profile']))
 		{
-			echo '<a href="./?profile=' . strval($visits_entry['playerid']) . '">';
+			echo '<a href="./?profile=' . strval($visits_entry['userid']) . '">';
 		} else
 		{
-			echo '<a href="../Players/?profile=' . strval($visits_entry['playerid']) . '">';
+			echo '<a href="../Players/?profile=' . strval($visits_entry['userid']) . '">';
 		}
 		echo $visits_entry['name'];
 		echo '</a></td>' . "\n";

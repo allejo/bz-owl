@@ -42,8 +42,8 @@
 			}
 			
 			// activate module code based on user requested action
-			include_once(dirname(__FILE__) . '/modules/' . $module . '/index.php');
-			$moduleInstance = new $module;
+			include_once(dirname(__FILE__) . '/modules/' . $module . '/' . $module . '.php');
+			$moduleInstance = new $module();
 			
 			switch($_GET['action'])
 			{
@@ -72,7 +72,7 @@
 			
 			$tmpl->assign('modules', $this->moduleOutput);
 			$tmpl->display('loginSystem');
-		}		
+		}
 		
 		
 		public static function getModules()
@@ -90,17 +90,24 @@
 					continue;
 				}
 				
+				// remove module if DEACTIVATED file is found in its root folder
+				if (file_exists(dirname(__FILE__) . '/modules/' . $curFile . '/DEACTIVATED'))
+				{
+					unset($modules[$i]);
+					continue;
+				}
+				
 				// filter reserved directory names
 				switch ($curFile)
 				{
 					case (strcasecmp('.', $curFile) === 0):
 						unset($modules[$i]);
 						break;
-						
+					
 					case (strcasecmp('..', $curFile) === 0):
 						unset($modules[$i]);
 						break;
-						
+					
 					case (strcasecmp('.svn', $curFile) === 0):
 						unset($modules[$i]);
 						break;
@@ -120,7 +127,7 @@
 			{
 				if ($module = array_shift($modules))
 				{
-					include_once(dirname(__FILE__) . '/modules/' . $module . '/index.php');
+					include_once(dirname(__FILE__) . '/modules/' . $module . '/' . $module . '.php');
 					$class = new $module();
 					
 					if ($firstLoginModuleText === false)
@@ -286,7 +293,10 @@
 			if ($uid > 0)
 			{
 				// update username first because online user list uses the name directly instead of an id
-				$userOperations->updateUserName($uid, $moduleInstance->getID(), $moduleInstance->getName());
+				//hmm, uid := $moduleInstance->getID()
+				$userOperations->updateUserName($uid,
+												($externalLogin ? $moduleInstance->getID() : 0),
+												$moduleInstance->getName());
 				$user->setID($uid);
 				$moduleInstance->givePermissions();
 				$userOperations->addToVisitsLog($uid);
@@ -302,5 +312,22 @@
 			
 			return false;
 		}
+		
+		public function logFailedLoginAttempt($name, $service, $reason='unknown')
+		{
+			global $db;
+			
+			
+			// a module called this function to log a failed login attempt
+			// name is the name passed by user (not reliable information)
+			// service is the module/service that failed
+			// reason is the reported reason of an enum
+			// check db structure about what reason to report as the reason is only passed through
+			echo 'huhu';
+			// do nothing as long the queries are not fully implemented
+			return;
+			$query = $db->prepare('INSERT INTO `users_rejected_logins` (`name`,`ip-address`,`forwarded_for`,`host`,`timestamp`,`reason`)'
+								  . ' VALUES (:name, :ip, :forwarded, :host, :timestamp, :reason)');
+		}
 	}
-	?>
+?>
