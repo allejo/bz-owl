@@ -635,7 +635,7 @@
 		$query .= ' AND `users_profile`.`location`=`countries`.`id`';
 		$query .= ' AND `users`.`id`=';
 		$query .= sqlSafeStringQuotes($profile) . ' LIMIT 1';
-		if (!($result = @$site->execute_query('users, players_profile, countries', $query, $connection)))
+		if (!($result = @$site->execute_query('users, users_profile, countries', $query, $connection)))
 		{
 			// query was bad, error message was already given in $site->execute_query(...)
 			$site->dieAndEndPage('');
@@ -660,7 +660,7 @@
 			$query .= ' FROM `users`, `users_profile` WHERE `users`.`id` = `users_profile`.`userid`';
 			$query .= ' AND `users`.`id`=';
 			$query .= "'" . sqlSafeString($profile) . "'" . ' LIMIT 1';
-			if (!($result = @$site->execute_query('users, players_profile', $query, $connection)))
+			if (!($result = @$site->execute_query('users, users_profile', $query, $connection)))
 			{
 				// query was bad, error message was already given in $site->execute_query(...)
 				$site->dieAndEndPage('');

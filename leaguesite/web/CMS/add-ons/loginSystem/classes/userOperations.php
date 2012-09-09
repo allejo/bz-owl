@@ -215,7 +215,7 @@
 		}
 		
 		
-		public function updateUserName($internalID, $externalID=0, $name='')
+		public function updateUserName($internalID, $externalID=0, $name='LoginSystem:userOperations:updateUserNameFailed')
 		{
 			// update usernames based on data frome external logins
 			
@@ -224,7 +224,7 @@
 			{
 				return;
 			}
-			echo('$externalID'. $externalID);
+			
 			// copy name so we have original name if an error occurs
 			$newName = $name;
 			
@@ -237,11 +237,13 @@
 				$result = bzbb::updateUserName($externalID, $newName);
 			}
 			
-			$query = $this->prepare('UPDATE `users` SET `name`=:name WHERE `id`=:id LIMIT 1');
-			$this->execute($query, array(':name' => array($newName, PDO::PARAM_STR, 50),
-										 ':id' => array($internalID, PDO::PARAM_INT)));
-			$this->free($query);
-			
+			if ($newName !== false && strlen($newName) > 0)
+			{
+				$query = $this->prepare('UPDATE `users` SET `name`=:name WHERE `id`=:id LIMIT 1');
+				$this->execute($query, array(':name' => array($newName, PDO::PARAM_STR, 50),
+											 ':id' => array($internalID, PDO::PARAM_INT)));
+				$this->free($query);
+			}
 			
 			// report error if external login module (e.g. bzbb) failed doing its job
 			if (isset($result) && $result === false)

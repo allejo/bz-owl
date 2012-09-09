@@ -295,7 +295,7 @@
 	$query .= sqlSafeString($num_results + 1);
 
 	
-	if (!($result = @$site->execute_query('visits, players', $query, $connection)))
+	if (!($result = @$site->execute_query('visits, users', $query, $connection)))
 	{
 		// query was bad, error message was already given in $site->execute_query(...)
 		$site->dieAndEndPageNoBox();

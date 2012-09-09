@@ -287,8 +287,8 @@
 				// this can happen in case the user got imported from another database
 				if ($convert_to_external_login)
 				{
-					$query = $db->prepare('SELECT `password` FROM `players_passwords`'
-										  . ' WHERE `players_passwords`.`playerid`=? LIMIT 1');
+					$query = $db->prepare('SELECT `password` FROM `users_passwords`'
+										  . ' WHERE `users_passwords`.`playerid`=? LIMIT 1');
 					if (!$db->execute($query, $_SESSION['viewerid']))
 					{
 						$msg = ('Could not find out if password is set for local account with id '
@@ -437,7 +437,7 @@
 						}
 						
 						// adding player profile entry
-						$query = $db->prepare('INSERT INTO `players_profile` (`playerid`, `joined`, `location`)'
+						$query = $db->prepare('INSERT INTO `users_profile` (`playerid`, `joined`, `location`)'
 											  . ' VALUES (?, ?, ?)');
 						if (!$db->execute($query, array($_SESSION['viewerid'], date('Y-m-d H:i:s'), 1)))
 						{
@@ -474,7 +474,7 @@
 						if ($local_name_collisions && isset($_SESSION['external_login']) && $_SESSION['external_login'])
 						{
 							// see if error can be recovered (empty password set)
-							$query = $db->prepare('SELECT `password` FROM `players_passwords` WHERE `playerid`=? LIMIT 1');
+							$query = $db->prepare('SELECT `password` FROM `users_passwords` WHERE `playerid`=? LIMIT 1');
 							$db->execute($query, $collisionID);
 							if ($collisionID > 0 && $row = $db->fetchRow($query))
 							{
@@ -484,7 +484,7 @@
 								$db->free($updateAccountQuery);
 								
 								// fix the problem so next login will not run into the same error recovery code
-								$deleteEmptyPWQuery = $db->prepare('DELETE FROM `players_passwords` WHERE `playerid`=? LIMIT 1');
+								$deleteEmptyPWQuery = $db->prepare('DELETE FROM `users_passwords` WHERE `playerid`=? LIMIT 1');
 								$db->execute($deleteEmptyPWQuery, $collisionID);
 								$db->free($deleteEmptyPWQuery);
 								
@@ -695,7 +695,7 @@
 			if (isset($_SESSION['user_logged_in']) && ($_SESSION['user_logged_in']))
 			{
 				// update last login entry
-				$query = $db->prepare('UPDATE `players_profile` SET `last_login`=? WHERE `playerid`=? LIMIT 1');
+				$query = $db->prepare('UPDATE `users_profile` SET `last_login`=? WHERE `playerid`=? LIMIT 1');
 				
 				if (isset($_SESSION['external_login']) && ($_SESSION['external_login']))
 				{

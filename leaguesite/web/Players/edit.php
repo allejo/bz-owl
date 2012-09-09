@@ -120,7 +120,7 @@
 						mysql_free_result($result);
 						$query = 'UPDATE `players` SET `name`=' . sqlSafeStringQuotes(htmlent(urldecode($_POST['callsign'])));
 						$query .= ' WHERE `id`=' . sqlSafeStringQuotes($profile);
-						if (!($result = @$site->execute_query('players_profile', $query, $connection)))
+						if (!($result = @$site->execute_query('users_profile', $query, $connection)))
 						{
 							// query was bad, error message was already given in $site->execute_query(...)
 							$site->dieAndEndPage('');
@@ -131,8 +131,8 @@
 			
 			if (isset($_POST['location']))
 			{
-				$query = 'SELECT `location` FROM `players_profile` WHERE `playerid`=' . sqlSafeStringQuotes($profile) . ' LIMIT 1';
-				if (!($result = @$site->execute_query('players_profile', $query, $connection)))
+				$query = 'SELECT `location` FROM `users_profile` WHERE `playerid`=' . sqlSafeStringQuotes($profile) . ' LIMIT 1';
+				if (!($result = @$site->execute_query('users_profile', $query, $connection)))
 				{
 					$site->dieAndEndPageNoBox('Could not confirm value ' . sqlSafeStringQuotes($_POST['location']) . ' as new location.');
 				}
@@ -147,9 +147,9 @@
 				mysql_free_result($result);
 				if ($update_location)
 				{
-					$query = 'UPDATE `players_profile` SET `location`=' . sqlSafeStringQuotes((int) $_POST['location']);
+					$query = 'UPDATE `users_profile` SET `location`=' . sqlSafeStringQuotes((int) $_POST['location']);
 					$query .= ' WHERE `playerid`=' . sqlSafeStringQuotes($profile);
-					if (!($result = @$site->execute_query('players_profile', $query, $connection)))
+					if (!($result = @$site->execute_query('users_profile', $query, $connection)))
 					{
 						$site->dieAndEndPageNoBox('Could not update value '
 												  . sqlSafeStringQuotes($_POST['location'])
@@ -161,9 +161,9 @@
 			
 			if (isset($_POST['timezone']))
 			{
-				$query = 'UPDATE `players_profile` SET `UTC`=' . sqlSafeStringQuotes(intval($_POST['timezone']));
+				$query = 'UPDATE `users_profile` SET `UTC`=' . sqlSafeStringQuotes(intval($_POST['timezone']));
 				$query .= ' WHERE `playerid`=' . sqlSafeStringQuotes($profile);
-				if (!($result = @$site->execute_query('players_profile', $query, $connection)))
+				if (!($result = @$site->execute_query('users_profile', $query, $connection)))
 				{
 					$site->dieAndEndPageNo('Could not set timezone for player with id '
 										   . sqlSafeStringQuotes($profile)
@@ -177,10 +177,10 @@
 				if (!(strcmp($_POST['user_comment'], 'No profile text has yet been set up') === 0))
 				{
 					// yes there is a comment, save it!
-					$query = 'UPDATE `players_profile` SET `user_comment`=' . sqlSafeStringQuotes($site->bbcode($_POST['user_comment']));
+					$query = 'UPDATE `users_profile` SET `user_comment`=' . sqlSafeStringQuotes($site->bbcode($_POST['user_comment']));
 					$query .= ', `raw_user_comment`=' . sqlSafeStringQuotes($_POST['user_comment']);
 					$query .= ' WHERE `playerid`=' . sqlSafeStringQuotes($profile);
-					if (!($result = @$site->execute_query('players_profile', $query, $connection)))
+					if (!($result = @$site->execute_query('users_profile', $query, $connection)))
 					{
 						$site->dieAndEndPage('');
 					}
@@ -194,9 +194,9 @@
 				if ((in_array(substr($logo_url, -4), $allowedExtensions)) && (substr($logo_url, 0, 7) == 'http://'))
 				{
 					// image url exists and has a valid file extension
-					$query = "UPDATE `players_profile` SET `logo_url` = '$logo_url'";
+					$query = "UPDATE `users_profile` SET `logo_url` = '$logo_url'";
 					$query .= " WHERE `playerid` = $profile";
-					if (!($result = $site->execute_query('players_profile', $query, $connection)))
+					if (!($result = $site->execute_query('users_profile', $query, $connection)))
 					{
 						// query was bad, error message was already given in $site->execute_query(...)
 						$site->dieAndEndPage('');
@@ -215,10 +215,10 @@
 				// only admins can edit their comments
 				if ($allow_add_admin_comments_to_user_profile)
 				{
-					$query = 'UPDATE `players_profile` SET `admin_comments`=' . sqlSafeStringQuotes($site->bbcode($_POST['admin_comments']));
+					$query = 'UPDATE `users_profile` SET `admin_comments`=' . sqlSafeStringQuotes($site->bbcode($_POST['admin_comments']));
 					$query .= ', `raw_admin_comments`=' . sqlSafeStringQuotes($_POST['admin_comments']);
 					$query .= ' WHERE `playerid`=' . sqlSafeStringQuotes($profile);
-					if (!($result = @$site->execute_query('players_profile', $query, $connection)))
+					if (!($result = @$site->execute_query('users_profile', $query, $connection)))
 					{
 						// query was bad, error message was already given in $site->execute_query(...)
 						$site->dieAndEndPage('');
@@ -241,9 +241,9 @@
 		
 		$query = 'SELECT `location`, `UTC`';
 		$query .= ', `raw_user_comment`, `raw_admin_comments`';
-		$query .= ', `logo_url` FROM `players_profile` WHERE `playerid`=' . "'" . sqlSafeString($profile) . "'";
+		$query .= ', `logo_url` FROM `users_profile` WHERE `playerid`=' . "'" . sqlSafeString($profile) . "'";
 		$query .= ' LIMIT 1';
-		if (!($result = @$site->execute_query('players_profile', $query, $connection)))
+		if (!($result = @$site->execute_query('users_profile', $query, $connection)))
 		{
 			// query was bad, error message was already given in $site->execute_query(...)
 			$site->dieAndEndPage('');

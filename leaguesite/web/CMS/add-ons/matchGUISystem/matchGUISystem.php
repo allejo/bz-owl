@@ -1,5 +1,5 @@
 <?php
-	class matchServices
+	class matchGUISystem
 	{
 		private $matchClass;
 		

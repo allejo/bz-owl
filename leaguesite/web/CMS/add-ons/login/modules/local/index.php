@@ -32,7 +32,7 @@
 		{
 			$query .= ', `external_id` ';
 		}
-		$query .= ' FROM `players` WHERE `name`=?';
+		$query .= ' FROM `users` WHERE `name`=?';
 		// only one player tries to login so only fetch one entry, speeds up login a lot
 		$query .= ' LIMIT 1';
 		
@@ -79,7 +79,7 @@
 		}
 		
 		// get password from database in order to compare it with the user entered password
-		$query = ('SELECT `password`, `password_encoding` FROM `players_passwords` WHERE `playerid`=?'
+		$query = ('SELECT `password`, `password_encoding` FROM `users_passwords` WHERE `playerid`=?'
 				  // only one player tries to login so only fetch one entry, speeds up login a lot
 				  . ' LIMIT 1');
 		

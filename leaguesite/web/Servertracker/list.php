@@ -284,7 +284,7 @@ function formatbzfquery_last($server, $connection)
                 // team herausfinden
                 marke('td', 'team');
                 $callsign = $data['player'][$key]['sign'];
-                $query = 'SELECT `teamid` from players WHERE `name`='. sqlSafeStringQuotes($callsign) . ' LIMIT 1';
+                $query = 'SELECT `teamid` from users WHERE `name`='. sqlSafeStringQuotes($callsign) . ' LIMIT 1';
                 $result = mysql_query($query, $connection);
                 if (!$result)
                 {

@@ -138,7 +138,7 @@
 			print mysql_error();
 			die("<br>\nQuery $query is not valid SQL.");
 		}
-		$query = 'TRUNCATE players';
+		$query = 'TRUNCATE users';
 		$result = mysql_query($query, $connection);
 		if (!$result)
 		{

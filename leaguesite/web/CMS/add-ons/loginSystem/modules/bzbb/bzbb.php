@@ -180,7 +180,7 @@
 				$externalID = substr($output, 9);
 				
 				// check if external id is already used in our db
-				$query = $db->prepare('SELECT `id` FROM `players` WHERE `external_id`=? LIMIT 1');
+				$query = $db->prepare('SELECT `id` FROM `users` WHERE `external_id`=? LIMIT 1');
 				$db->execute($query, $externalID);
 				
 				// error if id already used
@@ -192,7 +192,7 @@
 					return false;
 				}
 				
-				$query = $db->prepare('UPDATE `players` SET `external_id`=?'
+				$query = $db->prepare('UPDATE `users` SET `external_id`=?'
 									  // each user has only one entry in the database
 									  . ' WHERE `id`=? LIMIT 1');
 				if (!$db->execute($query, array(htmlent(substr($output, 9)), $userid)))

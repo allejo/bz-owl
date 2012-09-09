@@ -22,9 +22,9 @@
 	}
 	mysql_free_result($result);
 	
-	$query = ('SELECT `id`,`teamid`,`name` FROM `players`'
-			  . ' WHERE `players`.`status`=' . sqlSafeStringQuotes('active'));
-	if (!($result = @$site->execute_silent_query('players', $query, $connection)))
+	$query = ('SELECT `id`,`teamid`,`name` FROM `users`'
+			  . ' WHERE `users`.`status`=' . sqlSafeStringQuotes('active'));
+	if (!($result = @$site->execute_silent_query('users', $query, $connection)))
 	{
 		$site->dieAndEndPage('It seems like the player profile can not be accessed for an unknown reason.');
 	}
