@@ -551,7 +551,15 @@
 		status('+----------------------------------------------------------------------------------------------------------------------+');
 		status('');
 		$db->SQL('INSERT INTO `CMS` (`id`, `request_path`, `title`, `addon`) VALUES (\'\', \'Logout/\', \'Logout\', \'logoutSystem\')');
-
+		
+		
+		status('');
+		status('+---------------------------------------------------------------------------------------------------------------------------+'):
+		status('| If you hardcoded Online User path into webserver config you must remove that path now. That path is now set in CMS table. |'):
+		status('+---------------------------------------------------------------------------------------------------------------------------+');
+		status('');
+		$db->SQL('INSERT INTO `CMS` (`id`, `request_path`, `title`, `addon`) VALUES (NULL, \'Online/\', \'Online users\', \'onlineUserSystem\')');
+		
 		
 		return true;
 	}

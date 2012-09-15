@@ -1,5 +1,6 @@
 <?php
-namespace pathLoaderSystem;
+	namespace pathLoaderSystem;
+	
 	class local
 	{
 		public function __construct(&$banned)
