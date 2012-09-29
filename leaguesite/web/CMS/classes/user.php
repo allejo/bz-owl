@@ -126,7 +126,7 @@
 			
 			
 			// collect name from database
-			$query = $db->prepare('SELECT `name` FROM `players` WHERE `id`=:id LIMIT 1');
+			$query = $db->prepare('SELECT `name` FROM `users` WHERE `id`=:id LIMIT 1');
 			if ($db->execute($query, array(':id' => array($id, PDO::PARAM_INT))))
 			{
 				$userName = $db->fetchRow($query);

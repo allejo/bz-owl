@@ -12,8 +12,8 @@
 			
 			// Specification:
 			// $matchDataFormat=1;
-			// $matchData = array('timestamp' => 'YYYY:MM:DD HH:MM:SS', 'duration' => (int) 30,'teamID1' => (int) 1, 'teamID2' => (int) 2, 'team1Score' => (int) 3, 'team2Score' => (int) 4);
-			// where teamID1 and teamID2 are unique id's from team table and both id's must not be identical
+			// $matchData = array('timestamp' => 'YYYY:MM:DD HH:MM:SS', 'duration' => (int) 30,'team1ID' => (int) 1, 'team2ID' => (int) 2, 'team1Score' => (int) 3, 'team2Score' => (int) 4);
+			// where team1ID and team2ID are unique id's from team table and both id's must not be identical
 			// timestamp must be in UTC zone
 			
 			// call private function that deals with specific matchDataFormat 
@@ -30,8 +30,8 @@
 		private function enterMatch1($matchData)
 		{
 			// check if all keys are set in $matchData
-			if (!isset($matchData['timestamp'] || !isset($matchData['duration']) || !isset($matchData['teamID1'])
-				|| !isset($matchData['teamID2']) || !isset($matchData['team1Score']) || !isset($matchData['team2Score'])))
+			if (!isset($matchData['timestamp'] || !isset($matchData['duration']) || !isset($matchData['team1ID'])
+				|| !isset($matchData['team2ID']) || !isset($matchData['team1Score']) || !isset($matchData['team2Score'])))
 			{
 				return 'E_REQ_PARAMS_NOT_SET';
 			}
@@ -52,8 +52,10 @@
 			
 			// begin critical database part
 			$this->SQL('LOCK TABLES `matches` WRITE');
-			$team1TotalScore = getTeamScore($matchData['teamID1'], $matchData['timestamp']);
-			$team2TotalScore = getTeamScore($matchData['teamID2'], $matchData['timestamp']);
+			
+			// get the score of both teams at the time we want to insert the new match
+			$team1TotalScore = getTeamScore($matchData['team1ID'], $matchData['timestamp']);
+			$team2TotalScore = getTeamScore($matchData['team2ID'], $matchData['timestamp']);
 			
 			
 			$this->SQL('UNLOCK TABLES');
@@ -63,11 +65,18 @@
 		
 		private function getTeamScore($teamID, $timestamp='9999:99:99 99:99:99')
 		{
+			global $config;
+			
+			
+			// 1200 is default starting value for all teams
 			$defaultScore = 1200;
 			
+			// if a different default value is specified in settings, us that custom one
+			$configValue = $config->getValue('cms.addon.matchServices.teamStartingScore');
+			$score = isset($configValue) && $configValue ? $configValue : $defaultScore;
 			
-			$query = $this->prepare('SELECT * FROM `matches` WHERE `timestamp` < \':timestamp\' LIMIT 1');
-			if (!$this->execute($query, array(':timestamp' => array($timestamp, PDO::PARAM_STR)))
+			$query = $this->prepare('SELECT * FROM `matches` WHERE `timestamp` <= \':timestamp\' AND (`team1_id`=\':teamID\' OR `team2_id`=\':teamID\')LIMIT 1');
+			if (!$this->execute($query, array(':timestamp' => array($timestamp, PDO::PARAM_STR), ':teamID' => array($teamID, PDO::PARAM_INT)))
 			{
 				return 'E_TEAM_SCORE_QUERY_FAILURE';
 			}
@@ -78,19 +87,18 @@
 			if (!$row)
 			{
 				// no match played
-				return $defaultScore;
+				return $score;
 			}
 			
-			if ((int) $row['team1ID'] === $teamID)
+			if ((int) $row['team1_id'] === $teamID)
 			{
-				
+				$score = $row['team1_new_score'];
 			} else
 			{
-				
+				$score = $row['team2_new_score'];
 			}
 			
-			// 1200 is default value
-			return $defaultScore;
+			return $score;
 		}
 	}
 ?>

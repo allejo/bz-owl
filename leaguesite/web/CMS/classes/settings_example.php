@@ -14,6 +14,8 @@
 						 'cms.addon.gallerySystem.picturePath' => realpath(dirname(__FILE__) . '/gallerySystem/'),
 						 // show postings as anon
 						 'cms.addon.newsSystem.hideIdentity' => array('path' => 'Bans/', 'anonUser' => 'GU League Council'),
+						 // new teams start with that team score
+						 'cms.addon.matchServices.teamStartingScore' => 1200,
 						 // show unfinished (and thus likely not properly working) themes in config chooser, too
 						 'config.themes.showUnfinished' => false,
 						 // nl2br needs php newer or equal to 4.0.5 to support xhtml

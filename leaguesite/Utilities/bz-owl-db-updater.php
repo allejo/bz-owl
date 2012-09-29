@@ -512,12 +512,23 @@
 	function updateVersion4()
 	{
 		global $db;
+				
 		
 		status('Replace player in table names with user ');
 		$db->SQL('RENAME TABLE `players` TO `users`');
 		$db->SQL('RENAME TABLE `players_passwords` TO `users_passwords`');
 		$db->SQL('RENAME TABLE `players_profile` TO `users_profile`');
 		
+		
+		status('Renaming several table fields to lower case');
+		$db->SQL('ALTER TABLE `CMS` CHANGE `requestPath` `request_path` VARCHAR(1000)  NOT NULL  DEFAULT \'/\'');
+		$db->SQL('ALTER TABLE `matches` CHANGE `team1ID` `team1_id` INT(11)  UNSIGNED  NOT NULL  DEFAULT \'0\'');
+		$db->SQL('ALTER TABLE `matches` CHANGE `team2ID` `team2_id` INT(11)  UNSIGNED  NOT NULL  DEFAULT \'0\'');
+		$db->SQL('ALTER TABLE `matches_edit_stats` CHANGE `team1ID` `team1_id` INT(11)  UNSIGNED  NOT NULL  DEFAULT \'0\'');
+		$db->SQL('ALTER TABLE `matches_edit_stats` CHANGE `team2ID` `team2_id` INT(11)  UNSIGNED  NOT NULL  DEFAULT \'0\'');
+		$db->SQL('ALTER TABLE `users_profile` CHANGE `UTC` `utc` TINYINT(2)  NOT NULL  DEFAULT \'0\'');
+		
+		status('Creating new cms bans and user rejected login tables');
 		$db->SQL('CREATE TABLE `cms_bans` (
 				 `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
 				 `ip-address` varchar(100) NOT NULL DEFAULT \'0.0.0.0.0\',
@@ -535,6 +546,7 @@
 				 `reason` enum(\'unknown\',\'fieldMissing\',\'emptyUserName\',\'emptyPassword\',\'tooLongPassword\',\'tooLongUserName\',\'passwordMismatch\',\'missconfiguration\') DEFAULT NULL,
 				 PRIMARY KEY (`id`)
 				 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT=\'Log failed logins with their reason\'');
+		
 		$db->SQL('ALTER TABLE `users_profile` DROP FOREIGN KEY `users_profile_ibfk_1`');
 		$db->SQL('ALTER TABLE `users_profile` CHANGE `playerid` `userid` INT(11)  UNSIGNED  NOT NULL  DEFAULT \'0\'');
 		$db->SQL('ALTER TABLE `users_profile` ADD FOREIGN KEY (`userid`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE');
@@ -546,20 +558,28 @@
 		$db->SQL('ALTER TABLE `visits` ADD FOREIGN KEY (`userid`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE');
 		
 		status('');
-		status('+----------------------------------------------------------------------------------------------------------------------+'):
-		status('| If you hardcoded logout path into webserver config you must remove that path now. That path is now set in CMS table. |'):
+		status('+----------------------------------------------------------------------------------------------------------------------+');
+		status('| If you hardcoded logout path into webserver config you must remove that path now. That path is now set in CMS table. |');
 		status('+----------------------------------------------------------------------------------------------------------------------+');
 		status('');
 		$db->SQL('INSERT INTO `CMS` (`id`, `request_path`, `title`, `addon`) VALUES (\'\', \'Logout/\', \'Logout\', \'logoutSystem\')');
 		
 		
 		status('');
-		status('+---------------------------------------------------------------------------------------------------------------------------+'):
-		status('| If you hardcoded Online User path into webserver config you must remove that path now. That path is now set in CMS table. |'):
+		status('+---------------------------------------------------------------------------------------------------------------------------+');
+		status('| If you hardcoded Online User path into webserver config you must remove that path now. That path is now set in CMS table. |');
 		status('+---------------------------------------------------------------------------------------------------------------------------+');
 		status('');
 		$db->SQL('INSERT INTO `CMS` (`id`, `request_path`, `title`, `addon`) VALUES (NULL, \'Online/\', \'Online users\', \'onlineUserSystem\')');
 		
+		
+		status('');
+		status('+-----------------------------------------------------------------------------------------------------------------------+');
+		status('| If you hardcoded Matches path into webserver config you must remove that path now. That path is now set in CMS table. |');
+		status('+-----------------------------------------------------------------------------------------------------------------------+');
+		status('');
+		$db->SQL('INSERT INTO `CMS` (`id`, `request_path`, `title`, `addon`) VALUES (NULL, \'Matches/\', \'Matches\', \'matchGUISystem\')');
+
 		
 		return true;
 	}

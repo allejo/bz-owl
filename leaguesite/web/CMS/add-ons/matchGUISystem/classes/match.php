@@ -47,10 +47,10 @@
 				$id = (int) $row['id'];
 				$tmplMatchData[$id]['id'] = $row['id'];
 				$tmplMatchData[$id]['dateAndTime'] = $row['timestamp'];
-				$tmplMatchData[$id]['team1Name'] = $teamClass->getName((int) $row['team1ID']);
-				$tmplMatchData[$id]['team2Name'] = $teamClass->getName((int) $row['team2ID']);
-				$tmplMatchData[$id]['team1ID'] = $row['team1ID'];
-				$tmplMatchData[$id]['team2ID'] = $row['team2ID'];
+				$tmplMatchData[$id]['team1Name'] = $teamClass->getName((int) $row['team1_id']);
+				$tmplMatchData[$id]['team2Name'] = $teamClass->getName((int) $row['team2_id']);
+				$tmplMatchData[$id]['team1ID'] = $row['team1_id'];
+				$tmplMatchData[$id]['team2ID'] = $row['team2_id'];
 				$tmplMatchData[$id]['team1Score'] = $row['team1_points'];
 				$tmplMatchData[$id]['team2Score'] = $row['team2_points'];
 				$tmplMatchData[$id]['lastModUserName'] = $user->getName((int) $row['userid']);
