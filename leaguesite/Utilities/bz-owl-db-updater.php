@@ -327,6 +327,7 @@
 		status('Adding DB version column (db.version) to misc_data');
 		$db->SQL("ALTER TABLE `misc_data` ADD `db.version` int(11) NOT NULL DEFAULT '0'  AFTER `last_servertracker_query`");
 		
+		
 		return true;
 	}
 	
@@ -363,6 +364,7 @@
 		$db->SQL("ALTER TABLE `teams_overview` ADD `activityOld` float NOT NULL DEFAULT '0'  AFTER `activityNew`");
 		$db->SQL("ALTER TABLE `teams` CHANGE `leader_playerid` `leader_userid` int(11) NOT NULL DEFAULT '0'");
 		
+		
 		return true;
 	}
 	
@@ -390,6 +392,7 @@
 				return false;
 			}
 		}
+		
 		
 		return true;
 	}
@@ -505,7 +508,6 @@
 		}
 		
 		
-		
 		return true;
 	}
 	
@@ -578,8 +580,11 @@
 		status('| If you hardcoded Matches path into webserver config you must remove that path now. That path is now set in CMS table. |');
 		status('+-----------------------------------------------------------------------------------------------------------------------+');
 		status('');
-		$db->SQL('INSERT INTO `CMS` (`id`, `request_path`, `title`, `addon`) VALUES (NULL, \'Matches/\', \'Matches\', \'matchGUISystem\')');
-
+		$db->SQL('INSERT INTO `CMS` (`id`, `request_path`, `title`, `addon`) VALUES (NULL, \'Matches/\', \'Matches\', \'matchServices\')');
+		
+		status('Renaming CMS table to cms_paths');
+		$db->SQL('RENAME TABLE `CMS` TO `cms_paths`)';
+		
 		
 		return true;
 	}

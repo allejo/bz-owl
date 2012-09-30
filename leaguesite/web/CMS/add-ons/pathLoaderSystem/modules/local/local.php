@@ -8,6 +8,9 @@
 			global $db;
 			
 			
+			// local ban system may revert bans from other modules
+			// thus it does ignore the case that banned flag could be already set
+			
 			// do nothing in cli mode
 			if (php_sapi_name() == 'cli' && empty($_SERVER['REMOTE_ADDR']))
 			{

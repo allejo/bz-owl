@@ -1,7 +1,7 @@
 <?php
 	class pathLoaderSystem
 	{
-		function __construct()
+		public function __construct()
 		{
 			global $config;
 			global $tmpl;
@@ -31,12 +31,12 @@
 		}
 		
 		
-		function addonToUse($path, &$title)
+		public function addonToUse($path, &$title)
 		{
 			global $db;
 			
 			
-			$query = $db->prepare('SELECT `addon`, `title` FROM `CMS` WHERE `request_path`=? LIMIT 1');
+			$query = $db->prepare('SELECT `addon`, `title` FROM `cms_paths` WHERE `request_path`=? LIMIT 1');
 			$db->execute($query, $path);
 			
 			$row = $db->fetchRow($query);
@@ -60,7 +60,7 @@
 		}
 		
 		
-		function getFixedPageAddon($path, &$title, &$addon)
+		public function getFixedPageAddon($path, &$title, &$addon)
 		{
 			if (strcmp($path, 'Login/') === 0)
 			{
@@ -74,7 +74,7 @@
 		}
 		
 		
-		function getUserBanned()
+		public function getUserBanned()
 		{
 			// find out if user should have access
 			// to do this ask installed helper modules
@@ -155,7 +155,7 @@
 		}
 		
 		
-		function loadAddon($addon, $title, $path)
+		public function loadAddon($addon, $title, $path)
 		{
 			global $site;
 			global $tmpl;

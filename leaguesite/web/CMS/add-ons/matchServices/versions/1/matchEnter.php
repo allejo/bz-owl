@@ -1,24 +1,22 @@
 <?php
+	namespace matchServices;
+	
 	class matchDataSubmitted
 	{
 		const	ok = 1,
 				checkTeam1 = 2;
+				
 	}
-
+	
 	class matchEnter
 	{
 		private $teamList = array();
 		
-		function __construct($noGUI)
+		function __construct()
 		{
 			global $user;
 			global $tmpl;
 			global $db;
-			
-			if ($noGUI)
-			{
-				return;
-			}
 			
 //			$tmpl->setTemplate('MatchServicesMatchEnter');
 			
@@ -58,7 +56,7 @@
 				// show preview
 				case 'no': $this->showEnterPreview(); break;
 				// user has confirmed preview, enter the match now
-				case 'action': $this->matchEnterGUI($data); break;
+				case 'action': $this->matchEnter($data); break;
 				default: break;
 			}
 			
@@ -244,7 +242,7 @@
 				$match_id = intval($_POST['$match_id']);
 			}
 			
-			// does the match exit?
+			// does the match exist?
 			if (isset($match_id))
 			{
 				$query = $db->prepare('SELECT `id` FROM `matches` WHERE `id`=?');
@@ -415,13 +413,13 @@
 			global $tmpl;
 			
 			
-			echo 'showEnterPreview called';
+//			echo 'showEnterPreview called';
 			$tmpl->setTemplate('MatchServicesMatchPreview');
 		}
 		
-		private function matchEnterGUI(&$data)
+		private function matchEnter(&$data)
 		{
-			echo 'matchEnterGUI called';
+			echo 'matchEnter called';
 		}
 		
 		function displayResult()

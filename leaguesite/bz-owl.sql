@@ -5,9 +5,9 @@
 # http://www.sequelpro.com/
 # http://code.google.com/p/sequel-pro/
 #
-# Host: localhost (MySQL 5.1.63)
-# Datenbank: scherenschnitte
-# Erstellungsdauer: 2012-07-25 13:11:59 +0200
+# Host: localhost (MySQL 5.1.65)
+# Datenbank: bz-owl
+# Erstellungsdauer: 2012-09-30 17:34:37 +0200
 # ************************************************************
 
 
@@ -20,24 +20,38 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 
-# Export von Tabelle CMS
+# Export von Tabelle cms_bans
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `CMS`;
+DROP TABLE IF EXISTS `cms_bans`;
 
-CREATE TABLE `CMS` (
+CREATE TABLE `cms_bans` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `ip-address` varchar(100) NOT NULL DEFAULT '0.0.0.0.0',
+  `expiration_timestamp` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '0000-00-00 00:00:00 means a ban won''t expire',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
+
+# Export von Tabelle cms_paths
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `cms_paths`;
+
+CREATE TABLE `cms_paths` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `requestPath` varchar(1000) NOT NULL DEFAULT '/',
+  `request_path` varchar(1000) NOT NULL DEFAULT '/',
   `title` varchar(256) NOT NULL DEFAULT 'Untitled',
   `addon` varchar(256) NOT NULL DEFAULT 'staticPageEditor',
   PRIMARY KEY (`id`),
-  KEY `requestPath` (`requestPath`(255))
+  KEY `requestPath` (`request_path`(255))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-LOCK TABLES `CMS` WRITE;
-/*!40000 ALTER TABLE `CMS` DISABLE KEYS */;
+LOCK TABLES `cms_paths` WRITE;
+/*!40000 ALTER TABLE `cms_paths` DISABLE KEYS */;
 
-INSERT INTO `CMS` (`id`, `requestPath`, `title`, `addon`)
+INSERT INTO `cms_paths` (`id`, `request_path`, `title`, `addon`)
 VALUES
 	(1,'/','Home','staticPageEditor'),
 	(2,'PM/','Mail overview','pmSystem'),
@@ -50,9 +64,11 @@ VALUES
 	(9,'Config/','Config','configSystem'),
 	(10,'Teams/','Teams','teamSystem'),
 	(11,'Pages/','Page assignments','pageSystem'),
-	(12,'index.php','Coda 2 bug','staticPageEditor');
+	(12,'Logout/','Logout','logoutSystem'),
+	(13,'Online/','Online users','onlineUserSystem'),
+	(14,'Matches/','Matches','matchServices');
 
-/*!40000 ALTER TABLE `CMS` ENABLE KEYS */;
+/*!40000 ALTER TABLE `cms_paths` ENABLE KEYS */;
 UNLOCK TABLES;
 
 
@@ -78,27 +94,11 @@ DROP TABLE IF EXISTS `ERROR_LOG`;
 
 CREATE TABLE `ERROR_LOG` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `timestamp` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00',
   `msg` varchar(2000) DEFAULT 'Something went wrong. You should see an actual error message instead.',
+  `timestamp` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-LOCK TABLES `ERROR_LOG` WRITE;
-/*!40000 ALTER TABLE `ERROR_LOG` DISABLE KEYS */;
-
-INSERT INTO `ERROR_LOG` (`id`, `timestamp`, `msg`)
-VALUES
-	(1,'2012-07-25 18:12:45','SQLSTATE error code: 42S02, driver error code: 1146\ndriver error message: Table \'scherenschnitte.players\' doesn\'t exist\n\nexecuting prepared statement failed,  query was:\nSELECT `id`,`author_id`,`subject`,`timestamp`,`folder`,`msg_status`, IF(`pmsystem_msg_storage`.`author_id`<>0, (SELECT `name` FROM `players` WHERE `id`=`author_id`),:author) AS `author` FROM `pmsystem_msg_storage`, `pmsystem_msg_users` WHERE `pmsystem_msg_users`.`userid`=:userid AND `pmsystem_msg_storage`.`id`=`pmsystem_msg_users`.`msgid` AND `folder`=:folder ORDER BY `pmsystem_msg_storage`.`id` DESC LIMIT :limit OFFSET :offset'),
-	(2,'2012-07-25 18:14:41','SQLSTATE error code: 42S02, driver error code: 1146\ndriver error message: Table \'scherenschnitte.players\' doesn\'t exist\n\nexecuting prepared statement failed,  query was:\nSELECT `id`,`author_id`,`subject`,`timestamp`,`folder`,`msg_status`, IF(`pmsystem_msg_storage`.`author_id`<>0, (SELECT `name` FROM `players` WHERE `id`=`author_id`),:author) AS `author` FROM `pmsystem_msg_storage`, `pmsystem_msg_users` WHERE `pmsystem_msg_users`.`userid`=:userid AND `pmsystem_msg_storage`.`id`=`pmsystem_msg_users`.`msgid` AND `folder`=:folder ORDER BY `pmsystem_msg_storage`.`id` DESC LIMIT :limit OFFSET :offset'),
-	(3,'2012-07-25 18:14:43','SQLSTATE error code: 42S02, driver error code: 1146\ndriver error message: Table \'scherenschnitte.players\' doesn\'t exist\n\nexecuting prepared statement failed,  query was:\nSELECT `id`,`author_id`,`subject`,`timestamp`,`folder`,`msg_status`, IF(`pmsystem_msg_storage`.`author_id`<>0, (SELECT `name` FROM `players` WHERE `id`=`author_id`),:author) AS `author` FROM `pmsystem_msg_storage`, `pmsystem_msg_users` WHERE `pmsystem_msg_users`.`userid`=:userid AND `pmsystem_msg_storage`.`id`=`pmsystem_msg_users`.`msgid` AND `folder`=:folder ORDER BY `pmsystem_msg_storage`.`id` DESC LIMIT :limit OFFSET :offset'),
-	(4,'2012-07-25 18:14:45','SQLSTATE error code: 42S02, driver error code: 1146\ndriver error message: Table \'scherenschnitte.players\' doesn\'t exist\n\nexecuting prepared statement failed,  query was:\nSELECT `id`,`author_id`,`subject`,`timestamp`,`folder`,`msg_status`, IF(`pmsystem_msg_storage`.`author_id`<>0, (SELECT `name` FROM `players` WHERE `id`=`author_id`),:author) AS `author` FROM `pmsystem_msg_storage`, `pmsystem_msg_users` WHERE `pmsystem_msg_users`.`userid`=:userid AND `pmsystem_msg_storage`.`id`=`pmsystem_msg_users`.`msgid` AND `folder`=:folder ORDER BY `pmsystem_msg_storage`.`id` DESC LIMIT :limit OFFSET :offset'),
-	(5,'2012-07-25 18:15:00','SQLSTATE error code: 42S02, driver error code: 1146\ndriver error message: Table \'scherenschnitte.players\' doesn\'t exist\n\nexecuting prepared statement failed,  query was:\nSELECT `id`,`author_id`,`subject`,`timestamp`,`folder`,`msg_status`, IF(`pmsystem_msg_storage`.`author_id`<>0, (SELECT `name` FROM `players` WHERE `id`=`author_id`),:author) AS `author` FROM `pmsystem_msg_storage`, `pmsystem_msg_users` WHERE `pmsystem_msg_users`.`userid`=:userid AND `pmsystem_msg_storage`.`id`=`pmsystem_msg_users`.`msgid` AND `folder`=:folder ORDER BY `pmsystem_msg_storage`.`id` DESC LIMIT :limit OFFSET :offset'),
-	(6,'2012-07-25 18:23:46','SQLSTATE error code: 42S02, driver error code: 1146\ndriver error message: Table \'scherenschnitte.players\' doesn\'t exist\n\nexecuting prepared statement failed,  query was:\nSELECT `id`,`author_id`,`subject`,`timestamp`,`folder`,`msg_status`, IF(`pmsystem_msg_storage`.`author_id`<>0, (SELECT `name` FROM `players` WHERE `id`=`author_id`),:author) AS `author` FROM `pmsystem_msg_storage`, `pmsystem_msg_users` WHERE `pmsystem_msg_users`.`userid`=:userid AND `pmsystem_msg_storage`.`id`=`pmsystem_msg_users`.`msgid` AND `folder`=:folder ORDER BY `pmsystem_msg_storage`.`id` DESC LIMIT :limit OFFSET :offset'),
-	(7,'2012-07-25 18:25:20','SQLSTATE error code: 42S02, driver error code: 1146\ndriver error message: Table \'scherenschnitte.players\' doesn\'t exist\n\nexecuting prepared statement failed,  query was:\nSELECT `id`,`author_id`,`subject`,`timestamp`,`folder`,`msg_status`, IF(`pmsystem_msg_storage`.`author_id`<>0, (SELECT `name` FROM `players` WHERE `id`=`author_id`),:author) AS `author` FROM `pmsystem_msg_storage`, `pmsystem_msg_users` WHERE `pmsystem_msg_users`.`userid`=:userid AND `pmsystem_msg_storage`.`id`=`pmsystem_msg_users`.`msgid` AND `folder`=:folder ORDER BY `pmsystem_msg_storage`.`id` DESC LIMIT :limit OFFSET :offset'),
-	(8,'2012-07-25 18:37:10','SQLSTATE error code: 42S02, driver error code: 1146\ndriver error message: Table \'scherenschnitte.players\' doesn\'t exist\n\nexecuting prepared statement failed,  query was:\nSELECT `id`,`author_id`,`subject`,`timestamp`,`folder`,`msg_status`, IF(`pmsystem_msg_storage`.`author_id`<>0, (SELECT `name` FROM `players` WHERE `id`=`author_id`),:author) AS `author` FROM `pmsystem_msg_storage`, `pmsystem_msg_users` WHERE `pmsystem_msg_users`.`userid`=:userid AND `pmsystem_msg_storage`.`id`=`pmsystem_msg_users`.`msgid` AND `folder`=:folder ORDER BY `pmsystem_msg_storage`.`id` DESC LIMIT :limit OFFSET :offset');
-
-/*!40000 ALTER TABLE `ERROR_LOG` ENABLE KEYS */;
-UNLOCK TABLES;
 
 
 # Export von Tabelle invitations
@@ -110,7 +110,7 @@ CREATE TABLE `invitations` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `invited_playerid` int(11) unsigned NOT NULL DEFAULT '0',
   `teamid` int(11) unsigned NOT NULL DEFAULT '0',
-  `expiration` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `expiration` varchar(20) NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
   KEY `invited_playerid` (`invited_playerid`),
   KEY `teamid` (`teamid`),
@@ -129,13 +129,13 @@ CREATE TABLE `matches` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `userid` int(11) unsigned NOT NULL,
   `timestamp` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `team1ID` int(11) unsigned NOT NULL DEFAULT '0',
-  `team2ID` int(11) unsigned NOT NULL DEFAULT '0',
+  `team1_id` int(11) unsigned NOT NULL DEFAULT '0',
+  `team2_id` int(11) unsigned NOT NULL DEFAULT '0',
   `team1_points` int(11) NOT NULL DEFAULT '0',
   `team2_points` int(11) NOT NULL DEFAULT '0',
   `team1_new_score` int(11) NOT NULL DEFAULT '1200',
   `team2_new_score` int(11) NOT NULL DEFAULT '1200',
-  `duration` int(11) NOT NULL DEFAULT '30',
+  `duration` int(11) unsigned NOT NULL DEFAULT '30',
   PRIMARY KEY (`id`),
   KEY `timestamp` (`timestamp`),
   KEY `playerid` (`userid`),
@@ -150,19 +150,20 @@ CREATE TABLE `matches` (
 DROP TABLE IF EXISTS `matches_edit_stats`;
 
 CREATE TABLE `matches_edit_stats` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `match_id` int(11) unsigned NOT NULL,
-  `playerid` int(11) unsigned NOT NULL,
+  `userid` int(11) unsigned NOT NULL,
   `timestamp` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `team1_teamid` int(11) unsigned NOT NULL DEFAULT '0',
-  `team2_teamid` int(11) unsigned NOT NULL DEFAULT '0',
+  `team1_id` int(11) unsigned NOT NULL DEFAULT '0',
+  `team2_id` int(11) unsigned NOT NULL DEFAULT '0',
   `team1_points` int(11) NOT NULL DEFAULT '0',
   `team2_points` int(11) NOT NULL DEFAULT '0',
-  `duration` int(11) NOT NULL DEFAULT '30',
+  `duration` int(11) unsigned NOT NULL DEFAULT '30',
   PRIMARY KEY (`id`),
   KEY `match_id` (`match_id`),
-  KEY `playerid` (`playerid`),
-  KEY `timestamp` (`timestamp`)
+  KEY `playerid` (`userid`),
+  KEY `timestamp` (`timestamp`),
+  CONSTRAINT `matches_edit_stats_ibfk_1` FOREIGN KEY (`userid`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The match editing history';
 
 
@@ -175,7 +176,7 @@ DROP TABLE IF EXISTS `misc_data`;
 CREATE TABLE `misc_data` (
   `last_maintenance` varchar(10) DEFAULT '0000-00-00',
   `last_servertracker_query` int(11) unsigned NOT NULL DEFAULT '0',
-  `db.version` int(11) unsigned NOT NULL DEFAULT '0'
+  `db.version` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -192,7 +193,7 @@ CREATE TABLE `newssystem` (
   `author` varchar(255) DEFAULT NULL,
   `msg` text,
   `raw_msg` text,
-  `page` varchar(1000) NOT NULL DEFAULT 'News/',
+  `page` varchar(1000) NOT NULL DEFAULT 'news',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -209,19 +210,11 @@ CREATE TABLE `online_users` (
   `username` varchar(50) NOT NULL,
   `last_activity` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
+  KEY `playerid` (`userid`),
   KEY `userid` (`userid`),
   CONSTRAINT `online_users_ibfk_1` FOREIGN KEY (`userid`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='list of online users';
 
-LOCK TABLES `online_users` WRITE;
-/*!40000 ALTER TABLE `online_users` DISABLE KEYS */;
-
-INSERT INTO `online_users` (`id`, `userid`, `username`, `last_activity`)
-VALUES
-	(29,1,'admin','2012-07-25 19:14:14');
-
-/*!40000 ALTER TABLE `online_users` ENABLE KEYS */;
-UNLOCK TABLES;
 
 
 # Export von Tabelle pmsystem_msg_recipients_teams
@@ -280,12 +273,11 @@ CREATE TABLE `pmsystem_msg_users` (
   `folder` set('inbox','outbox') NOT NULL DEFAULT 'inbox',
   `msg_status` set('new','read') NOT NULL DEFAULT 'new',
   `msg_replied_to_msgid` int(11) unsigned DEFAULT NULL,
-  PRIMARY KEY (`msgid`),
   KEY `msgid` (`msgid`),
   KEY `userid` (`userid`),
   KEY `msg_status` (`msg_status`),
-  CONSTRAINT `pmsystem_msg_users_ibfk_1` FOREIGN KEY (`msgid`) REFERENCES `pmsystem_msg_storage` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `pmsystem_msg_users_ibfk_2` FOREIGN KEY (`userid`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `pmsystem_msg_users_ibfk_4` FOREIGN KEY (`msgid`) REFERENCES `pmsystem_msg_storage` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `pmsystem_msg_users_ibfk_5` FOREIGN KEY (`userid`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Connects messages to users';
 
 
@@ -317,7 +309,7 @@ CREATE TABLE `static_pages` (
   `page` varchar(1000) NOT NULL,
   `content` mediumtext NOT NULL,
   `raw_content` mediumtext NOT NULL,
-  `last_modified` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `last_modified` varchar(20) NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -411,15 +403,6 @@ CREATE TABLE `users` (
   KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The players'' main data';
 
-LOCK TABLES `users` WRITE;
-/*!40000 ALTER TABLE `users` DISABLE KEYS */;
-
-INSERT INTO `users` (`id`, `external_id`, `teamid`, `name`, `last_teamid`, `status`)
-VALUES
-	(1,'',0,'admin',0,'active');
-
-/*!40000 ALTER TABLE `users` ENABLE KEYS */;
-UNLOCK TABLES;
 
 
 # Export von Tabelle users_passwords
@@ -430,47 +413,13 @@ DROP TABLE IF EXISTS `users_passwords`;
 CREATE TABLE `users_passwords` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `userid` int(11) unsigned NOT NULL DEFAULT '0',
-  `password` varchar(255) NOT NULL DEFAULT '',
-  `cipher` set('md5','blowfish') NOT NULL DEFAULT 'blowfish',
+  `password` varchar(32) NOT NULL DEFAULT '',
+  `password_encoding` set('md5') NOT NULL DEFAULT 'md5',
   PRIMARY KEY (`id`),
   KEY `playerid` (`userid`),
   CONSTRAINT `users_passwords_ibfk_1` FOREIGN KEY (`userid`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-LOCK TABLES `users_passwords` WRITE;
-/*!40000 ALTER TABLE `users_passwords` DISABLE KEYS */;
-
-INSERT INTO `users_passwords` (`id`, `userid`, `password`, `cipher`)
-VALUES
-	(1,1,'$2a$09$th1s1sSp4rt4.O.RlySureLMP23INbDfy7SFSM0yA4fa52plSb31C','blowfish');
-
-/*!40000 ALTER TABLE `users_passwords` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
-# Export von Tabelle users_permissions
-# ------------------------------------------------------------
-
-DROP TABLE IF EXISTS `users_permissions`;
-
-CREATE TABLE `users_permissions` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `userid` int(11) unsigned NOT NULL,
-  `permissions` varchar(1023) NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`),
-  KEY `userid` (`userid`),
-  CONSTRAINT `users_permissions_ibfk_1` FOREIGN KEY (`userid`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Applies to local login only at the moment';
-
-LOCK TABLES `users_permissions` WRITE;
-/*!40000 ALTER TABLE `users_permissions` DISABLE KEYS */;
-
-INSERT INTO `users_permissions` (`id`, `userid`, `permissions`)
-VALUES
-	(1,1,'a:1:{s:18:\"allow_add_messages\";b:0;}');
-
-/*!40000 ALTER TABLE `users_permissions` ENABLE KEYS */;
-UNLOCK TABLES;
 
 
 # Export von Tabelle users_profile
@@ -480,9 +429,9 @@ DROP TABLE IF EXISTS `users_profile`;
 
 CREATE TABLE `users_profile` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `playerid` int(11) unsigned NOT NULL DEFAULT '0',
+  `userid` int(11) unsigned NOT NULL DEFAULT '0',
   `location` int(11) NOT NULL DEFAULT '1',
-  `UTC` tinyint(2) NOT NULL DEFAULT '0',
+  `utc` tinyint(2) NOT NULL DEFAULT '0',
   `user_comment` varchar(1500) NOT NULL DEFAULT '',
   `raw_user_comment` varchar(1500) NOT NULL DEFAULT '',
   `admin_comments` mediumtext NOT NULL,
@@ -491,9 +440,27 @@ CREATE TABLE `users_profile` (
   `last_login` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00',
   `logo_url` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `playerid` (`playerid`),
-  CONSTRAINT `users_profile_ibfk_1` FOREIGN KEY (`playerid`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `playerid` (`userid`),
+  CONSTRAINT `users_profile_ibfk_1` FOREIGN KEY (`userid`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='the players profile data';
+
+
+
+# Export von Tabelle users_rejected_logins
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `users_rejected_logins`;
+
+CREATE TABLE `users_rejected_logins` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL DEFAULT '',
+  `ip-address` varchar(100) NOT NULL DEFAULT '0.0.0.0.0',
+  `forwarded_for` varchar(200) DEFAULT NULL,
+  `host` varchar(100) DEFAULT NULL,
+  `timestamp` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `reason` enum('unknown','fieldMissing','emptyUserName','emptyPassword','tooLongPassword','tooLongUserName','passwordMismatch','missconfiguration') DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Log failed logins with their reason';
 
 
 
@@ -504,69 +471,18 @@ DROP TABLE IF EXISTS `visits`;
 
 CREATE TABLE `visits` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `playerid` int(11) unsigned NOT NULL DEFAULT '0',
+  `userid` int(11) unsigned NOT NULL DEFAULT '0',
   `ip-address` varchar(100) NOT NULL DEFAULT '0.0.0.0.0',
   `host` varchar(100) DEFAULT NULL,
   `forwarded_for` varchar(200) DEFAULT NULL,
-  `timestamp` varchar(19) NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `timestamp` varchar(20) NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
-  KEY `playerid` (`playerid`),
+  KEY `playerid` (`userid`),
   KEY `ip-address` (`ip-address`),
   KEY `host` (`host`),
-  CONSTRAINT `visits_ibfk_1` FOREIGN KEY (`playerid`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `visits_ibfk_1` FOREIGN KEY (`userid`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-LOCK TABLES `visits` WRITE;
-/*!40000 ALTER TABLE `visits` DISABLE KEYS */;
-
-INSERT INTO `visits` (`id`, `playerid`, `ip-address`, `host`, `forwarded_for`, `timestamp`)
-VALUES
-	(1,1,'192.168.1.10','192.168.1.10','','2012-07-23 19:29:40'),
-	(2,1,'192.168.1.10','192.168.1.10','','2012-07-23 19:29:57'),
-	(3,1,'192.168.1.10','192.168.1.10','','2012-07-23 19:33:11'),
-	(4,1,'192.168.1.10','192.168.1.10','','2012-07-23 19:37:11'),
-	(5,1,'192.168.1.10','192.168.1.10','','2012-07-23 19:43:21'),
-	(6,1,'192.168.1.10','192.168.1.10','','2012-07-23 19:53:47'),
-	(7,1,'192.168.1.10','192.168.1.10','','2012-07-23 19:56:20'),
-	(8,1,'192.168.1.10','192.168.1.10','','2012-07-23 20:05:42'),
-	(9,1,'192.168.1.10','192.168.1.10','','2012-07-23 20:06:48'),
-	(10,1,'192.168.1.10','192.168.1.10','','2012-07-23 20:07:51'),
-	(11,1,'192.168.1.10','192.168.1.10','','2012-07-23 20:08:24'),
-	(12,1,'192.168.1.10','192.168.1.10','','2012-07-23 20:09:08'),
-	(13,1,'192.168.1.10','192.168.1.10','','2012-07-23 20:09:56'),
-	(14,1,'192.168.1.10','192.168.1.10','','2012-07-23 20:23:32'),
-	(15,1,'192.168.1.10','192.168.1.10','','2012-07-25 18:03:38'),
-	(16,1,'192.168.1.10','192.168.1.10','','2012-07-25 18:04:03'),
-	(17,1,'192.168.1.10','192.168.1.10','','2012-07-25 18:05:53'),
-	(18,1,'192.168.1.10','192.168.1.10','','2012-07-25 18:06:33'),
-	(19,1,'192.168.1.10','192.168.1.10','','2012-07-25 18:08:34'),
-	(20,1,'192.168.1.10','192.168.1.10','','2012-07-25 18:08:59'),
-	(21,1,'192.168.1.10','192.168.1.10','','2012-07-25 18:10:38'),
-	(22,1,'192.168.1.10','192.168.1.10','','2012-07-25 18:12:22'),
-	(23,1,'192.168.1.10','192.168.1.10','','2012-07-25 18:12:35'),
-	(24,1,'192.168.1.10','192.168.1.10','','2012-07-25 18:23:42'),
-	(25,1,'192.168.1.10','192.168.1.10','','2012-07-25 18:25:17'),
-	(26,1,'192.168.1.10','192.168.1.10','','2012-07-25 18:26:10'),
-	(27,1,'192.168.1.10','192.168.1.10','','2012-07-25 18:36:02'),
-	(28,1,'192.168.1.10','192.168.1.10','','2012-07-25 18:37:04'),
-	(29,1,'192.168.1.10','192.168.1.10','','2012-07-25 18:44:07'),
-	(30,1,'192.168.1.10','192.168.1.10','','2012-07-25 18:44:29'),
-	(31,1,'192.168.1.10','192.168.1.10','','2012-07-25 18:45:59'),
-	(32,1,'192.168.1.10','192.168.1.10','','2012-07-25 18:46:14'),
-	(33,1,'192.168.1.10','192.168.1.10','','2012-07-25 18:47:17'),
-	(34,1,'192.168.1.10','192.168.1.10','','2012-07-25 19:01:05'),
-	(35,1,'192.168.1.10','192.168.1.10','','2012-07-25 19:01:59'),
-	(36,1,'192.168.1.10','192.168.1.10','','2012-07-25 19:02:41'),
-	(37,1,'192.168.1.10','192.168.1.10','','2012-07-25 19:03:03'),
-	(38,1,'192.168.1.10','192.168.1.10','','2012-07-25 19:07:40'),
-	(39,1,'192.168.1.10','192.168.1.10','','2012-07-25 19:09:40'),
-	(40,1,'192.168.1.10','192.168.1.10','','2012-07-25 19:12:46'),
-	(41,1,'192.168.1.10','192.168.1.10','','2012-07-25 19:13:30'),
-	(42,1,'192.168.1.10','192.168.1.10','','2012-07-25 19:13:50'),
-	(43,1,'192.168.1.10','192.168.1.10','','2012-07-25 19:14:14');
-
-/*!40000 ALTER TABLE `visits` ENABLE KEYS */;
-UNLOCK TABLES;
 
 
 

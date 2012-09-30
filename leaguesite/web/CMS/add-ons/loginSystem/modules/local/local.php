@@ -114,7 +114,7 @@
 				return $this->showForm();
 			} else
 			{
-				$msg = ('<form action="./?module=local&action=form" method="post">' . "\n");
+				$msg = ('<form action="./?module=local&amp;action=form" method="post">' . "\n");
 				$msg .= '<p class="first_p">' . "\n";
 				if ($config->getValue('login.modules.forceExternalLoginOnly'))
 				{
