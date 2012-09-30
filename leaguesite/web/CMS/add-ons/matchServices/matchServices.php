@@ -1,8 +1,23 @@
 <?php
 	namespace matchServices;
 	
-	class matchServices extends \db
+	class matchServices extends \database
 	{
+		private $noGUI = false;
+		
+		public function __construct($title, $path)
+		{
+			// assume this add-on will not be directly called by user if no path is given
+			if (strlen($path) === 0)
+			{
+				$this->noGUI = true;
+			}
+			
+			// initialise root database class
+			\database::__construct();
+		}
+		
+		
 		public function enterMatch($matchData, $matchDataFormat=1)
 		{
 			// enter a match
@@ -30,8 +45,8 @@
 		private function enterMatch1($matchData)
 		{
 			// check if all keys are set in $matchData
-			if (!isset($matchData['timestamp'] || !isset($matchData['duration']) || !isset($matchData['team1ID'])
-				|| !isset($matchData['team2ID']) || !isset($matchData['team1Score']) || !isset($matchData['team2Score'])))
+			if (!isset($matchData['timestamp']) || !isset($matchData['duration']) || !isset($matchData['team1ID'])
+				|| !isset($matchData['team2ID']) || !isset($matchData['team1Score']) || !isset($matchData['team2Score']))
 			{
 				return 'E_REQ_PARAMS_NOT_SET';
 			}
@@ -76,7 +91,7 @@
 			$score = isset($configValue) && $configValue ? $configValue : $defaultScore;
 			
 			$query = $this->prepare('SELECT * FROM `matches` WHERE `timestamp` <= \':timestamp\' AND (`team1_id`=\':teamID\' OR `team2_id`=\':teamID\')LIMIT 1');
-			if (!$this->execute($query, array(':timestamp' => array($timestamp, PDO::PARAM_STR), ':teamID' => array($teamID, PDO::PARAM_INT)))
+			if (!$this->execute($query, array(':timestamp' => array($timestamp, PDO::PARAM_STR), ':teamID' => array($teamID, PDO::PARAM_INT))))
 			{
 				return 'E_TEAM_SCORE_QUERY_FAILURE';
 			}

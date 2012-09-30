@@ -160,11 +160,22 @@
 			global $site;
 			global $tmpl;
 			
+			
 			$file = dirname(dirname(__FILE__)) . '/' . $addon . '/' . $addon . '.php';
 			if (file_exists($file))
 			{
 				// init the addon
 				include($file);
+				
+				// use special namespace if declaration file found
+				$namespaceFile = dirname($file) . '/' . $addon . '.namespace';
+				if (file_exists($namespaceFile))
+				{
+					$namespace = file_get_contents($namespaceFile);
+					$addon = $addon . '\\' . $namespace;
+				}
+				
+				// load the add-on
 				$addon = new $addon($title, $path);
 			} else
 			{

@@ -6,9 +6,9 @@
 		{
 			global $tmplHelper;
 			global $config;
-			global $db;
-			global $user;
 			global $tmpl;
+			global $user;
+			global $db;
 			
 			
 			// site config information
