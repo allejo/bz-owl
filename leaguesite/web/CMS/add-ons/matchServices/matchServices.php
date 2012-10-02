@@ -78,6 +78,25 @@
 		}
 		
 		
+		public function getEventType()
+		{
+			// by default assume 2 teams matching each other
+			$type = '2TeamMatch';
+			
+			// if a different default value is specified in settings, us that custom one
+			$configType = $config->getValue('cms.addon.matchServices.eventType');
+			if (isset($configType) && $configType)
+			{
+				$type = $configType;
+			}
+			
+			
+			// return computed event type
+			// this returned value may affect expected match data format
+			return $type;
+		}
+		
+		
 		public function getMatchData($offset=0, $numRows=200)
 		{
 			require_once dirname(__FILE__) . '/versions/' . $this->version . '/matchList.php';
