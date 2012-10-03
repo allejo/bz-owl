@@ -96,6 +96,11 @@
 			return $type;
 		}
 		
+		public function getEventVersion()
+		{
+			return $this-version;
+		}
+		
 		
 		public function getMatchData($offset=0, $numRows=200)
 		{

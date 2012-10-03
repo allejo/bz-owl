@@ -48,7 +48,7 @@
 			
 			// get user confirmation status
 			// NOTE: enum would be really cool
-			$confirmed = isset($_GET['confirmed']) ? $_GET['confirmed'] : 'no';
+			$confirmed = isset($_GET['confirmed']) ? $_GET['confirmed'] : 'not confirmed';
 			
 			$this->sanityCheck($confirmed);
 			switch ($confirmed)
