@@ -3,14 +3,10 @@ until next release:
 * Move CMS tree and other files that are not direct URL targets out of
   the web tree.
 
-* Re-implement Matches, Online, Players, Teams and rss as add-ons
+* Re-implement Matches, Players, Teams and rss as add-ons
 
 
 short term:
-
-* Clean up DB usage in code to allow usage of engines other than mysql
-
-* Convert existing features to use Smarty before adding new features.
 
 * Add web interface to manage the database `CMS` table, which controls
   which add-on should be used for which page.
@@ -21,6 +17,8 @@ short term:
 
 
 long term:
+
+* Clean up DB usage in code to allow usage of engines other than mysql
 
 * Merge Osta's Ducati League features, especially the the ability to
   delete multiple PMs at once.
@@ -51,3 +49,4 @@ long term:
   because the same incorrect offset is used when comparing the current
   time with stored timestamps.  (Should set the configured timezone as
   early as possible in all pages, perhaps in index.php.)
+

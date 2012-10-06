@@ -17,7 +17,7 @@
 			global $tmpl;
 			global $db;
 			
-			$tmpl->setTemplate('MatchServicesMatchList');
+			$tmpl->setTemplate('MatchServices.MatchList');
 			
 			
 			// type specifications

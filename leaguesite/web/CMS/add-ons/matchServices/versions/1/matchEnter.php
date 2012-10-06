@@ -15,10 +15,10 @@
 		function __construct()
 		{
 			global $user;
-			global $tmpl;
-			global $db;
+//			global $tmpl;
 			
-//			$tmpl->setTemplate('MatchServicesMatchEnter');
+						
+//			$tmpl->setTemplate('MatchServices.MatchEnter');
 			
 			if (!$user->getPermission('allow_add_match'))
 			{
@@ -26,6 +26,32 @@
 //				$tmpl->display('NoPerm');
 //				die();
 			}
+			
+			// get user confirmation status
+			// NOTE: enum would be really cool
+			$confirmed = isset($_POST['confirmed']) ? $_POST['confirmed'] : 'not confirmed';
+			
+			$this->sanityCheck($confirmed);
+			switch ($confirmed)
+			{
+				// show preview
+				case 'preview': $this->showEnterPreview(); return;
+				// user has confirmed preview, enter the match now
+				case 'action': $this->matchEnter($data); return;
+				default: break;
+			}
+			
+			echo $confirmed;
+			$this->defaultForm();
+			
+			// done
+		}
+		
+		private function defaultForm()
+		{
+			global $tmpl;
+			global $db;
+			
 			
 			// get list of teams eligible to match
 			$query = $db->SQL('SELECT `teams`.`id`,`teams`.`name` FROM `teams`,`teams_overview` '
@@ -46,29 +72,6 @@
 			//pass teamList to template logic
 			$tmpl->assign('teamList',$this->teamList);
 			
-			// get user confirmation status
-			// NOTE: enum would be really cool
-			$confirmed = isset($_GET['confirmed']) ? $_GET['confirmed'] : 'not confirmed';
-			
-			$this->sanityCheck($confirmed);
-			switch ($confirmed)
-			{
-				// show preview
-				case 'no': $this->showEnterPreview(); break;
-				// user has confirmed preview, enter the match now
-				case 'action': $this->matchEnter($data); break;
-				default: break;
-			}
-			
-			echo $confirmed;
-			$this->defaultForm();
-			
-			// done
-		}
-		
-		private function defaultForm()
-		{
-			global $tmpl;
 			
 			// pass default values for new match to template
 			$tmpl->assign('team1CurPoints',  0);
@@ -80,7 +83,7 @@
 			$tmpl->assign('matchDay',  date('Y-m-d'));
 			$tmpl->assign('matchTime',  date('H:i:s'));
 			
-			$tmpl->setTemplate('MatchServicesMatchEnter');
+			$tmpl->setTemplate('MatchServices.MatchEnter');
 		}
 		
 		private function sanityCheck(&$confirmed)
@@ -319,6 +322,7 @@
 				return;
 			}
 			
+			
 			// check if there is already a match entered at that time
 			// scores depend on the order, two matches done at the same time lead to undefined behaviour
 			$query = $db->prepare('SELECT `timestamp` FROM `matches` WHERE `timestamp`=?');
@@ -413,8 +417,34 @@
 			global $tmpl;
 			
 			
-//			echo 'showEnterPreview called';
-			$tmpl->setTemplate('MatchServicesMatchPreview');
+			// team helper code in teamOperations class used
+			require_once('classes/teamOperations.php');
+			$teamOperations = new teamOperations();
+			
+			// use MatchPreview template to confirm entered match data
+			$tmpl->setTemplate('MatchServices.MatchPreview');
+			
+			
+			// pass default time values to template
+			$tmpl->assign('curDay',  date('Y-m-d'));
+			$tmpl->assign('curTime',  date('H:i:s'));
+			
+			
+			// compute readonly data for preview
+			$team1_id = $_POST['match_team_id1'];
+			$team2_id = $_POST['match_team_id2'];
+			
+			$team1_name = $teamOperations->getName($team1_id);
+			$team2_name = $teamOperations->getName($team2_id);
+			
+			$tmpl->assign('team1_id', $team1_id);
+			$tmpl->assign('team2_id', $team2_id);
+			$tmpl->assign('team1_name', $team1_name);
+			$tmpl->assign('team2_name', $team2_name);
+			$tmpl->assign('team1_points', (int) $_POST['team1_points']);
+			$tmpl->assign('team2_points', (int) $_POST['team2_points']);
+			$tmpl->assign('match_day', $_POST['match_day']);
+			$tmpl->assign('match_time', $_POST['match_time']);
 		}
 		
 		private function matchEnter(&$data)
