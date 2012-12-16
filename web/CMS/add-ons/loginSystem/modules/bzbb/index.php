@@ -23,7 +23,8 @@
 			$text = ('<p class="first_p">Please login using your account at <a href='
 					 . '"http://my.bzflag.org/weblogin.php?action=weblogin&amp;url='
 					 . urlencode($config->getValue('baseaddress') . 'Login/'
-							   . '?module=bzbb&action=login&auth=%TOKEN%,%USERNAME%')
+							   . '?module=bzbb&action=login&auth=true'
+							   . '&token=%TOKEN%&username=%USERNAME%')
 					 . '">my.bzflag.org (BZBB)</a>.</p>' . "\n");
 			
 			return ($text);
@@ -63,10 +64,6 @@
 				return false;
 			}
 			
-			// parameters supplied by 3rd party weblogin script
-			// $params[0] is token, $params[1] is callsign
-			$params = explode(',', urldecode($_GET['auth']));
-			
 			$groupNames = array();
 			foreach ($this->groups as $group)
 			{
@@ -74,8 +71,9 @@
 			}
 			unset($group);
 			
-			// set external login data
-			if (!$this->info = validate_token($params[0], $params[1], $groupNames,
+			// validate external login data
+			// parameters supplied by 3rd party weblogin script
+			if (!$this->info = validate_token($_GET['token'], $_GET['username'], $groupNames,
 											  !$config->getValue('login.modules.bzbb.disableCheckIP')))
 			{
 				// login did not work
