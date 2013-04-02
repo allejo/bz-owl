@@ -1,7 +1,7 @@
 <?php
 	class onlineUserSystem
 	{
-		function __construct($title)
+		public function __construct($title)
 		{
 			global $config;
 			global $user;
@@ -50,10 +50,17 @@
 				}
 				$db->free($result);
 			}
+			// list of online users computed successfully
+		}
+		
+		public function __destruct()
+		{
+			global $tmpl;
+			
 			$tmpl->display();
 		}
 		
-		function showTimeSince($gettime)
+		private function showTimeSince($gettime)
 		{
 			$rtn = "";
 			$gettime = time() - $gettime;
@@ -73,7 +80,7 @@
 			return $rtn;
 		}
 		
-		function convert_datetime($str)
+		private function convert_datetime($str)
 		{
 			list($date, $time) = explode(' ', $str);
 			list($year, $month, $day) = explode('-', $date);

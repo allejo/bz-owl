@@ -1,7 +1,7 @@
 <?php
 	class pathLoaderSystem
 	{
-		public function __construct()
+		public function __construct($silent=false)
 		{
 			global $config;
 			global $tmpl;
@@ -26,8 +26,11 @@
 				exit($config->getValue('maintenance.msg') ? $config->getValue('maintenance.msg') : 'This site has been shut down due to maintenance.' . "\n");
 			}
 			
-			// load the add-on
-			$this->loadAddon($this->addonToUse($path, $title), $title, $path);
+			// load the add-on by default, if not opted out (e.g. used by other code)
+			if (!$silent)
+			{
+				$this->loadAddon($this->addonToUse($path, $title), $title, $path);
+			}
 		}
 		
 		
@@ -176,7 +179,7 @@
 				}
 				
 				// load the add-on
-				$addon = new $addon($title, $path);
+				return $addon = new $addon($title, $path);
 			} else
 			{
 				// the path could not be found in database

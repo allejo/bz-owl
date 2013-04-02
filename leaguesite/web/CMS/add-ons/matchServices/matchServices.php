@@ -121,10 +121,10 @@
 			// timestamp must be in UTC zone
 			
 			// call private function that deals with specific matchDataFormat 
-			if (function_exists(enterMatch . $matchDataFormat))
+			if (function_exists('enterMatch' . $matchDataFormat))
 			{
 				// pass through the result
-				return enterMatch . $matchDataFormat($matchData);
+				return 'enterMatch' . $matchDataFormat($matchData);
 			}
 			
 			
