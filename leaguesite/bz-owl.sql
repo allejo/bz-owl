@@ -1,13 +1,13 @@
 # ************************************************************
 # Sequel Pro SQL dump
-# Version 3408
+# Version 4004
 #
 # http://www.sequelpro.com/
 # http://code.google.com/p/sequel-pro/
 #
-# Host: localhost (MySQL 5.1.65)
+# Host: localhost (MySQL 5.1.68)
 # Datenbank: bz-owl
-# Erstellungsdauer: 2012-09-30 17:34:37 +0200
+# Erstellungsdauer: 2013-04-20 18:06:23 +0200
 # ************************************************************
 
 
@@ -413,12 +413,28 @@ DROP TABLE IF EXISTS `users_passwords`;
 CREATE TABLE `users_passwords` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `userid` int(11) unsigned NOT NULL DEFAULT '0',
-  `password` varchar(32) NOT NULL DEFAULT '',
-  `password_encoding` set('md5') NOT NULL DEFAULT 'md5',
+  `password` varchar(255) NOT NULL DEFAULT '',
+  `cipher` set('md5','blowfish') NOT NULL DEFAULT 'blowfish',
   PRIMARY KEY (`id`),
   KEY `playerid` (`userid`),
   CONSTRAINT `users_passwords_ibfk_1` FOREIGN KEY (`userid`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+# Export von Tabelle users_permissions
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `users_permissions`;
+
+CREATE TABLE `users_permissions` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `userid` int(11) unsigned NOT NULL,
+  `permissions` varchar(1023) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  KEY `userid` (`userid`),
+  CONSTRAINT `users_permissions_ibfk_1` FOREIGN KEY (`userid`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Applies to local login only at the moment';
 
 
 

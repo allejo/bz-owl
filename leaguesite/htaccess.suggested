@@ -1,4 +1,4 @@
-# opion needed, if indexes used, you also need to enable indexes
+# option needed, if indexes used, you also need to enable indexes
 Options +FollowSymlinks
 
 # turn on rewrite engine

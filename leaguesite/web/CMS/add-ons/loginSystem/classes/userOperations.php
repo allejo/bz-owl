@@ -14,7 +14,7 @@
 			// insert login of user to visits log
 			$ip_address = getenv('REMOTE_ADDR');
 			$host = gethostbyaddr($ip_address);
-			$query = ('INSERT INTO `visits` (`playerid`,`ip-address`,`host`,`forwarded_for`,`timestamp`) VALUES'
+			$query = ('INSERT INTO `visits` (`userid`,`ip-address`,`host`,`forwarded_for`,`timestamp`) VALUES'
 					  . ' (?, ?, ?, ?, ?)');
 			$query = $this->prepare($query);
 			$args = array($id, htmlent($ip_address), htmlent($host)
@@ -88,7 +88,7 @@
 		public function updateLastLogin($id)
 		{
 			$query = $this->prepare('UPDATE `users_profile` SET `last_login`=:lastLogin'
-									. ' WHERE `playerid`=:uid LIMIT 1');
+									. ' WHERE `userid`=:uid LIMIT 1');
 			$this->execute($query, array(':lastLogin' => array(date('Y-m-d H:i:s'), PDO::PARAM_STR),
 										 ':uid' => array($id, PDO::PARAM_INT)));
 			
@@ -179,7 +179,7 @@
 			$this->SQL('SET AUTOCOMMIT = 1');
 			
 			// create empty profile connected to new user id
-			$query = $this->prepare('INSERT INTO `users_profile` (`playerid`, `joined`) VALUES (?,?)');
+			$query = $this->prepare('INSERT INTO `users_profile` (`userid`, `joined`) VALUES (?,?)');
 			$date = new DateTime('now', new DateTimeZone('UTC'));
 			$curDate = $date->format('Y-m-d H:i:s');
 			$this->execute($query, array($uid, $curDate));

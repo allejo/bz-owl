@@ -3,6 +3,7 @@
 	{
 		private $xhtml = true;
 		private $info = array();
+		private $loginAllowed = true;
 		
 		
 		function __construct()
@@ -52,6 +53,7 @@
 			if ($numRows > 5)
 			{
 				$tmpl->setTemplate('NoPerm');
+				$this->loginAllowed = false;
 				return;
 			}
 			
@@ -225,6 +227,14 @@
 			// initialise permissions
 			$user->removeAllPermissions();
 			
+			// too many login attempts
+			if (!$this->loginAllowed)
+			{
+				// print out the same error message an incorrect password would trigger
+				$output .= ('Your password does not match the stored password.'
+							. ' You may want to <a href="./">try logging in again</a>.' . "\n");
+				return false;
+			}
 			
 			// set loginname based on POST parameter
 			// no loginname -> login failed
@@ -281,20 +291,20 @@
 			
 			
 			
-			// get player id
+			// get user id
 			$query = 'SELECT `id`';
 			if ($config->getValue('login.modules.forceExternalLoginOnly'))
 			{
 				$query .= ', `external_id` ';
 			}
-			// only one player tries to login so only fetch one entry, speeds up login a lot
+			// only one user tries to login so only fetch one entry, speeds up login a lot
 			$query .= ' FROM `users` WHERE `name`=? LIMIT 1';
 			
 			$query = $db->prepare($query);
 			$db->execute($query, $loginname);
 			
 			
-			// initialise with reserved player id 0 (no player)
+			// initialise with reserved user id 0 (no user)
 			$userid = (int) 0;
 			$convert_to_external_login = true;
 			while($row = $db->fetchRow($query))
@@ -380,7 +390,7 @@
 			}
 			
 			// get password from database in order to compare it with the user entered password
-			// only one player tries to login so only fetch one entry, speeds up login a lot
+			// only one user tries to login so only fetch one entry, speeds up login a lot
 			$query = ('SELECT `password`, `cipher` FROM `users_passwords` WHERE `userid`=? LIMIT 1');
 			
 			// execute query

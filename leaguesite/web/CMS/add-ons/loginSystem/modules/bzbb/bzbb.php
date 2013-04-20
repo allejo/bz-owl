@@ -152,7 +152,7 @@
 			global $db;
 			
 			
-			// user is not new, update his callsign with new external playerid supplied from login
+			// user is not new, update his callsign with new external userid supplied from login
 			
 			// external_id was empty, set it to the external value obtained by bzidtools
 			// create a new cURL resource
@@ -197,7 +197,7 @@
 				if (!$db->execute($query, array(htmlent(substr($output, 9)), $userid)))
 				{
 					$output = ('Unfortunately there seems to be a database problem'
-							   . ' which prevents the system from setting your external playerid (id='
+							   . ' which prevents the system from setting your external userid (id='
 							   . htmlent($userid)
 							   . '). Please report this to an admin.');
 					return false;
@@ -210,7 +210,7 @@
 			} else
 			{
 				$output = ('Unfortunately the bzidtools2.php script failed'
-						   . ' which prevents the system from setting your external playerid (id='
+						   . ' which prevents the system from setting your external userid (id='
 						   . htmlent($userid)
 						   . '). The bzidtool2.php call was '
 						   . htmlent($url)
