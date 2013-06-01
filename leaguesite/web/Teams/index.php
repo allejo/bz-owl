@@ -56,6 +56,16 @@
 				if (!(strcmp(($_POST['logo_url']), '') === 0))
 				{
 					echo '<p>Error: Skipping logo setting: Not allowed URL or extension.</p>';
+				} else
+				{
+					// image url is empty
+					$query = 'UPDATE `teams_profile` SET `logo_url`=' . sqlSafeStringQuotes($logo_url);
+					$query .= ' WHERE `teamid`=' . sqlSafeStringQuotes($profile);
+					if (!($result = $site->execute_query('teams_profile', $query, $connection)))
+					{
+						// query was bad, error message was already given in $site->execute_query(...)
+						$site->dieAndEndPage('');
+					}
 				}
 			}
 		}
