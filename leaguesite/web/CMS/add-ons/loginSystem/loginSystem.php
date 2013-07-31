@@ -323,11 +323,22 @@
 			// service is the module/service that failed
 			// reason is the reported reason of an enum
 			// check db structure about what reason to report as the reason is only passed through
-			echo 'huhu';
+			
 			// do nothing as long the queries are not fully implemented
 			return;
 			$query = $db->prepare('INSERT INTO `users_rejected_logins` (`name`,`ip-address`,`forwarded_for`,`host`,`timestamp`,`reason`)'
 								  . ' VALUES (:name, :ip, :forwarded, :host, :timestamp, :reason)');
+			
+			if (!$db->execute($query, array(':name'			=> $name,
+											':ip'			=> $_SERVER['REMOTE_ADDR'],
+											':forwarded'	=> getenv('HTTP_X_FORWARDED_FOR'),
+											':host'			=> gethostbyaddr($_SERVER['REMOTE_ADDR']),
+											':timestamp'	=> date('Y-m-d H:i:s'),
+											':reason'		=> $reason)))
+			{
+				$output = ('Could not register invalid login of '. htmlent($name) ' in database. Please report this to an admin.');
+				return;
+			}
 		}
 	}
 ?>

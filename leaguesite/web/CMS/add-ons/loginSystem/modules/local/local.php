@@ -89,7 +89,7 @@
 			
 			if (isset($loginSystem))
 			{
-				$this->$loginSystemClass->logFailedLoginAttempt($name, pathinfo(dirname(__FILE__), PATHINFO_FILENAME));
+				$this->$loginSystemClass->logFailedLoginAttempt($name, pathinfo(dirname(__FILE__), PATHINFO_FILENAME), $reason);
 			}
 			return;
 		}
