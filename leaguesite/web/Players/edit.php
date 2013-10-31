@@ -191,7 +191,7 @@
 			{
 				$allowedExtensions = array('.png', '.bmp', '.jpg', '.gif', 'jpeg');
 				$logo_url = sqlSafeString($_POST['logo_url']);
-				if ((in_array(substr($logo_url, -4), $allowedExtensions)) && (substr($logo_url, 0, 7) == 'http://'))
+				if ($logo_url === '' || ((in_array(substr($logo_url, -4), $allowedExtensions)) && (substr($logo_url, 0, 7) == 'http://')))
 				{
 					// image url exists and has a valid file extension
 					$query = "UPDATE `users_profile` SET `logo_url` = '$logo_url'";

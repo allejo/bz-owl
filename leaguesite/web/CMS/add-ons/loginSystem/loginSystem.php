@@ -336,7 +336,7 @@
 											':timestamp'	=> date('Y-m-d H:i:s'),
 											':reason'		=> $reason)))
 			{
-				$output = ('Could not register invalid login of '. htmlent($name) ' in database. Please report this to an admin.');
+				$output = ('Could not register invalid login of '. htmlent($name) .' in database. Please report this to an admin.');
 				return;
 			}
 		}

@@ -53,29 +53,39 @@
 		}
 		
 		
-		private function addToTeamList(&$row)
+		private function addToOpponentTeamList($teamid, &$row, &$stats)
 		{
-				// rename db result fields and assemble some additional informations
-				
-				$prepared = array();
-				$prepared['profileLink'] = './?profile=' . $row['teamid'];
-				$prepared['name'] = $row['name'];
-				$prepared['score'] = $row['score'];
-				$prepared['scoreClass'] = $this->rankScore($row['score']);
-				$prepared['matchSearchLink'] = ('../Matches/?search_string=' . $row['name']
-												. '&amp;search_type=team+name'
-												. '&amp;search_result_amount=20'
-												. '&amp;search=Search');
-				$prepared['matchCount'] = $row['num_matches_played'];
-				$prepared['memberCount'] = $row['member_count'];
-				$prepared['leaderLink'] = '../Players/?profile=' . $row['leader_userid'];
-				$prepared['leaderName'] = $row['leader_name'];
-				$prepared['activityNew'] = $row['activityNew'];
-				$prepared['activityOld'] = $row['activityOld'];
-				$prepared['created'] = $row['created'];
-				
-				// return result data
-				return $prepared;
+			global $db;
+			
+			// rename db result fields and assemble some additional informations
+			
+			// Who is opponent?
+			$opponentTeamId = ((int) $row['team1_id'] === $teamid) ? '2' : '1';
+			$opponentTeam = $row['team'. $opponentTeamId . '_id'];
+			$referenceTeamId = $opponentTeamId === '1' ? '2': '1';
+			
+			if (!isset($stats[$opponentTeam]))
+			{
+				$stats[$opponentTeam] = (object) array('teamId'=>$opponentTeam,'matchCount'=>0,'won'=>0,'tied'=>0,'lost'=>0,'ratio'=>0);
+				$query = $db->prepare('SELECT *,`name` FROM `teams` WHERE `id`=:opponentid LIMIT 1');
+				$db->execute($query, array(':opponentid' => array($opponentTeam, PDO::PARAM_INT)));
+				while ($nameRow = $db->fetchRow($query))
+				{
+					$stats[$opponentTeam]->name = $nameRow['name'];
+				}
+			}
+			
+			$stats[$opponentTeam]->matchCount++;
+			if ($row['team'.$referenceTeamId.'_points'] > $row['team'.$opponentTeamId.'_points'])
+			{
+				$stats[$opponentTeam]->won++;
+			} else if ($row['team'.$referenceTeamId.'_points'] < $row['team'.$opponentTeamId.'_points'])
+			{
+				$stats[$opponentTeam]->lost++;
+			} else
+			{
+				$stats[$opponentTeam]->tied++;
+			}
 		}
 		
 		
@@ -123,174 +133,45 @@
 			// collect team opponent informations for specified teamid
 			$teamOpponents = array();
 			$query = $db->prepare('SELECT * FROM `matches` '
-								  . 'WHERE `team1ID`=:teamid OR `team2ID`=:teamid');
+								  . 'WHERE `team1_id`=:teamid OR `team2_id`=:teamid');
 			$db->execute($query, $params);
+
 			while ($row = $db->fetchRow($query))
 			{
-				$teamOpponents[] = $this->addToTeamList($row);
+				$this->addToOpponentTeamList($teamid, $row, $stats);
 			}
+			
+			foreach($stats AS $opponentTeam)
+			{
+				$opponentTeam->winRatio = round(($opponentTeam->won / $opponentTeam->matchCount)*100, 2);
+				$query = $db->prepare('SELECT * FROM `teams_overview`
+									  JOIN `teams_profile` ON `teams`.`id`=`teams_profile`.`teamid`
+									  WHERE `id`=:opponentid LIMIT 1');
+				$db->execute($query, array(':opponentid' => array($opponentTeam->teamId, PDO::PARAM_INT)));
+				while ($nameRow = $db->fetchRow($query))
+				{
+					$opponentTeam->score = $nameRow['score'];
+					$opponentTeam->scoreClass = $this->rankScore($prepared['score']);
+					$opponentTeam->matchSearchLink = ('../Matches/?search_string=' . $prepared['name']
+													  . '&amp;search_type=team+name'
+													  . '&amp;search_result_amount=20'
+													  . '&amp;search=Search');
+				}
+				$opponentTeam->profileLink = './?profile=' . $opponentTeam->teamId;
+				$opponentTeam->memberCount = $nameRow['member_count'];
+				$opponentTeam->activityNew = $nameRow['activityNew'];
+				$opponentTeam->activityOld = $nameRow['activityOld'];
+				$opponentTeam->created = $nameRow['created'];
+				if (empty($opponentTeam->name)) {
+					$opponentTeam->name = '<i>could not resolve team name</i>';
+				}
+			}
+
 			$db->free($query);
 			unset($row);
 			
 			// pass the opponent data to template
-			$tmpl->assign('teamOpponents', $teamOpponents);
-						
-/*			$team = array();
-			while ($row = $db->fetchRow($query))
-			{
-				$teamLeader = intval($row['leader_userid']);
-				
-				
-				$team['profileLink'] = './?profile=' . $row['id'];
-				$team['name'] = $row['name'];
-				$team['score'] = $row['score'];
-				$team['scoreClass'] = $this->rankScore($row['score']);
-				$team['matchSearchLink'] = ('../Matches/?search_string=' . $row['name']
-												. '&amp;search_type=team+name'
-												. '&amp;search_result_amount=20'
-												. '&amp;search=Search');
-				$team['matchCount'] = $row['num_matches_played'];
-				$team['memberCount'] = $row['member_count'];
-				$team['leaderLink'] = '../Players/?profile=' . $row['leader_userid'];
-				$team['leaderName'] = $row['leader_name'];
-				$team['activityNew'] = $row['activityNew'];
-				$team['activityOld'] = $row['activityOld'];
-				$team['created'] = $row['created'];
-				
-				$team['wins'] = intval($row['num_matches_won']);
-				$team['draws'] = intval($row['num_matches_draw']);
-				$team['losses'] = intval($row['num_matches_lost']);
-				$team['total'] = $team['wins'] + $team['draws'] + $team['losses'];
-				
-				$tmpl->assign('teamDescription', $row['description']);
-			}
-			$db->free($query);
-			$tmpl->assign('team', $team);
-			
-			$tmpl->assign('showPMButton', $user->getID() > 0 ? true : false);
-			
-			
-			$showMemberActionOptions = false;
-			if ($user->getID() === $teamLeader
-				|| $user->getPermission('allow_kick_any_team_members'))
-			{
-				$showMemberActionOptions = true;
-			}
-			$members = array();
-			$query = $db->prepare('SELECT `players`.`name` AS `player_name`'
-								  . ', `players`.`id` AS `userid`'
-								  . ', (SELECT `name` FROM `countries`'
-								  . ' WHERE `countries`.`id`=`users_profile`.`location`'
-								  . ' AND `users_profile`.`playerid`=`players`.`id` LIMIT 1)'
-								  . ' AS `country_name`'
-								  . ', (SELECT `flagfile` FROM `countries`'
-								  . ' WHERE `countries`.`id`=`users_profile`.`location`'
-								  . ' AND `users_profile`.`playerid`=`players`.`id` LIMIT 1)'
-								  . ' AS `flagfile`'
-								  . ', `users_profile`.`joined`'
-								  . ', `users_profile`.`last_login`'
-								  . ' FROM `players`,`users_profile`'
-								  . 'WHERE `players`.`id`=`users_profile`.`playerid`'
-								  . ' AND `teamid`=?');
-			$db->execute($query, $teamid);
-			while ($row = $db->fetchRow($query))
-			{
-				// rename db result fields and assemble some additional informations
-				// use a temporary array for better readable (but slower) code
-				$prepared = array();
-				if (!$showMemberActionOptions && $user->getID() === intval($row['userid']))
-				{
-					$showMemberActionOptions = true;
-				}
-				$prepared['profileLink'] = '../Players/?profile=' . $row['userid'];
-				$prepared['userName'] = $row['player_name'];
-				$prepared['permissions'] = $teamLeader === intval($row['userid']) ? 'Leader' : 'Standard';
-				$prepared['countryName'] = $row['country_name'];
-				if (strlen($row['flagfile']) > 0)
-				{
-					$prepared['countryFlag'] = '../Flags/' . $row['flagfile'];
-				}
-				$prepared['joined'] = $row['joined'];
-				
-				// show leave/kick links if permission is given
-				// a team leader can not leave or be kicked
-				// you must first give someone else leadership
-				if (($user->getID() === $teamLeader
-					|| $user->getID() === intval($row['userid'])
-					|| $user->getPermission('allow_kick_any_team_members'))
-					&& $user->getID() !== $teamLeader)
-				{
-					$prepared['removeLink'] = './?remove=' . intval($row['userid']);
-					
-					if ($user->getID() === intval($row['userid']))
-					{
-						$prepared['removeDescription'] = 'Leave team';
-					} else
-					{
-						$prepared['removeDescription'] = 'Kick member from team';
-					}
-				}
-				
-				// append current member data
-				$members[] = $prepared;
-			}
-			$db->free($query);
-			unset($prepared);
-			$tmpl->assign('members', $members);
-			$tmpl->assign('showMemberActionOptions', $showMemberActionOptions);
-			
-			
-			// show last entered matches
-			$matches = array();
-			
-			// show available options if any available
-			$allowEdit = $user->getPermission('allow_edit_match');
-			$allowDelete = $user->getPermission('allow_delete_match');
-			$tmpl->assign('showMatchActionOptions', $allowEdit || $allowDelete);
-			$tmpl->assign('allowEdit', $allowEdit);
-			$tmpl->assign('allowDelete', $allowDelete);
-			
-			// get match data
-			// sort the data by id to find out if abusers entered data a loong time in the past
-			$query = $db->prepare('SELECT `timestamp`,`team1ID`,`team2ID`,'
-								  . '(SELECT `name` FROM `teams` WHERE `id`=`team1ID`) AS `team1_name`'
-								  . ',(SELECT `name` FROM `teams` WHERE `id`=`team2ID`) AS `team2_name`'
-								  . ',`team1_points`,`team2_points`,`userid`'
-								  . ',(SELECT `players`.`name` FROM `players`'
-								  . ' WHERE `players`.`id`=`matches`.`userid`)'
-								  . ' AS `playername`'
-								  . ',`matches`.`id`'
-								  . ' FROM `matches` WHERE `matches`.`team1ID`=?'
-								  . ' OR `matches`.`team2ID`=?'
-								  . ' ORDER BY `id` DESC LIMIT 0,10');
-			$db->execute($query, array($teamid, $teamid));
-			while ($row = $db->fetchRow($query))
-			{
-				// rename db result fields and assemble some additional informations
-				// use a temporary array for better readable (but slower) code
-				$prepared = array();
- 				$prepared['time'] = $row['timestamp'];
-				$prepared['team1Link'] = '../Teams/?profile=' . $row['team1ID'];
-				$prepared['team2Link'] = '../Teams/?profile=' . $row['team2ID'];
-				$prepared['teamName1'] = $row['team1_name'];
-				$prepared['teamName2'] = $row['team2_name'];
-				$prepared['score1'] = $row['team1_points'];
-				$prepared['score2'] = $row['team2_points'];
-				$prepared['lastModBy'] = $row['playername'];
-				
-				if ($allowEdit)
-				{
-					$prepared['editLink'] = '../Matches/?edit=' . $row['id'];
-				}
-				if ($allowDelete)
-				{
-					$prepared['deleteLink'] = '../Matches/?delete=' . $row['id'];
-				}
-				
-				$matches[] = $prepared;
-			}
-			$tmpl->assign('matches', $matches);
-*/
+			$tmpl->assign('teamOpponents', $stats);
 		}
 	}
 ?>

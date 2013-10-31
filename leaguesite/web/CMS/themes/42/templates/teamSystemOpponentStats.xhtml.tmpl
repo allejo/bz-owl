@@ -45,6 +45,14 @@ No menu found.
 	<th><a href="./?opponent_stats={$teamid}&amp;sort=Win%20Ratio&amp;order=asc">Win Ratio</a></th>
 </tr>
 {foreach item="team" from=$teamOpponents}
+<tr>
+<td>{if $team->profileLink}<a href="{$team->profileLink}">{$team->name}</a>{else}{$team->name}{/if}</td>
+<td>{$team->matchCount}</td>
+<td>{$team->won}</td>
+<td>{$team->tied}</td>
+<td>{$team->lost}</td>
+<td>{$team->winRatio} %</td>
+</tr>
 {/foreach}
 </table>
 {/if}

@@ -15,7 +15,7 @@
 				$site = new site();
 			}
 			
-			// find out which template should be used
+			// no public private message folder
 			if ($user->getID() < 1)
 			{
 				$tmpl->setTemplate('NoPerm');
