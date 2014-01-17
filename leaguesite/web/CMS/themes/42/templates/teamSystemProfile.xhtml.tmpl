@@ -129,7 +129,7 @@ No menu found.
 {foreach item="match" from=$matches}
 <tr class="matches_overview">
 <td>{$match.time}</td>
-<td><a href="{$match.teamLink1}">{$match.teamName1}</a> - <a href="{$match.teamLink2}">{$match.teamName2}</a></td>
+<td><a href="{$match.team1Link}">{$match.team1Name}</a> - <a href="{$match.team2Link}">{$match.team2Name}</a></td>
 <td>{$match.score1} - {$match.score2}</td>
 <td>{$match.lastModBy}</td>
 {if $showMatchActionOptions}

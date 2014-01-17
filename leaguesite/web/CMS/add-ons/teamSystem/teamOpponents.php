@@ -88,6 +88,14 @@
 			}
 		}
 		
+		public function sortOpponents($key, $order)
+		{
+			// sort teams by column name in $key, order is either 'asc' or 'desc'
+			return function ($a, $b) use ($key, $order)
+			{
+				return ($order === 'desc') ? strnatcmp($b->$key, $a->$key) : strnatcmp($a->$key, $b->$key);
+			};
+		}
 		
 		public function showOpponentStats($teamid)
 		{
@@ -140,13 +148,15 @@
 			{
 				$this->addToOpponentTeamList($teamid, $row, $stats);
 			}
+			$db->free($query);
+			unset($row);
 			
 			foreach($stats AS $opponentTeam)
 			{
 				$opponentTeam->winRatio = round(($opponentTeam->won / $opponentTeam->matchCount)*100, 2);
 				$query = $db->prepare('SELECT * FROM `teams_overview`
-									  JOIN `teams_profile` ON `teams`.`id`=`teams_profile`.`teamid`
-									  WHERE `id`=:opponentid LIMIT 1');
+									  JOIN `teams_profile` ON `teams_overview`.`teamid`=`teams_profile`.`teamid`
+									  WHERE `teams_overview`.`teamid`=:opponentid LIMIT 1');
 				$db->execute($query, array(':opponentid' => array($opponentTeam->teamId, PDO::PARAM_INT)));
 				while ($nameRow = $db->fetchRow($query))
 				{
@@ -162,13 +172,26 @@
 				$opponentTeam->activityNew = $nameRow['activityNew'];
 				$opponentTeam->activityOld = $nameRow['activityOld'];
 				$opponentTeam->created = $nameRow['created'];
-				if (empty($opponentTeam->name)) {
-					$opponentTeam->name = '<i>could not resolve team name</i>';
+				if (empty($opponentTeam->name))
+				{
+					$opponentTeam->name = '<span style="font-style:bold;">Could not resolve team name</span>';
 				}
+				$db->free($query);
 			}
-
-			$db->free($query);
-			unset($row);
+			
+			// sort data
+			// check if sort column is set and exists in dataset
+			if (isset($_GET['sort']) && isset($opponentTeam->{$_GET['sort']}))
+			{
+				// sort ascending by default
+				$order = (isset($_GET['order']) && $_GET['order'] === 'desc') ? 'desc': 'asc';
+				// use user defined sorting function, utilising a closure
+				uasort($stats, $this->sortOpponents($_GET['sort'], $order));
+				
+				// pass sorting infos to template
+				$tmpl->assign('sortCol', $_GET['sort']);
+				$tmpl->assign('sortOrder', ($order === 'desc') ? 'desc' : 'asc');
+			}
 			
 			// pass the opponent data to template
 			$tmpl->assign('teamOpponents', $stats);

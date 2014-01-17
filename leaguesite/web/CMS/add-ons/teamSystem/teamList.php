@@ -312,16 +312,16 @@
 			
 			// get match data
 			// sort the data by id to find out if abusers entered data a loong time in the past
-			$query = $db->prepare('SELECT `timestamp`,`team1ID`,`team2ID`,'
-								  . '(SELECT `name` FROM `teams` WHERE `id`=`team1ID`) AS `team1_name`'
-								  . ',(SELECT `name` FROM `teams` WHERE `id`=`team2ID`) AS `team2_name`'
+			$query = $db->prepare('SELECT `timestamp`,`team1_id`,`team2_id`,'
+								  . '(SELECT `name` FROM `teams` WHERE `id`=`team1_id`) AS `team1_name`'
+								  . ',(SELECT `name` FROM `teams` WHERE `id`=`team2_id`) AS `team2_name`'
 								  . ',`team1_points`,`team2_points`,`userid`'
 								  . ',(SELECT `users`.`name` FROM `users`'
 								  . ' WHERE `users`.`id`=`matches`.`userid`)'
 								  . ' AS `playername`'
 								  . ',`matches`.`id`'
-								  . ' FROM `matches` WHERE `matches`.`team1ID`=?'
-								  . ' OR `matches`.`team2ID`=?'
+								  . ' FROM `matches` WHERE `matches`.`team1_id`=?'
+								  . ' OR `matches`.`team2_id`=?'
 								  . ' ORDER BY `id` DESC LIMIT 0,10');
 			$db->execute($query, array($teamid, $teamid));
 			while ($row = $db->fetchRow($query))
@@ -330,10 +330,10 @@
 				// use a temporary array for better readable (but slower) code
 				$prepared = array();
  				$prepared['time'] = $row['timestamp'];
-				$prepared['team1Link'] = '../Teams/?profile=' . $row['team1ID'];
-				$prepared['team2Link'] = '../Teams/?profile=' . $row['team2ID'];
-				$prepared['teamName1'] = $row['team1_name'];
-				$prepared['teamName2'] = $row['team2_name'];
+				$prepared['team1Link'] = '../Teams/?profile=' . $row['team1_id'];
+				$prepared['team2Link'] = '../Teams/?profile=' . $row['team2_id'];
+				$prepared['team1Name'] = $row['team1_name'];
+				$prepared['team2Name'] = $row['team2_name'];
 				$prepared['score1'] = $row['team1_points'];
 				$prepared['score2'] = $row['team2_points'];
 				$prepared['lastModBy'] = $row['playername'];

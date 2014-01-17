@@ -23,7 +23,6 @@ No menu found.
 </div>
 
 <div class="content">
-<a class="button" href="./">overview</a>
 <a class="button" href="./?profile={$teamid}">back to team profile</a>
 
 {if !isset($teamName)}
@@ -36,13 +35,25 @@ No menu found.
 <table class="big" id="opponent_stats">
 <caption>Opponent statistics for team {$teamName}</caption>
 <tr>
-	<th><a href="./?opponent_stats={$teamid}&amp;sort=Name&amp;order=asc">Name</a></th>
-	<th><a href="./?opponent_stats={$teamid}&amp;sort=Total&amp;order=asc">Total</a></th>
-
-	<th><a href="./?opponent_stats={$teamid}&amp;sort=Won&amp;order=asc">Won</a></th>
-	<th><a href="./?opponent_stats={$teamid}&amp;sort=Tied&amp;order=asc">Tied</a></th>
-	<th><a href="./?opponent_stats={$teamid}&amp;sort=Lost&amp;order=asc">Lost</a></th>
-	<th><a href="./?opponent_stats={$teamid}&amp;sort=Win%20Ratio&amp;order=asc">Win Ratio</a></th>
+	{$sortNext = "asc" nocache}
+	{if isset($sortOrder) && $sortOrder === "asc"}
+		{$sortNext = "desc" nocache}
+	{else}
+		{if isset($sortOrder) && $sortOrder === "desc"}
+			{$sortNext = "" nocache}
+		{/if}
+	{/if}
+	{$colsToDisplay = ['name'=>'Name','matchCount'=>'Total','won'=>'Won','tied'=>'Tied','lost'=>'Lost','winRatio'=>'Win Ratio']}
+	
+	{foreach $colsToDisplay as $colInternalName=>$colDisplayName}
+		{$link = "./?opponent_stats={$teamid}"}
+		{if $sortNext !== "" || (isset($sortCol) && $sortCol !== $colInternalName)}
+			{$link = $link|cat:"&amp;sort={$colInternalName}&amp;"}
+			{$link = $link|cat:"order={if !isset($sortCol) || (isset($sortCol) && $sortCol === $colInternalName)}{$sortNext}{else}{$sortOrder}{/if}"}
+		{/if}
+		
+		<th><a href="{$link}">{$colDisplayName}{if isset($sortCol) && $sortCol === $colInternalName} ({$sortOrder|capitalize}){/if}</a></th>
+	{/foreach}
 </tr>
 {foreach item="team" from=$teamOpponents}
 <tr>
