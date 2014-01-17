@@ -15,7 +15,7 @@
 			global $db;
 		
 			$this->timestamp = date('Y-m-d H:i:s');
-			$this->usernameQuery = $db->prepare('SELECT `id`, `name` FROM `players` WHERE `name`=? AND `status`=? LIMIT 1');
+			$this->usernameQuery = $db->prepare('SELECT `id`, `name` FROM `users` WHERE `name`=? AND `status`=? LIMIT 1');
 			$this->teamnameQuery = $db->prepare('SELECT `teams`.`id`, `name` FROM `teams` LEFT JOIN `teams_overview`'
 												. ' ON `teams`.`id`=`teams_overview`.`teamid`'
 												. ' WHERE `name`=? AND `deleted` < 2 LIMIT 1');
@@ -25,7 +25,7 @@
 		{
 			global $db;
 			
-			$query = $db->prepare('SELECT `name` FROM `players` WHERE `id`=? and `status`=? LIMIT 1');
+			$query = $db->prepare('SELECT `name` FROM `users` WHERE `id`=? and `status`=? LIMIT 1');
 			$db->execute($query, array($userID, 'active'));
 			
 			$row = $db->fetchRow($query);
@@ -218,7 +218,7 @@
 			
 			// initialise variables
 			$recipientIDs = array();
-			$query = $db->prepare('SELECT `id` FROM `players` WHERE `name`=?');
+			$query = $db->prepare('SELECT `id` FROM `users` WHERE `name`=?');
 			
 			// no need for queries to find out id's if id of first item already set
 			if ((count($this->users) > 0) && isset($this->users[0]['id']))
@@ -251,7 +251,7 @@
 		{
 			global $db;
 			
-			$query = $db->prepare('SELECT `id` FROM `players` WHERE `teamid`=?');
+			$query = $db->prepare('SELECT `id` FROM `users` WHERE `teamid`=?');
 			$db->execute($query, intval($teamid));
 			
 			// build a new array that contains all the user id's
@@ -431,7 +431,7 @@
 				return $result;
 			}
 			
-			$query = $db->prepare('SELECT `id` FROM `players` WHERE `teamid`=?');
+			$query = $db->prepare('SELECT `id` FROM `users` WHERE `teamid`=?');
 			$db->execute($query, $teamid);
 			
 			while ($row = $db->fetchRow($query))
