@@ -33,7 +33,7 @@
 				// the ones who can ban, can also change a user's callsign
 				$query .= ',`name`';
 			}
-			$query .= ' FROM `players` WHERE `id`=' . "'" . (urlencode($profile)) ."'";
+			$query .= ' FROM `users` WHERE `id`=' . "'" . (urlencode($profile)) ."'";
 			// only information about one player needed
 			$query .= ' LIMIT 1';
 			if (!($result = @$site->execute_query('players', $query, $connection)))
@@ -85,7 +85,7 @@
 				if (isset($_SESSION['allow_ban_any_user']) && $_SESSION['allow_ban_any_user'])
 				{
 					// is the player name already used?
-					$query = 'SELECT `id` FROM `players` WHERE `name`=' . sqlSafeStringQuotes(htmlent($_POST['callsign'])) . ' LIMIT 1';
+					$query = 'SELECT `id` FROM `users` WHERE `name`=' . sqlSafeStringQuotes(htmlent($_POST['callsign'])) . ' LIMIT 1';
 					if (!($result = @$site->execute_query('players', $query, $connection)))
 					{
 						// query was bad, error message was already given in $site->execute_query(...)
@@ -118,7 +118,7 @@
 					} else
 					{
 						mysql_free_result($result);
-						$query = 'UPDATE `players` SET `name`=' . sqlSafeStringQuotes(htmlent(urldecode($_POST['callsign'])));
+						$query = 'UPDATE `users` SET `name`=' . sqlSafeStringQuotes(htmlent(urldecode($_POST['callsign'])));
 						$query .= ' WHERE `id`=' . sqlSafeStringQuotes($profile);
 						if (!($result = @$site->execute_query('users_profile', $query, $connection)))
 						{
@@ -131,7 +131,7 @@
 			
 			if (isset($_POST['location']))
 			{
-				$query = 'SELECT `location` FROM `users_profile` WHERE `playerid`=' . sqlSafeStringQuotes($profile) . ' LIMIT 1';
+				$query = 'SELECT `location` FROM `users_profile` WHERE `id`=' . sqlSafeStringQuotes($profile) . ' LIMIT 1';
 				if (!($result = @$site->execute_query('users_profile', $query, $connection)))
 				{
 					$site->dieAndEndPageNoBox('Could not confirm value ' . sqlSafeStringQuotes($_POST['location']) . ' as new location.');
@@ -148,7 +148,7 @@
 				if ($update_location)
 				{
 					$query = 'UPDATE `users_profile` SET `location`=' . sqlSafeStringQuotes((int) $_POST['location']);
-					$query .= ' WHERE `playerid`=' . sqlSafeStringQuotes($profile);
+					$query .= ' WHERE `id`=' . sqlSafeStringQuotes($profile);
 					if (!($result = @$site->execute_query('users_profile', $query, $connection)))
 					{
 						$site->dieAndEndPageNoBox('Could not update value '
@@ -162,7 +162,7 @@
 			if (isset($_POST['timezone']))
 			{
 				$query = 'UPDATE `users_profile` SET `UTC`=' . sqlSafeStringQuotes(intval($_POST['timezone']));
-				$query .= ' WHERE `playerid`=' . sqlSafeStringQuotes($profile);
+				$query .= ' WHERE `id`=' . sqlSafeStringQuotes($profile);
 				if (!($result = @$site->execute_query('users_profile', $query, $connection)))
 				{
 					$site->dieAndEndPageNo('Could not set timezone for player with id '
@@ -179,7 +179,7 @@
 					// yes there is a comment, save it!
 					$query = 'UPDATE `users_profile` SET `user_comment`=' . sqlSafeStringQuotes($site->bbcode($_POST['user_comment']));
 					$query .= ', `raw_user_comment`=' . sqlSafeStringQuotes($_POST['user_comment']);
-					$query .= ' WHERE `playerid`=' . sqlSafeStringQuotes($profile);
+					$query .= ' WHERE `id`=' . sqlSafeStringQuotes($profile);
 					if (!($result = @$site->execute_query('users_profile', $query, $connection)))
 					{
 						$site->dieAndEndPage('');
@@ -195,7 +195,7 @@
 				{
 					// image url exists and has a valid file extension
 					$query = "UPDATE `users_profile` SET `logo_url` = '$logo_url'";
-					$query .= " WHERE `playerid` = $profile";
+					$query .= " WHERE `id` = $profile";
 					if (!($result = $site->execute_query('users_profile', $query, $connection)))
 					{
 						// query was bad, error message was already given in $site->execute_query(...)
@@ -217,7 +217,7 @@
 				{
 					$query = 'UPDATE `users_profile` SET `admin_comments`=' . sqlSafeStringQuotes($site->bbcode($_POST['admin_comments']));
 					$query .= ', `raw_admin_comments`=' . sqlSafeStringQuotes($_POST['admin_comments']);
-					$query .= ' WHERE `playerid`=' . sqlSafeStringQuotes($profile);
+					$query .= ' WHERE `id`=' . sqlSafeStringQuotes($profile);
 					if (!($result = @$site->execute_query('users_profile', $query, $connection)))
 					{
 						// query was bad, error message was already given in $site->execute_query(...)
@@ -241,7 +241,7 @@
 		
 		$query = 'SELECT `location`, `UTC`';
 		$query .= ', `raw_user_comment`, `raw_admin_comments`';
-		$query .= ', `logo_url` FROM `users_profile` WHERE `playerid`=' . "'" . sqlSafeString($profile) . "'";
+		$query .= ', `logo_url` FROM `users_profile` WHERE `id`=' . "'" . sqlSafeString($profile) . "'";
 		$query .= ' LIMIT 1';
 		if (!($result = @$site->execute_query('users_profile', $query, $connection)))
 		{
