@@ -160,12 +160,14 @@
 				$db->execute($query, array(':opponentid' => array($opponentTeam->teamId, PDO::PARAM_INT)));
 				while ($nameRow = $db->fetchRow($query))
 				{
+					$team = new team($nameRow['teamid']);
 					$opponentTeam->score = $nameRow['score'];
-					$opponentTeam->scoreClass = $this->rankScore($prepared['score']);
-					$opponentTeam->matchSearchLink = ('../Matches/?search_string=' . $prepared['name']
+					$opponentTeam->scoreClass = $this->rankScore($team->getScore());
+					$opponentTeam->matchSearchLink = ('../Matches/?search_string=' . $team->getName()
 													  . '&amp;search_type=team+name'
 													  . '&amp;search_result_amount=20'
 													  . '&amp;search=Search');
+					unset($team);
 				}
 				$opponentTeam->profileLink = './?profile=' . $opponentTeam->teamId;
 				$opponentTeam->memberCount = $nameRow['member_count'];

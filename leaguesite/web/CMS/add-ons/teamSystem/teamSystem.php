@@ -4,20 +4,24 @@
 		function __construct()
 		{
 			global $tmpl;
+			global $site;
 			
+			// load team class source code
+			require_once($site->installationPath() . '/CMS/classes/team.php');
 			
 			if (isset($_GET['add']))
 			{
 				require_once dirname(__FILE__) . '/teamAdd.php';
-				new pmSystemAddPM();
+/* 				new pmSystemAddPM(); */
 				die();
 			} elseif (isset($_GET['edit']))
 			{
 				require_once dirname(__FILE__) . '/teamEdit.php';
+				new teamEdit();
 			} elseif (isset($_GET['delete']))
 			{
 				require_once dirname(__FILE__) . '/teamDelete.php';
-				new pmDelete($folder, intval($_GET['delete']));
+/* 				new pmDelete($folder, intval($_GET['delete'])); */
 			} elseif (isset($_GET['opponent_stats']))
 			{
 				require_once dirname(__FILE__) . '/teamOpponents.php';

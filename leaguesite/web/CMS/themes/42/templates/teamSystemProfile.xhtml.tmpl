@@ -23,8 +23,8 @@ No menu found.
 </div>
 
 <div class="content">
-{if isset($showPMButton) && $showPMButton}<a class="button" href="{$pmLink}">Send message to team</a>{/if}
-{if isset($showEditButton) && $showEditButton}<a class="button" href="./?edit={$teamid}">edit</a>{/if}
+{if isset($canPMTeam) && $canPMTeam}<a class="button" href="{$pmLink}">Send message to team</a>{/if}
+{if isset($canEditTeam) && $canEditTeam}<a class="button" href="./?edit={$teamid}">edit</a>{/if}
 <a class="button" href="./?opponent_stats={$teamid}">opponent stats</a>
 
 {if !isset($team) || empty($team)}

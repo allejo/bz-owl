@@ -94,6 +94,11 @@
 			return $name;
 		}
 		
+		public function installationPath()
+		{
+			return realpath(dirname(dirname(__FILE__)));
+		}
+		
 		function setKey($randomkey_name)
 		{
 			// this should be good enough as all we need is something that can not be guessed without many tries

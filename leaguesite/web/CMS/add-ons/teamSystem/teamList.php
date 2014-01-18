@@ -1,7 +1,7 @@
 <?php
 	class teamList
 	{
-		function __construct()
+		public function __construct()
 		{
 		
 		}
@@ -85,6 +85,9 @@
 			global $user;
 			global $db;
 			
+			
+			// tell template if user can reactivate maintained/deleted teams
+			$tmpl->assign('canReactivateTeams', $user->getPermission('allow_reactivate_teams'));
 			
 			if (!$tmpl->setTemplate('teamSystemList'))
 			{
@@ -223,9 +226,12 @@
 			}
 			$db->free($query);
 			$tmpl->assign('team', $team);
-
+			
 			$tmpl->assign('teamid', $teamid);
-			$tmpl->assign('showPMButton', $user->getID() > 0 ? true : false);
+			$tmpl->assign('canPMTeam', $user->getID() > 0 ? true : false);
+			
+			// tell template if user can edit this team
+			$tmpl->assign('canEditTeam', ($user->getId() === $teamLeader) || $user->getPermission('allow_edit_any_team_profile'));
 			
 			
 			$showMemberActionOptions = false;

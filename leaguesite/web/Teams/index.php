@@ -331,7 +331,6 @@
 			if (!(isset($_POST['edit_team_name'])))
 			{
 				$site->dieAndEndPage('You (id=' . sqlSafeString($viewerid) . ') did not specify a team name while creating a new team.');
-
 			}
 			
 			// do not allow "(teamless)" as team name (refers to all teamless players)
