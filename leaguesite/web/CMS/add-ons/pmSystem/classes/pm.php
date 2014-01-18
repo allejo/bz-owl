@@ -31,7 +31,7 @@
 				
 				if (count($recipientName) < 1)
 				{
-					$recipientName['0']['name'] = 'ERROR: Could not find out player name';
+					$recipientName['0']['name'] = 'ERROR: Could not find out user name';
 				}
 				
 				$recipient['link'] = ($config->getValue('baseaddress') . 'Players/?profile='
