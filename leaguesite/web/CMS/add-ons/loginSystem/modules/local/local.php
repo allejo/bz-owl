@@ -211,8 +211,6 @@
 			$msg .= '</div>' . "\n";
 			$msg .= '</form>' . "\n";
 			
-			$msg .= '<p>Note: Only global login has the ability to allow more than standard permissions at the moment.</p>' . "\n";
-			
 			return $msg;
 		}
 		
