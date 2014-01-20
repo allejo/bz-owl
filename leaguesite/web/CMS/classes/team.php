@@ -6,12 +6,14 @@
 	{
 		private $getNameQuery;
 		private $teamid;
+		private $origTeamid;
 		private $name = false;
 		private $score = false;
 		
 		public function __construct($teamid = 0)
 		{
 			$this->teamid = $teamid;
+			$this->origTeamid = $teamid;
 		}
 		
 		// sanitises team name
@@ -85,28 +87,48 @@
 				
 				return $this->score;
 			}
-		}
-		
-		
-		// save changes
-		// returns true if save is successful
-		public function save()
-		{
-			global $db;
-			
-			
-			$query = $db->prepare('UPDATE `teams` SET name=:name');
-			if ($db->execute($query, array(':name' => array($name, PDO::PARAM_STR))))
-			{
-				return true;
-			}
-			
 			return false;
 		}
 		
 		public function setName($name)
 		{
 			$this->name = $name;
+		}
+		
+		public function setTeamid($teamid)
+		{
+			$this->teamid = $teamid;
+		}
+		
+		// update team in db
+		// returns true if update is successful
+		public function update()
+		{
+			global $db;
+			
+			
+			// teamid 0 is reserved, not to be used
+			// update not possible on new entry
+			if ($this->teamid === 0 || $this->origTeamid === 0)
+			{
+				return false;
+			}
+			
+			if ($this->name === false)
+			{
+				$this->name = $this->getName();
+			}
+			
+			$query = $db->prepare('UPDATE `teams` SET id=:id, name=:name WHERE id=:origid');
+			if ($db->execute($query, array(':name' => array($this->name, PDO::PARAM_STR),
+										   ':id' => array($this->teamid),
+										   ':origid' => array($this->origTeamid))))
+			{
+				$this->origTeamid = $this->teamid;
+				return true;
+			}
+			
+			return false;
 		}
 	}
 ?>
