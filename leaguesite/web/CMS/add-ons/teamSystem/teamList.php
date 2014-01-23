@@ -324,7 +324,7 @@
 								  . ',`team1_points`,`team2_points`,`userid`'
 								  . ',(SELECT `users`.`name` FROM `users`'
 								  . ' WHERE `users`.`id`=`matches`.`userid`)'
-								  . ' AS `playername`'
+								  . ' AS `username`'
 								  . ',`matches`.`id`'
 								  . ' FROM `matches` WHERE `matches`.`team1_id`=?'
 								  . ' OR `matches`.`team2_id`=?'
@@ -342,8 +342,10 @@
 				$prepared['team2Name'] = $row['team2_name'];
 				$prepared['score1'] = $row['team1_points'];
 				$prepared['score2'] = $row['team2_points'];
-				$prepared['lastModBy'] = $row['playername'];
+				$prepared['lastModById'] = $row['userid'];
+				$prepared['lastModByName'] = $row['username'];
 				
+				$prepared['lastModByLink'] = '../Players/?profile=' . $prepared['lastModById'];
 				if ($allowEdit)
 				{
 					$prepared['editLink'] = '../Matches/?edit=' . $row['id'];

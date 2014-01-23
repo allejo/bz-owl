@@ -26,10 +26,11 @@ No menu found.
 {if isset($canPMTeam) && $canPMTeam}<a class="button" href="{$pmLink}">Send message to team</a>{/if}
 {if isset($canEditTeam) && $canEditTeam}<a class="button" href="./?edit={$teamid}">edit</a>{/if}
 <a class="button" href="./?opponent_stats={$teamid}">opponent stats</a>
+<br /><br />
 
 {if !isset($team) || empty($team)}
 <div class="static_page_box">
-<p>An error occured: Display of team's profile impossible.</p>
+<p>An error occurred: Display of team's profile impossible.</p>
 </div>
 {else}
 
@@ -131,7 +132,7 @@ No menu found.
 <td>{$match.time}</td>
 <td><a href="{$match.team1Link}">{$match.team1Name}</a> - <a href="{$match.team2Link}">{$match.team2Name}</a></td>
 <td>{$match.score1} - {$match.score2}</td>
-<td>{$match.lastModBy}</td>
+<td>{if isset($match.lastModByLink) && $match.lastModByLink !== 0}<a href="{$match.lastModByLink}">{/if}{$match.lastModByName}{if isset($match.lastModByLink) && $match.lastModByLink !== 0}</a>{/if}</td>
 {if $showMatchActionOptions}
 <td>
 {if $allowEdit}
