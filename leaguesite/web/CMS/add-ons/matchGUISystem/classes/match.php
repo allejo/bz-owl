@@ -8,7 +8,6 @@
 		
 		function displayMatches($offset=0, $numRows=200)
 		{
-			global $user;
 			global $tmpl;
 			global $db;
 			
@@ -53,7 +52,8 @@
 				$tmplMatchData[$id]['team2ID'] = $row['team2_id'];
 				$tmplMatchData[$id]['team1Score'] = $row['team1_points'];
 				$tmplMatchData[$id]['team2Score'] = $row['team2_points'];
-				$tmplMatchData[$id]['lastModUserName'] = $user->getName((int) $row['userid']);
+				$tmplMatchData[$id]['lastModUserID'] = (int) $row['userid'];
+				$tmplMatchData[$id]['lastModUserName'] = (new \user((int) $row['userid']))->getName();
 			}
 			unset($tmplMatchData[0]);
 			unset($id);

@@ -111,9 +111,9 @@
 			}
 			
 			// user is logged in -> show logout option
-			if ($user->loggedIn())
+			if (user::getCurrentUserLoggedIn())
 			{
-				/* 				parent::assign('LOGOUT'); */
+				/* parent::assign('LOGOUT'); */
 				parent::assign('logoutURL', ($config->getValue('baseaddress') . 'Logout/'));
 			}
 		}

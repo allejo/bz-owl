@@ -13,7 +13,6 @@
 		
 		public function displayMatches($offset=0, $numRows=200)
 		{
-			global $user;
 			global $tmpl;
 			global $db;
 			
@@ -41,9 +40,9 @@
 				die();
 			}
 			
+			
 			// FIXME: implement generic class loader somewhere else
 			require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/classes/team.php');
-			$teamClass = new \team();
 			
 			// collect data to display from query result in database
 			$tmplMatchData = array(array());;
@@ -52,13 +51,17 @@
 				$id = (int) $row['id'];
 				$tmplMatchData[$id]['id'] = $row['id'];
 				$tmplMatchData[$id]['dateAndTime'] = $row['timestamp'];
-				$tmplMatchData[$id]['team1Name'] = $teamClass->getName((int) $row['team1_id']);
-				$tmplMatchData[$id]['team2Name'] = $teamClass->getName((int) $row['team2_id']);
+				// get team names using team class
+				$tmplMatchData[$id]['team1Name'] = (new \team((int) $row['team1_id']))->getName();
+				$tmplMatchData[$id]['team2Name'] = (new \team((int) $row['team2_id']))->getName();
+				// pass through team id list and scores
 				$tmplMatchData[$id]['team1ID'] = $row['team1_id'];
 				$tmplMatchData[$id]['team2ID'] = $row['team2_id'];
 				$tmplMatchData[$id]['team1Score'] = $row['team1_points'];
 				$tmplMatchData[$id]['team2Score'] = $row['team2_points'];
-				$tmplMatchData[$id]['lastModUserName'] = $user->getName((int) $row['userid']);
+				// lookup user name using user class
+				$tmplMatchData[$id]['lastModUserID'] = (int) $row['userid'];
+				$tmplMatchData[$id]['lastModUserName'] = (new \user((int) $row['userid']))->getName();
 			}
 			unset($tmplMatchData[0]);
 			unset($id);

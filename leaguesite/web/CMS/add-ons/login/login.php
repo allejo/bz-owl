@@ -37,7 +37,7 @@
 			}
 			
 			// no need to do anything
-			if ($user->loggedIn())
+			if (user::getCurrentUserLoggedIn())
 			{
 				$this->helper->done('Login was already successful.');
 			}
@@ -125,7 +125,7 @@
 			
 			$auth_performed = false;
 			
-			if ($user->loggedIn())
+			if ($user->getLoggedIn())
 			{
 				$auth_performed = true;
 				
@@ -144,7 +144,7 @@
 			
 			
 			
-			if ($auth_performed && $user->loggedIn())
+			if ($auth_performed && $user->getLoggedIn())
 			{
 				return true;
 			}
@@ -203,7 +203,7 @@
 			$msg = '';
 			
 			// only perform the operation if user logs in and not on reload
-			if ($user->loggedIn())
+			if ($user->getLoggedIn())
 			{
 				// delete expired invitations
 				$query = $db->prepare('DELETE LOW_PRIORITY FROM `invitations` WHERE `expiration`<=?');

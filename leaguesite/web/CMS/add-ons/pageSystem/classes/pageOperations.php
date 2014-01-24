@@ -181,7 +181,7 @@
 		{
 			// you may use getAddonUsed instead
 			
-			$query = $this->prepare('SELECT `id` FROM `CMS` WHERE `id`=? LIMIT 1');
+			$query = $this->prepare('SELECT `id` FROM `cms_paths` WHERE `id`=? LIMIT 1');
 			$this->execute($query, $id);
 			$row = $this->fetchRow($query);
 			if (!$row)
@@ -195,7 +195,7 @@
 		
 		public function getAddonUsed($id)
 		{
-			$query = $this->prepare('SELECT `addon` FROM `CMS` WHERE `id`=? LIMIT 1');
+			$query = $this->prepare('SELECT `addon` FROM `cms_paths` WHERE `id`=? LIMIT 1');
 			$this->execute($query, $id);
 			$row = $this->fetchRow($query);
 			if (!$row)
@@ -212,7 +212,7 @@
 		{
 			// this function collects the list of assigned pages directly from database
 			
-			$query = $this->SQL('SELECT `id`,`request_path`,`title`,`addon` FROM `CMS` ORDER BY `id`');
+			$query = $this->SQL('SELECT `id`,`request_path`,`title`,`addon` FROM `cms_paths` ORDER BY `id`');
 			$pages = $this->fetchAll($query);
 			
 			return $pages;
@@ -221,7 +221,7 @@
 		
 		public function getPageData($id)
 		{
-			$query = $this->prepare('SELECT `id`,`request_path`,`title`,`addon` FROM `CMS` WHERE `id`=? LIMIT 1');
+			$query = $this->prepare('SELECT `id`,`request_path`,`title`,`addon` FROM `cms_paths` WHERE `id`=? LIMIT 1');
 			$this->execute($query, $id);
 			
 			return $this->fetchRow($query);
@@ -246,7 +246,7 @@
 		public function requestPathUnique($path, $id=0)
 		{
 			// check if request path is unique
-			$query = $this->prepare('SELECT `id` FROM `CMS` WHERE `id`<>? AND `request_path`=? LIMIT 1');
+			$query = $this->prepare('SELECT `id` FROM `cms_paths` WHERE `id`<>? AND `request_path`=? LIMIT 1');
 			$this->execute($query, array($id, $path));
 			$row = $this->fetchRow($query);
 			$this->free($query);

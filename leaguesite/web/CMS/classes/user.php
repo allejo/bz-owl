@@ -2,8 +2,12 @@
 	// handle user related data
 	class user
 	{
-		public function __construct()
+		private $userid = 0;
+		public function __construct($userid = 0)
 		{
+			// instance based on current user should be built
+			$this->userid = $userid;
+			
 			// set default permissions for all users one time
 			// make sure not to do it more than once because it would reset perms then
 			// TODO: getPermission should return default permission instead
@@ -14,13 +18,29 @@
 			}
 		}
 		
+		public static function getCurrentUserId()
+		{
+			$userid = 0;
+			
+			if (static::getCurrentUserLoggedIn() && isset($_SESSION['viewerid']))
+			{
+				$userid = $_SESSION['viewerid'];
+			}
+			
+			return (int) $userid;
+		}
+		
+		public static function getCurrentUserLoggedIn()
+		{
+			return (isset($_SESSION['user_logged_in']) && ($_SESSION['user_logged_in'] === true));
+		}
 		
 		// id > 0 means a user is logged in
 		function getID()
 		{
 			$userid = 0;
 			
-			if ($this->loggedIn() && isset($_SESSION['viewerid']))
+			if (static::getCurrentUserLoggedIn() && isset($_SESSION['viewerid']))
 			{
 				$userid = $_SESSION['viewerid'];
 			}
@@ -112,12 +132,11 @@
 			// returns current user if no userid specified, otherwise name of user of supplied userid
 			if ($userid === 0)
 			{
-				$id = self::getID();
+				$id = $this->userid;
 			} else
 			{
 				$id = $userid;
 			}
-			
 			
 			if ($id === 0)
 			{
@@ -249,38 +268,17 @@
 			}
 		}
 		
-		
-		function loggedIn()
+		public function getLoggedIn()
 		{
-			return (isset($_SESSION['user_logged_in']) && ($_SESSION['user_logged_in'] === true));
+			return parent::getCurrentUserLoggedIn();
 		}
-		
 		
 		// logout the user
 		function logout()
 		{
 			global $db;
-/*
-			// does session exist? session_status() and PHP_SESSION_ACTIVE are >= PHP 5.4
-			if (version_compare(PHP_VERSION, '5.4.0', '<') || session_status() === PHP_SESSION_ACTIVE)
-			{
-				
-				// gather session data
-				$sessionName = session_name();
-				$sessionCookie = session_get_cookie_params();
-				
-*/
-/*
-				// destroy the session
-				session_destroy();
-				
-				// delete session cookie, if possible
-				@setcookie($sessionName, '', time() - 3600, $sessionCookie['path'], $sessionCookie['domain'], $sessionCookie['secure']);
-				
-				
-				// start a new session
-				session_start();
-*/
+			
+			
 			// remove user from online user list
 			$query = $db->prepare('DELETE FROM `online_users` WHERE `userid`=:uid');
 			$db->execute($query, array(':uid' => array($this->getID(), PDO::PARAM_INT)));
@@ -289,13 +287,8 @@
 			$_SESSION['user_logged_in'] = false;
 			$_SESSION['viewerid'] = -1;
 			
-			
-			// reset all session variables of this session
-			// session_unset();	
-
 			// reset permissions back to standard
 			$this->setDefaultPermissions();
-/* 			} */
 		}
 		
 		function removeAllPermissions()

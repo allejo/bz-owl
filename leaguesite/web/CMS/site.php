@@ -36,7 +36,7 @@
 			
 			// user information
 			require dirname(__FILE__) . '/classes/user.php';
-			$user = new user();
+			$user = new user(user::getCurrentUserId());
 			
 			// template builder
 			require dirname(__FILE__) . '/classes/tmpl.php';
