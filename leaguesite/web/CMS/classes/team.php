@@ -4,6 +4,7 @@
 	// not loaded by default!
 	class team
 	{
+		private $leaderid = false;
 		private $getNameQuery;
 		private $teamid;
 		private $origTeamid;
@@ -40,12 +41,30 @@
 			return false;
 		}
 		
+		public function getLeaderId()
+		{
+			global $db;
+			
+			$query = $db->prepare('SELECT `leader_userid` FROM `teams` WHERE `id`=:teamid LIMIT 1');
+			if ($db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT))))
+			{
+				$row = $db->fetchRow($query);
+				$db->free($query);
+				
+				$this->leaderid = $row['leader_userid'];
+				
+				return $this->leaderid;
+			}
+			return false;
+		}
+		
+		
+		// returns team name belonging to teamid of current class instance
 		public function getName()
 		{
 			global $config;
 			global $db;
 			
-			// returns current user if no userid specified, otherwise name of user of supplied userid			
 			
 			if ($this->teamid === 0)
 			{
@@ -72,6 +91,23 @@
 			return '$team->getName(' . strval($this->teamid) . ') failed.';
 		}
 		
+		public function getPermission($permission, $userid)
+		{
+			// userid 0 is reserved and never has any permission
+			// any user not identified or logged in has id 0
+			if ($userid === 0)
+			{
+				return false;
+			}
+			
+			switch ($permission)
+			{
+				case 'edit':
+					return $this->getLeaderId() === $userid;
+				default: return false;
+			}
+		}
+		
 		public function getScore()
 		{
 			global $db;
@@ -80,8 +116,8 @@
 			$query = $db->prepare('SELECT `score` FROM `teams_overview` WHERE `id`=:teamid LIMIT 1');
 			if ($db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT))))
 			{
-				$row = $db->fetchRow($this->getNameQuery);
-				$db->free($this->getNameQuery);
+				$row = $db->fetchRow($query);
+				$db->free($query);
 				
 				$this->score = $row['score'];
 				
@@ -89,6 +125,26 @@
 			}
 			return false;
 		}
+		
+		public function getUserIds()
+		{
+			global $db;
+			
+			
+			$ids = array();
+			
+			$query = $db->prepare('SELECT `id` FROM `users` WHERE `teamid`=:teamid');
+			if ($db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT))))
+			{
+				while ($row = $db->fetchRow($query))
+				{
+					$ids[] = $row['id'];
+				}
+				$db->free($query);
+			}
+			return $ids;
+		}
+		
 		
 		public function setName($name)
 		{

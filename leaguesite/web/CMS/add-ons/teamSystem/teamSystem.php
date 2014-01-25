@@ -17,7 +17,7 @@
 			} elseif (isset($_GET['edit']))
 			{
 				require_once dirname(__FILE__) . '/teamEdit.php';
-				new teamEdit();
+				new teamEdit((int) $_GET['edit']);
 			} elseif (isset($_GET['delete']))
 			{
 				require_once dirname(__FILE__) . '/teamDelete.php';

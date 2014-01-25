@@ -10,6 +10,13 @@ PHP's variable register_globals is required to be off.
 PHP's variable magic_quotes_gpc is required to be off, see also
 	http://www.php.net/manual/en/info.configuration.php#ini.magic-quotes-gpc
 
+PHP packages:
+	cURL: Updating usernames and converting accounts from local to bzbb
+	GD: Gallery
+	mbstring: multibyte strings
+	mysql: PDO driver for database connectivity
+
+
 You need to set up four configuration files
 	CMS/siteoptions_path.php: file that shows the code where the old world config resides.
 				  A template is available at CMS/siteoptions_path_example.php
