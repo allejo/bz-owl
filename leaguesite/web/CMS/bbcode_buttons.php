@@ -16,7 +16,7 @@
 				if ($config->getValue('bbcodeLibAvailable'))
 				{
 					$buttons = array();
-					$buttons[] = '<script type="text/javascript" src="' . $config->getValue('baseaddress') . 'bbcode_buttons.js"></script>' . "\n";
+					$buttons[] = '<script type="text/javascript" src="' . $config->getValue('baseaddress') . 'js/bbcode_buttons.js"></script>' . "\n";
 					$buttons[] = ('<input type="button" name="bold" value="b" '
 								  . 'style="font-weight: bold;" '
 								  . 'onclick="' . "insert('[b]', '[/b]', '$form_number', '$element_name')" . '" />');
@@ -40,7 +40,7 @@
 				// check for bbcode library
 				if ($site->bbcode_lib_available())
 				{
-					echo "\n" . '<script type="text/javascript" src="' . baseaddress() . 'bbcode_buttons.js"></script>' . "\n";
+					echo "\n" . '<script type="text/javascript" src="' . baseaddress() . 'js/bbcode_buttons.js"></script>' . "\n";
 					$site->write_self_closing_tag('input type="button" name="bold" value="b" '
 												  . 'style="font-weight: bold;" '
 												  . 'onclick="' . "insert('[b]', '[/b]', '$form_number', '$element_name')" . '"');

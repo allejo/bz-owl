@@ -35,6 +35,12 @@
 			}
 			
 			$tmpl->assign('members', $members);
+			
+			include dirname(dirname(dirname(__FILE__))) . '/bbcode_buttons.php';
+			$bbcode = new bbcode_buttons();
+			// set up name of field to edit so javascript knows which element to manipulate
+			$tmpl->assign('buttonsToFormat', $bbcode->showBBCodeButtons('team_description'));
+			unset($bbcode);
 		}
 	}
 ?>

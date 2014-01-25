@@ -38,7 +38,7 @@ No menu found.
 <div><input type="hidden" name="confirmed" value="1" /></div>
 <div><input type="hidden" name="key_name" value="randomkey_team0.19958100 1390653736" /></div>
 <div><input type="hidden" name="randomkey_team" value="1081898905" /></div>
-<p><label class="team_change" for="edit_team_name">Change team name: </label>
+<p><label class="team_change" for="edit_team_name">Team name: </label>
 <input type="text" maxlength="30" size="30" name="edit_team_name" value="{($teamName)}" id="edit_team_name" /></p>
 <p><label class="team_change" for="team_leader">Leader:</label>
 <select name="team_leader" id="team_leader">
@@ -51,6 +51,19 @@ No menu found.
 {/if}
 </select>
 </p>
+<p>
+	<label class="team_change" for="any_teamless_player_can_join">Can any teamless player join the team?</label>
+	<input type="checkbox" name="any_teamless_player_can_join" value="1" id="any_teamless_player_can_join" />
+</p>
+{foreach item="button" from=$buttonsToFormat}
+{$button}
+{/foreach}
+<div>
+	<label class="team_change" for="team_description">Edit team description:</label>
+	<span>
+		<textarea id="team_description" rows="10" cols="50" name="team_description">{if !empty($teamDescription)}{$teamDescription}{else}Think of a good team description{/if}</textarea>
+	</span>
+</div>
 </form>
 </div>
 {/if}
