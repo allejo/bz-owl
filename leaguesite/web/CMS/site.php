@@ -38,6 +38,9 @@
 			require dirname(__FILE__) . '/classes/user.php';
 			$user = new user(user::getCurrentUserId());
 			
+			// user invitations
+			require dirname(__FILE__) . '/classes/invitation.php';
+			
 			// template builder
 			require dirname(__FILE__) . '/classes/tmpl.php';
 			$tmpl = new tmpl();

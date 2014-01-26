@@ -24,17 +24,6 @@
 		}
 		
 		
-		public function deleteOldInvitations()
-		{
-			// delete expired invitations
-			$query = $this->prepare('DELETE LOW_PRIORITY FROM `invitations` WHERE `expiration`<=?');
-			if (!$this->execute($query, date('Y-m-d H:i:s')))
-			{
-				$this->logError('Could not delete expired invitations.');
-			}
-		}
-		
-		
 		public function findIDByExternalLogin($id)
 		{
 			// internal id is an integer of length 11 by definition
