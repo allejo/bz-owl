@@ -297,7 +297,7 @@
 				$userOperations->updateUserName($uid,
 												($externalLogin ? $moduleInstance->getID() : 0),
 												$moduleInstance->getName());
-				$user->setID($uid);
+				user::setCurrentUserID($uid);
 				$moduleInstance->givePermissions();
 				$userOperations->addToVisitsLog($uid);
 				$userOperations->updateLastLogin($uid);

@@ -107,9 +107,30 @@
 		}
 		
 		
-		function maintainTeams()
+		private function maintainTeams()
 		{
+			// 6 months long inactive teams will be deleted during maintenance
+			// inactive is defined as the team did not match 6 months
+			$six_months_in_past = strtotime('-6 months');
+			$six_months_in_past = strftime('%Y-%m-%d %H:%M:%S', $six_months_in_past);
 			
+			$teamIds = team::getActiveTeamIds();
+			foreach ($teamIds AS $teamid)
+			{
+				$team = new team($teamid);
+				if ($team->getNewestMatchTimestamp() < $six_months_in_past)
+				{
+					$team->setStatus('deleted');
+					$uids = $team->getUserIds();
+					foreach($uids AS $userid)
+					{
+						$user = new user($userid);
+						$user->removeTeamMembership($teamid);
+						$user->update();
+					}
+					$team->update();
+				}
+			}
 		}
 		
 		

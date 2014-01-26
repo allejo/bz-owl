@@ -38,8 +38,8 @@ No menu found.
 
 	<div class="team_header">
 		<div class="team_name">{$team.name}</div>
-{if isset($team.logo)}
-<img class="team_logo" src="{$team.logo}" style="max-width:300px; max-height:200px" alt="team logo" />
+{if isset($team.logo) && !empty($team.logo)}
+<img class="team_logo" src="{$team.logo|escape}" style="max-width:300px; max-height:200px" alt="team logo" />
 {/if}
 		<span class="team_score">Rating: {$team.score}<span class="{$team.scoreClass}"></span></span>
 		<div class="team_activity"><span class="team_activity_announcement">Activity: </span><span class="team_activity">{$team.activityNew} ({$team.activityOld})</span></div>

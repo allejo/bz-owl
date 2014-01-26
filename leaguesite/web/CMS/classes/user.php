@@ -2,10 +2,14 @@
 	// handle user related data
 	class user
 	{
+		private $origUserid = 0;
 		private $userid = 0;
+		private $teamid = false;
+		
 		public function __construct($userid = 0)
 		{
 			// instance based on current user should be built
+			$this->origUserid = $userid;
 			$this->userid = $userid;
 			
 			// set default permissions for all users one time
@@ -48,12 +52,16 @@
 			return (int) $userid;
 		}
 		
-		function setID($id=0)
+		public static function setCurrentUserID($id=0)
 		{
 			$_SESSION['viewerid'] = intval($id);
 			$_SESSION['user_logged_in'] = (intval($id) > 0) ?  true : false;
 		}
 		
+		function setID($userid)
+		{
+			$this->userid = $userid;
+		}
 		
 		function getTheme()
 		{
@@ -157,6 +165,12 @@
 			// error handling: log error and show it in end user visible result
 			$db->logError((__FILE__) . ': getName(' . strval($userid) . ') failed: transformed into (.' . $id . ').'); 
 			return '$user->getName(' . strval($userid) . ') failed.';
+		}
+		
+		// removes user from team
+		public function removeTeamMembership($teamid)
+		{
+			$this->teamid = 0;
 		}
 		
 		function setPermission($permission, $value=true)
@@ -357,6 +371,48 @@
 			
 			// aux permissions
 			$this->setPermission('IsAdmin', false);
+		}
+		
+		// update user in db
+		// returns true if update is successful
+		public function update()
+		{
+			global $db;
+			
+			
+			// teamid 0 is reserved, not to be used
+			// update not possible on new entry
+			if ($this->userid === 0 || $this->origUserid === 0)
+			{
+				return false;
+			}
+			
+			if ($this->name === false)
+			{
+				$this->name = $this->getName();
+			}
+			
+			$query = $db->prepare('UPDATE `users` SET id=:id WHERE id=:origid');
+			if ($db->execute($query, array(':id' => array($this->userid, PDO::PARAM_INT),
+										   ':origid' => array($this->origTeamid, PDO::PARAM_INT))))
+			{
+				$this->origUserid = $this->userid;
+				if ($this->status !== false)
+				{
+					$query = $db->prepare('UPDATE `teams_overview` SET deleted=:status WHERE id=:id');
+					if ($db->execute($query, array(':status' => array($this->status, PDO::PARAM_INT),
+												   ':id' => array($this->teamid, PDO::PARAM_INT))))
+					{
+						return true;
+					}
+				} else
+				{
+					return true;
+				}
+			}
+			
+			
+			return false;
 		}
 	}
 ?>

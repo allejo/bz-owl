@@ -222,6 +222,8 @@
 				$team['losses'] = intval($row['num_matches_lost']);
 				$team['total'] = $team['wins'] + $team['draws'] + $team['losses'];
 				
+				$team['logo'] = $row['logo_url'];
+				
 				$tmpl->assign('teamDescription', $row['description']);
 			}
 			$db->free($query);

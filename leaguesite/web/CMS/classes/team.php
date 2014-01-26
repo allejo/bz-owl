@@ -13,6 +13,7 @@
 		private $origTeamid;
 		private $name = false;
 		private $score = false;
+		private $status = false;
 		
 		public function __construct($teamid = 0)
 		{
@@ -61,9 +62,27 @@
 			return false;
 		}
 		
+		public static function getActiveTeamIds()
+		{
+			$query = $db->prepare('SELECT `teamid` FROM `teams_overview` WHERE `deleted`=:status');
+			if ($db->execute($query, array(':status' => array('2', PDO::PARAM_INT))))
+			{
+				$ids = array();
+				while ($row = $db->fetchRow($query))
+				{
+					$ids[] = $row['teamid'];
+				}
+				$db->free($query);
+				
+				return $ids;
+			}
+			return array();
+		}
+		
 		public function getDescription()
 		{
 			global $db;
+			
 			
 			$query = $db->prepare('SELECT `description` FROM `teams_profile` WHERE `teamid`=:teamid LIMIT 1');
 			if ($db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT))))
@@ -83,6 +102,7 @@
 		{
 			global $db;
 			
+			
 			$query = $db->prepare('SELECT `raw_description` FROM `teams_profile` WHERE `teamid`=:teamid LIMIT 1');
 			if ($db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT))))
 			{
@@ -100,6 +120,7 @@
 		{
 			global $db;
 			
+			
 			$query = $db->prepare('SELECT `leader_userid` FROM `teams` WHERE `id`=:teamid LIMIT 1');
 			if ($db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT))))
 			{
@@ -112,7 +133,6 @@
 			}
 			return false;
 		}
-		
 		
 		// returns team name belonging to teamid of current class instance
 		public function getName()
@@ -144,6 +164,23 @@
 			// error handling: log error and show it in end user visible result
 			$db->logError((__FILE__) . ': getName(' . strval($this->teamid) . ') failed.');
 			return '$team->getName(' . strval($this->teamid) . ') failed.';
+		}
+		
+		// FIXME: Probably better to call a match class and pass teamid as parameter
+		public function getNewestMatchTimestamp()
+		{
+			global $db;
+			
+			
+			$query = $db->prepare('SELECT `timestamp` FROM `matches` WHERE `team1_id`=:teamid OR `team2_id`=:teamid ORDER BY `timestamp` DESC LIMIT 1');
+			if ($db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT))))
+			{
+				$row = $db->fetchRow($query);
+				$db->free($query);
+				
+				return $row['timestamp'];
+			}
+			return false;
 		}
 		
 		public function getPermission($permission, $userid)
@@ -206,6 +243,14 @@
 			$this->name = $name;
 		}
 		
+		public function setStatus($status)
+		{
+			if ($status === 'deleted')
+			{
+				$this->status = 2;
+			}
+		}
+		
 		public function setTeamid($teamid)
 		{
 			$this->teamid = $teamid;
@@ -232,12 +277,24 @@
 			
 			$query = $db->prepare('UPDATE `teams` SET id=:id, name=:name WHERE id=:origid');
 			if ($db->execute($query, array(':name' => array($this->name, PDO::PARAM_STR),
-										   ':id' => array($this->teamid),
-										   ':origid' => array($this->origTeamid))))
+										   ':id' => array($this->teamid, PDO::PARAM_INT),
+										   ':origid' => array($this->origTeamid, PDO::PARAM_INT))))
 			{
 				$this->origTeamid = $this->teamid;
-				return true;
+				if ($this->status !== false)
+				{
+					$query = $db->prepare('UPDATE `teams_overview` SET deleted=:status WHERE id=:id');
+					if ($db->execute($query, array(':status' => array($this->status, PDO::PARAM_INT),
+												   ':id' => array($this->teamid, PDO::PARAM_INT))))
+					{
+						return true;
+					}
+				} else
+				{
+					return true;
+				}
 			}
+			
 			
 			return false;
 		}

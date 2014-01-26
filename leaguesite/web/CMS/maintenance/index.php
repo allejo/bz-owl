@@ -111,7 +111,7 @@
 			// 6 months long inactive teams will be deleted during maintenance
 			// inactive is defined as the team did not match 6 months
 			$six_months_in_past = strtotime('-6 months');
-			$six_months_in_past = strftime('%Y-%m-%d %H:%M:%S', $six_months_in_past);			
+			$six_months_in_past = strftime('%Y-%m-%d %H:%M:%S', $six_months_in_past);
 			
 			// walk through results
 			while ($row = mysql_fetch_array($result))
