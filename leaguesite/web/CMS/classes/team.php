@@ -168,7 +168,7 @@
 			global $db;
 			
 			
-			$query = $db->prepare('SELECT `score` FROM `teams_overview` WHERE `id`=:teamid LIMIT 1');
+			$query = $db->prepare('SELECT `score` FROM `teams_overview` WHERE `teamid`=:teamid LIMIT 1');
 			if ($db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT))))
 			{
 				$row = $db->fetchRow($query);
