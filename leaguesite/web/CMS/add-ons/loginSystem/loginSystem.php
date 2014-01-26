@@ -302,6 +302,7 @@
 				$userOperations->addToVisitsLog($uid);
 				$userOperations->updateLastLogin($uid);
 				$userOperations->addToOnlineUserList($moduleInstance->getName(), $uid);
+				$userOperations->deleteOldInvitations();
 				
 				$this->moduleOutput[] = 'Login was successful!';
 				return true;
