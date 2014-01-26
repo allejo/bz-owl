@@ -26,6 +26,8 @@
 					$buttons[] = ('<input type="button" name="underline" value="u" '
 								  . 'style="text-decoration: underline;" '
 								  . 'onclick="' . "insert('[u]', '[/u]', '$form_number', '$element_name')" . '" />');
+					$buttons[] = ('<input type="button" name="center" value="center" '
+								  . 'onclick="' . "insert('[center]', '[/center]', '$form_number', '$element_name')" . '" />');
 					$buttons[] = ('<input type="button" name="img" value="img" '
 								  . 'onclick="' . "insert('[img]', '[/img]', '$form_number', '$element_name')" . '" />');
 					$buttons[] = ('<input type="button" name="url" value="url" '

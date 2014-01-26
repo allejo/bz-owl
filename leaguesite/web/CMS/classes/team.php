@@ -4,6 +4,9 @@
 	// not loaded by default!
 	class team
 	{
+		private $avatarURI = false;
+		private $description = false;
+		private $rawDescription = false;
 		private $leaderid = false;
 		private $getNameQuery;
 		private $teamid;
@@ -37,6 +40,58 @@
 				{
 					return true;
 				}
+			}
+			return false;
+		}
+		
+		public function getAvatarURI()
+		{
+			global $db;
+			
+			$query = $db->prepare('SELECT `logo_url` FROM `teams_profile` WHERE `teamid`=:teamid LIMIT 1');
+			if ($db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT))))
+			{
+				$row = $db->fetchRow($query);
+				$db->free($query);
+				
+				$this->avatarURI = $row['logo_url'];
+				
+				return $this->avatarURI;
+			}
+			return false;
+		}
+		
+		public function getDescription()
+		{
+			global $db;
+			
+			$query = $db->prepare('SELECT `description` FROM `teams_profile` WHERE `teamid`=:teamid LIMIT 1');
+			if ($db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT))))
+			{
+				$row = $db->fetchRow($query);
+				$db->free($query);
+				
+				$this->description = $row['description'];
+				
+				return $this->description;
+			}
+			return false;
+		}
+		
+		// gets description before bbcode is processed
+		public function getRawDescription()
+		{
+			global $db;
+			
+			$query = $db->prepare('SELECT `raw_description` FROM `teams_profile` WHERE `teamid`=:teamid LIMIT 1');
+			if ($db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT))))
+			{
+				$row = $db->fetchRow($query);
+				$db->free($query);
+				
+				$this->rawDescription = $row['raw_description'];
+				
+				return $this->rawDescription;
 			}
 			return false;
 		}

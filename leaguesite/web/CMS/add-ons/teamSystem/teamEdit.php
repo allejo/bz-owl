@@ -41,6 +41,9 @@
 			// set up name of field to edit so javascript knows which element to manipulate
 			$tmpl->assign('buttonsToFormat', $bbcode->showBBCodeButtons('team_description'));
 			unset($bbcode);
+			
+			$tmpl->assign('teamDescription', $team->getRawDescription());
+			$tmpl->assign('avatarURI', $team->getAvatarURI());
 		}
 	}
 ?>

@@ -38,7 +38,7 @@ No menu found.
 <div><input type="hidden" name="confirmed" value="1" /></div>
 <div><input type="hidden" name="key_name" value="randomkey_team0.19958100 1390653736" /></div>
 <div><input type="hidden" name="randomkey_team" value="1081898905" /></div>
-<p><label class="team_change" for="edit_team_name">Team name: </label>
+<p><label class="team_change" for="edit_team_name">Team name:</label>
 <input type="text" maxlength="30" size="30" name="edit_team_name" value="{($teamName)}" id="edit_team_name" /></p>
 <p><label class="team_change" for="team_leader">Leader:</label>
 <select name="team_leader" id="team_leader">
@@ -61,9 +61,11 @@ No menu found.
 <div>
 	<label class="team_change" for="team_description">Edit team description:</label>
 	<span>
-		<textarea id="team_description" rows="10" cols="50" name="team_description">{if !empty($teamDescription)}{$teamDescription}{else}Think of a good team description{/if}</textarea>
+		<textarea id="team_description" rows="10" cols="50" name="team_description">{if !empty($teamDescription)}{$teamDescription|escape}{else}Think of a good team description. Hint: This isn't one ;){/if}</textarea>
 	</span>
 </div>
+<p><label class="team_change" for="edit_avatar_url">Avatar URI:</label><input id="edit_avatar_url" type="text" name="logo_url" maxlength="200" size="60" value="{if isset($avatarURI) && $avatarURI}{$avatarURI|escape}{/if}" />
+</p></div><p><input type="submit" name="edit_team_data" value="Submit new team data" id="send"></p>
 </form>
 </div>
 {/if}
