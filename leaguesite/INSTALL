@@ -5,7 +5,6 @@ Installing
 Installing is not easy. It is recommended you have basic PHP knowledge before proceeding.
 
 First of all PHP greater or equal 5.3 is recommended.
-PHP's extension mbstring and PDO drivers are required.
 PHP's variable register_globals is required to be off.
 PHP's variable magic_quotes_gpc is required to be off, see also
 	http://www.php.net/manual/en/info.configuration.php#ini.magic-quotes-gpc
