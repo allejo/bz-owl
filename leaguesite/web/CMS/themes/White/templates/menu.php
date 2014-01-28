@@ -54,19 +54,19 @@
 			
 			// update activity data
 			$logged_in = true;
-			if ($user->getID() > 0)
+			if (user::getCurrentUserId() > 0)
 			{
 				// the execution of the query is not that time critical and it happens often -> LOW_PRIORITY
 				$query = $db->prepare('UPDATE LOW_PRIORITY `online_users` SET `last_activity`=?'
 									  . ' WHERE `userid`=?');
-				$db->execute($query, array(date('Y-m-d H:i:s'), $user->getID()));
+				$db->execute($query, array(date('Y-m-d H:i:s'), user::getCurrentUserId()));
 				
 				// are there unread messages?
 				$query = $db->prepare('SELECT `msgid` FROM `pmsystem_msg_users` WHERE `msg_status`=?'
 									  . ' AND `userid`=?'
 									  . ' LIMIT 1');
 				
-				$result = $db->execute($query, array('new', $user->getID()));;
+				$result = $db->execute($query, array('new', user::getCurrentUserId()));;
 				$rows = $db->rowCount($query);
 				if ($rows > 0)
 				{

@@ -259,7 +259,7 @@
 			// add userid to prevent cached output being served to other users
 			if ($cache_id === null)
 			{
-				$cache_id = $user->getID();
+				$cache_id = user::getCurrentUserId();
 			}
 			
 			if ($compile_id === null)
@@ -285,7 +285,7 @@
 			}
 */
 			
-			parent::display($this->templateFile, $user->getID(), $compile_id, $parent);
+			parent::display($this->templateFile, user::getCurrentUserId(), $compile_id, $parent);
 			
 			return true;
 		}

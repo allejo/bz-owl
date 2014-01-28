@@ -27,7 +27,6 @@
 		function delete($folder, $id)
 		{
 			global $tmpl;
-			global $user;
 			global $db;
 			
 			
@@ -38,7 +37,7 @@
 			$query = $db->prepare('DELETE FROM `pmsystem_msg_users`'
 					. ' WHERE `msgid`=:msgid AND `userid`=:uid AND `folder`=:folder');
 			$params = array(':msgid' => array($id, PDO::PARAM_INT),
-							':uid' => array($user->getID(), PDO::PARAM_INT),
+							':uid' => array(user::getCurrentUserId(), PDO::PARAM_INT),
 							':folder' => array($folder, PDO::PARAM_STR));
 			$db->execute($query, $params);
 			

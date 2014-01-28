@@ -280,7 +280,7 @@
 				$content['raw_msg'] = $_POST['staticContent'];
 				
 				$query = $db->prepare('SELECT `name` FROM `users` WHERE `id`=? LIMIT 1');
-				$db->execute($query, $user->getID());
+				$db->execute($query, user::getCurrentUserId());
 				$content['author'] = $db->fetchRow($query);
 				$db->free($query);
 				
@@ -498,7 +498,6 @@
 		function writeContent(&$content)
 		{
 			global $config;
-			global $user;
 			global $tmpl;
 			global $db;
 			
@@ -555,7 +554,7 @@
 			}
 			
 			$query = $db->prepare('SELECT `name` FROM `users` WHERE `id`=? LIMIT 1');
-			$db->execute($query, $user->getID());
+			$db->execute($query, user::getCurrentUserId());
 			$author = $db->fetchRow($query);
 			$db->free($query);
 			

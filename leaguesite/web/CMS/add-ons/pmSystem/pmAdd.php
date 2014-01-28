@@ -38,7 +38,6 @@
 		{
 			global $tmpl;
 			global $config;
-			global $user;
 			global $db;
 			
 			
@@ -47,7 +46,7 @@
 				// data passed to form -> use it
 				
 				$query = $db->prepare('SELECT `name` FROM `users` WHERE `id`=? LIMIT 1');
-				$db->execute($query, $user->getID());
+				$db->execute($query, user::getCurrentUserId());
 				$author = $db->fetchRow($query);
 				if ($author === false)
 				{
@@ -119,7 +118,6 @@
 		function sanityCheck(&$confirmed)
 		{
 			global $config;
-			global $user;
 			global $tmpl;
 			global $db;
 			
@@ -150,7 +148,7 @@
 				
 				// find out if original message was readable for user
 				$query = $db->prepare('SELECT COUNT(*) FROM `pmsystem_msg_users` WHERE `msgid`=? AND `userid`=?');
-				$db->execute($query, array($_GET['id'], $user->getID()));
+				$db->execute($query, array($_GET['id'], user::getCurrentUserId()));
 				$rows = $db->fetchRow($query);
 				$db->free($query);
 				
@@ -369,17 +367,14 @@
 		
 		function writeContent()
 		{
-			global $user;
-			
-			
 			$result = false;
 			if (isset($_GET['id']) && intval($_GET['id']) > 0)
 			{
 				// TODO: use further reaching validation than just intval
-				$result = $this->PMComposer->send($user->getID(), intval($_GET['id']));
+				$result = $this->PMComposer->send(user::getCurrentUserId(), intval($_GET['id']));
 			} else
 			{
-				$result = $this->PMComposer->send($user->getID());
+				$result = $this->PMComposer->send(user::getCurrentUserId());
 			}
 			
 			if ($result === true)

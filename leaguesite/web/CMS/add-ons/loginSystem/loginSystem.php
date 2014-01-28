@@ -10,7 +10,7 @@
 			
 			
 			// abort process if user already logged in
-			if ($user->getID() > 0)
+			if (user::getCurrentUserId() > 0)
 			{
 				$this->moduleOutput[] = ('You are already logged in. '
 										 . 'If you want to login with a different account '

@@ -54,7 +54,7 @@
 				if ($this->loginSuccessful())
 				{
 					$this->helper->addMsg('<p class="first_p">Login was successful!</p>'
-								  . '<p>Your profile page can be found <a href="../Players/?profile=' . $user->getID() . '">here</a>.</p>');
+								  . '<p>Your profile page can be found <a href="../Players/?profile=' . user::getCurrentUserId() . '">here</a>.</p>');
 				} else
 				{
 					// module itself should create an error message in case of failure
@@ -136,7 +136,7 @@
 				
 				
 				// if account can not be identified, it willl logout the user
-				if ($user->getID() === 0)
+				if (user::getCurrentUserId() === 0)
 				{
 					$user->logout();
 				}
@@ -350,7 +350,7 @@
 				// dealing only with the current player from this point on
 				
 				// cache this variable to speed up further access to the value
-				$user_id = $user->getID();
+				$user_id = user::getCurrentUserId();
 				
 				
 				// suspended mode: active; deleted; login disable; banned
@@ -399,7 +399,7 @@
 									$_SESSION['viewerid'] = (int) $row['id'];
 								}
 								$db->free($query);
-								$user_id = $user->getID();
+								$user_id = user::getCurrentUserId();
 								if ($rows === 1)
 								{
 									// user inserted without problems

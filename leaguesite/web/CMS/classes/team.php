@@ -45,6 +45,31 @@
 			return false;
 		}
 		
+		// permanently delete team from database
+		public function delete()
+		{
+			global $db;
+			
+			$query = $db->prepare('DELETE FROM `teams` WHERE `id`=:teamid LIMIT 1');
+			if ($db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT))))
+			{
+				$query = $db->prepare('DELETE FROM `teams_overview` WHERE `teamid`=:teamid LIMIT 1');
+				if ($db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT))))
+				{
+					$query = $db->prepare('DELETE FROM `teams_profile` WHERE `teamid`=:teamid LIMIT 1');
+					if ($db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT))))
+					{
+						$query = $db->prepare('DELETE FROM `teams_permissions` WHERE `teamid`=:teamid LIMIT 1');
+						if ($db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT))))
+						{
+							return true;
+						}
+					}
+				}
+			}
+			return false;
+		}
+		
 		public function getAvatarURI()
 		{
 			global $db;
@@ -64,8 +89,11 @@
 		
 		public static function getActiveTeamIds()
 		{
+			global $db;
+			
+			
 			$query = $db->prepare('SELECT `teamid` FROM `teams_overview` WHERE `deleted`=:status');
-			if ($db->execute($query, array(':status' => array('2', PDO::PARAM_INT))))
+			if ($db->execute($query, array(':status' => array('1', PDO::PARAM_INT))))
 			{
 				$ids = array();
 				while ($row = $db->fetchRow($query))
@@ -95,6 +123,46 @@
 				return $this->description;
 			}
 			return false;
+		}
+		
+		public static function getDeletedTeamIds()
+		{
+			global $db;
+			
+			
+			$query = $db->prepare('SELECT `teamid` FROM `teams_overview` WHERE `deleted`=:status');
+			if ($db->execute($query, array(':status' => array('2', PDO::PARAM_INT))))
+			{
+				$ids = array();
+				while ($row = $db->fetchRow($query))
+				{
+					$ids[] = $row['teamid'];
+				}
+				$db->free($query);
+				
+				return $ids;
+			}
+			return array();
+		}
+		
+		public static function getInactiveTeamIds()
+		{
+			global $db;
+			
+			
+			$query = $db->prepare('SELECT `teamid` FROM `teams_overview` WHERE `deleted`=:status');
+			if ($db->execute($query, array(':status' => array('4', PDO::PARAM_INT))))
+			{
+				$ids = array();
+				while ($row = $db->fetchRow($query))
+				{
+					$ids[] = $row['teamid'];
+				}
+				$db->free($query);
+				
+				return $ids;
+			}
+			return array();
 		}
 		
 		// gets description before bbcode is processed
@@ -200,6 +268,72 @@
 			}
 		}
 		
+		public static function getReactivatedTeamIDs()
+		{
+			global $db;
+			
+			
+			$query = $db->prepare('SELECT `teamid` FROM `teams_overview` WHERE `deleted`=:status');
+			if ($db->execute($query, array(':status' => array('3', PDO::PARAM_INT))))
+			{
+				$ids = array();
+				while ($row = $db->fetchRow($query))
+				{
+					$ids[] = $row['teamid'];
+				}
+				$db->free($query);
+				
+				return $ids;
+			}
+			return array();
+		}
+		
+		// obtain status of team
+		// valid status values: new, active, deleted, reactivated
+		// returns false on error
+		public function getStatus()
+		{
+			if ($this->teamid === 0)
+			{
+				return false;
+			}
+			
+			if ($this->status !== false)
+			{
+				return $this->status;
+			}
+			
+			// collect name from database
+			$query = $db->prepare('SELECT `deleted` FROM `teams_overview` WHERE `teamid`=:teamid LIMIT 1');
+			if ($db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT))))
+			{
+				$teamStatus = $db->fetchRow($query);
+				$db->free($query);
+				
+				switch ($teamStatus['name'])
+				{
+					case 0:
+						$this->status = 'new';
+					case 1:
+						$this->status = 'active';
+					case 2:
+						$this->status = 'deleted';
+					case 3:
+						$this->status = 'reactivated';
+					case 4:
+						$this->status = 'inactive';
+				}
+
+				return $this->status;
+			}
+			
+			// error handling: log error and show it in end user visible result
+			$db->logError((__FILE__) . ': getName(' . strval($this->teamid) . ') failed.');
+			return false;
+			
+			
+		}
+		
 		public function getScore()
 		{
 			global $db;
@@ -243,11 +377,22 @@
 			$this->name = $name;
 		}
 		
+		// assign status to team
+		// valid status values: new, active, deleted, reactivated
 		public function setStatus($status)
 		{
-			if ($status === 'deleted')
+			switch ($status)
 			{
-				$this->status = 2;
+				case 'new':
+					$this->status = 0;
+				case 'active':
+					$this->status = 1;
+				case 'deleted':
+					$this->status = 2;
+				case 'reactivated':
+					$this->status = 3;
+				case 'inactive':
+					$this->status = 4;
 			}
 		}
 		
@@ -281,10 +426,26 @@
 										   ':origid' => array($this->origTeamid, PDO::PARAM_INT))))
 			{
 				$this->origTeamid = $this->teamid;
-				if ($this->status !== false)
+				
+				$status = false;
+				switch ($this->status)
 				{
+					case 'new':
+						$status = 0;
+					case 'active':
+						$status = 1;
+					case 'deleted':
+						$status = 2;
+					case 'reactivated':
+						$status = 3;
+					case 'inactive':
+						$status = 4;
+				}
+				if ($status !== false)
+				{
+					
 					$query = $db->prepare('UPDATE `teams_overview` SET deleted=:status WHERE id=:id');
-					if ($db->execute($query, array(':status' => array($this->status, PDO::PARAM_INT),
+					if ($db->execute($query, array(':status' => array($status, PDO::PARAM_INT),
 												   ':id' => array($this->teamid, PDO::PARAM_INT))))
 					{
 						return true;

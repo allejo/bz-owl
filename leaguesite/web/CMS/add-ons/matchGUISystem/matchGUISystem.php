@@ -7,7 +7,6 @@
 		{
 			global $site;
 			global $config;
-			global $user;
 			global $tmpl;
 			
 			
@@ -22,7 +21,7 @@
 			
 			// accessible by public (show..)
 			// find out which template should be used
-			if ($user->getID() < 0)
+			if (user::getCurrentUserId() < 0)
 			{
 				$matchClass->displayMatches();
  				$tmpl->display();

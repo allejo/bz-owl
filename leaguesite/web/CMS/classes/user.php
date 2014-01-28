@@ -2,6 +2,7 @@
 	// handle user related data
 	class user
 	{
+		private $lastLoginTimestamp;
 		private $origUserid = 0;
 		private $userid = 0;
 		private $teamid = false;
@@ -39,17 +40,26 @@
 			return (isset($_SESSION['user_logged_in']) && ($_SESSION['user_logged_in'] === true));
 		}
 		
-		// id > 0 means a user is logged in
 		function getID()
 		{
-			$userid = 0;
+			return $this->userid;
+		}
+		
+		public function getLastLoginTimestampStr()
+		{
+			global $db;
 			
-			if (static::getCurrentUserLoggedIn() && isset($_SESSION['viewerid']))
+			$query = $db->prepare('SELECT `last_login` FROM `users_profile` WHERE `userid`=:teamid LIMIT 1');
+			if ($db->execute($query, array(':userid' => array($this->userid, PDO::PARAM_INT))))
 			{
-				$userid = $_SESSION['viewerid'];
+				$row = $db->fetchRow($query);
+				$db->free($query);
+				
+				$this->lastLoginTimestamp = $row['last_login'];
+				
+				return $this->lastLoginTimestamp;
 			}
-			
-			return (int) $userid;
+			return false;
 		}
 		
 		public static function setCurrentUserID($id=0)

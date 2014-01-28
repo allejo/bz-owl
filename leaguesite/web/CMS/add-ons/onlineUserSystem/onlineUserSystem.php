@@ -4,7 +4,6 @@
 		public function __construct($title)
 		{
 			global $config;
-			global $user;
 			global $tmpl;
 			global $db;
 			
@@ -41,9 +40,9 @@
 					
 					// last_activity timestamp is set based on a low priority update that may finish after page data has been collected
 					// to avoid old info show about visitor user account just force set that value to 0
-					if (isset($onlineUsers[$user->getID()]))
+					if (isset($onlineUsers[user::getCurrentUserId()]))
 					{
-						$onlineUsers[$user->getID()]['idle'] = '0s';
+						$onlineUsers[user::getCurrentUserId()]['idle'] = '0s';
 					}
 					
 					$tmpl->assign('onlineUserSystem', $onlineUsers);

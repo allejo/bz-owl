@@ -115,7 +115,7 @@
 			{
 				// fatal error -> die
 				$db->logError('FATAL ERROR: Query in teamList.php (teamSystem add-on) by user '
-							  . $user->getID() . ' failed, request URI: ' . $_SERVER['REQUEST_URI']);
+							  . user::getCurrentUserId() . ' failed, request URI: ' . $_SERVER['REQUEST_URI']);
 				$tmpl->setTemplate('NoPerm');
 				$tmpl->display();
 				die();
@@ -189,7 +189,7 @@
 			{
 				// fatal error -> die
 				$db->logError('FATAL ERROR: Query in teamList.php (teamSystem add-on) by user '
-							  . $user->getID() . ' failed, request URI: ' . $_SERVER['REQUEST_URI']);
+							  . user::getCurrentUserId() . ' failed, request URI: ' . $_SERVER['REQUEST_URI']);
 				$tmpl->setTemplate('NoPerm');
 				$tmpl->display();
 				die();
@@ -230,14 +230,14 @@
 			$tmpl->assign('team', $team);
 			
 			$tmpl->assign('teamid', $teamid);
-			$tmpl->assign('canPMTeam', $user->getID() > 0 ? true : false);
+			$tmpl->assign('canPMTeam', user::getCurrentUserId() > 0 ? true : false);
 			
 			// tell template if user can edit this team
-			$tmpl->assign('canEditTeam', ($user->getId() === $teamLeader) || $user->getPermission('allow_edit_any_team_profile'));
+			$tmpl->assign('canEditTeam', (user::getCurrentUserId() === $teamLeader) || $user->getPermission('allow_edit_any_team_profile'));
 			
 			
 			$showMemberActionOptions = false;
-			if ($user->getID() === $teamLeader
+			if (user::getCurrentUserId() === $teamLeader
 				|| $user->getPermission('allow_kick_any_team_members'))
 			{
 				$showMemberActionOptions = true;
@@ -264,7 +264,7 @@
 				// rename db result fields and assemble some additional informations
 				// use a temporary array for better readable (but slower) code
 				$prepared = array();
-				if (!$showMemberActionOptions && $user->getID() === intval($row['userid']))
+				if (!$showMemberActionOptions && user::getCurrentUserId() === intval($row['userid']))
 				{
 					$showMemberActionOptions = true;
 				}
@@ -282,14 +282,14 @@
 				// show leave/kick links if permission is given
 				// a team leader can not leave or be kicked
 				// you must first give someone else leadership
-				if (($user->getID() === $teamLeader
-					|| $user->getID() === intval($row['userid'])
+				if ((user::getCurrentUserId() === $teamLeader
+					|| user::getCurrentUserId() === intval($row['userid'])
 					|| $user->getPermission('allow_kick_any_team_members'))
-					&& $user->getID() !== $teamLeader)
+					&& user::getCurrentUserId() !== $teamLeader)
 				{
 					$prepared['removeLink'] = './?remove=' . intval($row['userid']);
 					
-					if ($user->getID() === intval($row['userid']))
+					if (user::getCurrentUserId() === intval($row['userid']))
 					{
 						$prepared['removeDescription'] = 'Leave team';
 					} else

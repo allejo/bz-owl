@@ -34,7 +34,7 @@
 			
 			
 			// anon users may only view matches
-			if ($user->getID() < 0)
+			if (\user::getCurrentUserId() < 0)
 			{
 				require_once dirname(__FILE__) . '/versions/' . $this->version . '/matchList.php';
 				new matchList(false);

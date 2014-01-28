@@ -16,7 +16,7 @@
 			}
 			
 			// no public private message folder
-			if ($user->getID() < 1)
+			if (user::getCurrentUserId() < 1)
 			{
 				$tmpl->setTemplate('NoPerm');
 				$tmpl->assign('errorMsg', 'You need to login to access this content.');

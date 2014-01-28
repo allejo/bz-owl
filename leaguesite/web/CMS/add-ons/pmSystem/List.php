@@ -35,7 +35,6 @@
 		{
 			global $config;
 			global $tmpl;
-			global $user;
 			global $db;
 			
 			// set the template
@@ -70,7 +69,7 @@
 								  . ' AND `pmsystem_msg_storage`.`id`=?'
 								  . ' ORDER BY `pmsystem_msg_storage`.`id` DESC'
 								  . ' LIMIT 1');
-			$db->execute($query, array($config->getValue('displayedSystemUsername'), $user->getID(), $folder, $id));
+			$db->execute($query, array($config->getValue('displayedSystemUsername'), user::getCurrentUserId(), $folder, $id));
 			
 			$rows = $db->fetchAll($query);
 			$db->free($query);
@@ -80,7 +79,7 @@
 								  . ' WHERE `userid`=? AND `msgid`<?'
 								  . ' AND `folder`=?'
 								  . ' ORDER BY `msgid` DESC LIMIT 1');
-			$db->execute($query, array($user->getID(), $id, $folder));
+			$db->execute($query, array(user::getCurrentUserId(), $id, $folder));
 			
 			$prevMSG = $db->fetchAll($query);
 			$db->free($query);
@@ -95,7 +94,7 @@
 								  . ' WHERE `userid`=? AND `msgid`>?'
 								  . ' AND `folder`=?'
 								  . ' ORDER BY `msgid` LIMIT 1');
-			$db->execute($query, array($user->getID(), $id, $folder));
+			$db->execute($query, array(user::getCurrentUserId(), $id, $folder));
 			$nextMSG = $db->fetchAll($query);
 			$db->free($query);
 			if (count($nextMSG) > 0)
@@ -187,14 +186,13 @@
 								  . ' AND `folder`=?'
 								  . ' AND `userid`=?'
 								  . ' LIMIT 1');
-			$db->execute($query, array('read', $id, $folder, $user->getID()));
+			$db->execute($query, array('read', $id, $folder, user::getCurrentUserId()));
 		}
 		
 		function showMails($folder)
 		{
 			global $config;
 			global $tmpl;
-			global $user;
 			global $db;
 			
 			$max_per_page = 200;	// FIXME: move to settings.php (or define per theme)
@@ -232,7 +230,7 @@
 								  . ' LIMIT :limit OFFSET :offset');
 			$params = array();
 			$params[':author'] = array($config->getValue('displayedSystemUsername'), PDO::PARAM_STR);
-			$params[':userid'] = array($user->getID(), PDO::PARAM_INT);
+			$params[':userid'] = array(user::getCurrentUserId(), PDO::PARAM_INT);
 			$params[':folder'] = array($folder, PDO::PARAM_STR);
 			$params[':limit'] = array($max_per_page+1, PDO::PARAM_INT);
 			$params[':offset'] = array($offset, PDO::PARAM_INT);

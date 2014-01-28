@@ -178,7 +178,6 @@
 		function writeContent(&$content)
 		{
 			global $config;
-			global $user;
 			global $tmpl;
 			global $db;
 			
@@ -199,7 +198,7 @@
 			$db->free($query);
 			$date_format = date('Y-m-d H:i:s');
 			
-			$args = array($user->getID(), $date_format, $content);
+			$args = array(user::getCurrentUserId(), $date_format, $content);
 			if ($config->getValue('bbcodeLibAvailable'))
 			{
 				$args[] = $tmpl->encodeBBCode($content);
