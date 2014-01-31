@@ -17,23 +17,24 @@
 	// use the simple site.php as it's quite convenient to use
 	
 	// default to path within repository
-	$path = dirname(dirname(__FILE__)) . '/web/';
+	global $installationPath;
+	$installationPath = dirname(dirname(__FILE__)) . '/web/';
 	
 	// use custom installation path info if available
 	$installationPathFile = dirname(__FILE__) . '/installationPath.txt';
 	if (file_exists($installationPathFile) && is_readable($installationPathFile))
 	{
 		// remove newlines from end of file, if there is one
-		$path = rtrim(file_get_contents($installationPathFile), "\n");
+		$installationPath = rtrim(file_get_contents($installationPathFile), "\n");
 		
 		// if relative path -> if path does not begin with /
 		if (strcasecmp(substr($path, 0, 1), '/') !== 0)
 		{
-			$path = dirname(__FILE__) . '/' . $path;
+			$installationPath = dirname(__FILE__) . '/' . $installationPath;
 		}
 	}
 	// load site.php
-	require_once $path . 'CMS/site.php';
+	require_once $installationPath . 'CMS/site.php';
 	$site = new site();
 	
 	// do not run if website is in production mode
@@ -586,6 +587,32 @@
 		$db->SQL('RENAME TABLE `CMS` TO `cms_paths`)';
 		
 		
+		// delete maintenance log file, new version uses database instead
+		global $installationPath;
+		if (file_exists($installationPath . 'CMS/maintenance/maintenance.txt'))
+		{
+			status('Resetting maintenance date');
+			$db->SQL('Update `misc_data` SET `last_maintenance`=\'0000-00-00\'');
+			
+			if (!unlink($installationPath . 'CMS/maintenance/maintenance.txt'))
+			{
+				status('Could not delete file ' . $installationPath . 'CMS/maintenance/maintenance.txt');
+				return false;
+			}
+			$maintDir = scandir($installationPath . 'CMS/maintenance/';
+			if ($maintDir !== false && count(scandir($maintDir)) === 0 && rmdir($maintDir))
+			{
+				status('Deleted empty maintenance folder');
+			} else
+			{
+				status('Could not delete maintenance folder')
+				return false;
+			}
+		}
+		
+		
+		$db->SQL('ALTER TABLE `teams_overview` CHANGE `any_teamless_player_can_join` `open` TINYINT(1)  NOT NULL  DEFAULT \'1\');
+
 		return true;
 	}
 ?>

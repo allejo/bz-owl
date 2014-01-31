@@ -1,6 +1,8 @@
 <?php
 	class teamEdit
 	{
+		private $team;
+		
 		public function __construct($teamid)
 		{
 			global $tmpl;
@@ -13,20 +15,27 @@
 			}
 			$tmpl->assign('title', 'Edit team');
 			
-			$team = new team($teamid);
+			$this->team = new team($teamid);
 			
 			
 			$tmpl->assign('teamid', $teamid);
-			$tmpl->assign('teamName', $team->getName());
+			$tmpl->assign('teamName', $this->team->getName());
 			
 			$editPermission = $user->getPermission('allow_edit_any_team_profile') || 
-							  $team->getPermission('edit', user::getCurrentUserId());
+							  $this->team->getPermission('edit', user::getCurrentUserId());
 			
 			$tmpl->assign('canEditTeam', $editPermission);
 			
-			$tmpl->assign('leaderId', $team->getLeaderId());
+			// user has no permission to edit team
+			// do not proceed with request
+			if (!$editPermission)
+			{
+				return;
+			}
 			
-			$userids = $team->getUserIds();
+			$tmpl->assign('leaderId', $this->team->getLeaderId());
+			
+			$userids = $this->team->getUserIds();
 			$members = array();
 			foreach($userids AS $userid)
 			{
@@ -36,14 +45,141 @@
 			
 			$tmpl->assign('members', $members);
 			
-			include dirname(dirname(dirname(__FILE__))) . '/bbcode_buttons.php';
+			
+			if (!isset($_POST['confirmed']) || (string) $_POST['confirmed'] === '0')
+			{
+				$this->showForm();
+			}
+			if (!isset($_POST['confirmed']) || (string) $_POST['confirmed'] === '1')
+			{
+				// try to update team
+				// show editing form on error 
+				if ($this->updateTeam() !== true)
+				{
+					$this->showForm();
+				} else
+				{
+					$tmpl->assign('teamEditSuccessful', true);
+				}
+			}
+		}
+		
+		protected function showForm()
+		{
+			global $site;
+			global $tmpl;
+			
+			
+			// protected against cross site injection attempts
+			$randomKeyName = 'teamEdit_' . $this->team->getID() . '_' . microtime();
+			// convert some special chars to underscores
+			$randomKeyName = strtr($randomKeyName, array(' ' => '_', '.' => '_'));
+			$randomkeyValue = $site->setKey($randomKeyName);
+			$tmpl->assign('keyName', $randomKeyName);
+			$tmpl->assign('keyValue', htmlent($randomkeyValue));
+			
+			// bbcode editor
+			include_once(dirname(dirname(dirname(__FILE__))) . '/bbcode_buttons.php');
 			$bbcode = new bbcode_buttons();
 			// set up name of field to edit so javascript knows which element to manipulate
 			$tmpl->assign('buttonsToFormat', $bbcode->showBBCodeButtons('team_description'));
 			unset($bbcode);
 			
-			$tmpl->assign('teamDescription', $team->getRawDescription());
-			$tmpl->assign('avatarURI', $team->getAvatarURI());
+			$tmpl->assign('teamDescription', $this->team->getRawDescription());
+			$tmpl->assign('avatarURI', $this->team->getAvatarURI());
+		}
+		
+		// does sanity checks on input values
+		// returns true on success, error message as string on error
+		protected function updateTeam()
+		{
+			global $site;
+			global $tmpl;
+			
+			
+			// require random access key name
+			if (!isset($_POST['key_name']))
+			{
+				return false;
+			}
+			
+			// require random access key value
+			if (!isset($_POST[$_POST['key_name']]))
+			{
+				return false;
+			}
+			
+			// sanity check key
+			if (!$site->validateKey($_POST['key_name'], $_POST[$_POST['key_name']]))
+			{
+				return false;
+			}
+			
+			// validate team name
+			$teamName = false;
+			if (isset($_POST['team_name']))
+			{
+				$teamName = (string) $_POST['team_name'];
+				// check for leading and trailing whitespace
+				if (strlen(trim($teamName)) !== strlen($teamName))
+				{
+					return 'Check your team name, no leading or trailing whitespace allowed.';
+				}
+				
+				
+				// 3 characters min team name size
+				if (strlen($teamName) < 3)
+				{
+					return 'Check your team name, at least 3 characters required.';
+				}
+				
+				// 30 characters max team name size
+				if (strlen($teamName) > 30)
+				{
+					return 'Check your team name, maximum length is 30 characters.';
+				}
+				
+				$this->team->setName($teamName);
+			}
+			
+			// validate team leader
+			if (isset($_POST['team_name']))
+			{
+				$leaderid = (int) $_POST['team_name'];
+				
+				if ($leaderid === 0)
+				{
+					return 'Check your team leader, a team must have a leader.';
+				}
+				
+				// build a user instance and ask if user (wanted leader) is member of team
+				$user = new user($leaderid);
+				if ($user->getMemberOfTeam($this->team->getID()) !== true)
+				{
+					return 'Check your team leader, a team leader must be member of the team.';
+				}
+			}
+			
+			// validate open team
+			if (isset($_POST['team_open']))
+			{
+				if ($_POST['team_open'] === '0')
+				{
+					$this->team->setOpen(false);
+				} else
+				{
+					$this->team->setOpen(true);
+				}
+			}
+			
+			// update team using new data
+			$result = $this->team->update();
+			if ($result !== true)
+			{
+				return $result;
+			}
+			
+			return true;
 		}
 	}
 ?>

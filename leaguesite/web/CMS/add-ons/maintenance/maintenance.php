@@ -105,7 +105,44 @@
 		
 		function maintainUsers()
 		{
+			$three_months_in_past = strtotime('-3 months');
+			$three_months_in_past = strftime('%Y-%m-%d %H:%M:%S', $three_months_in_past);
 			
+			// get ids of all users in system
+			$uids = user::getAllUserIds();
+			
+			// look at each user closely
+			foreach ($uids AS $uid)
+			{
+				$user = new user($uid);
+				// did user log in within last 3 months?
+				if ($user->getLastLoginTimestampStr() < $three_months_in_past)
+				{
+					// is user member of a team?
+					$teamIds = $user->getTeamIds();
+					if ($teamIds !== false)
+					{
+						// check if teams of user are not deleted
+						// assume all teams are deleted by default then check status of each team
+						// this will work better with a very high number of teams because it avoids
+						// to load a huge list of deleted team ids into memory first
+						$teamsDeleted = true;
+						foreach ($teamids AS $teamid)
+						{
+							$team = new team($teamid);
+							// if getting status of team failed or status is not deleted then do not delete user
+							if ($team->getStatus() !== 'deleted')
+							{
+								$teamsDeleted = false;
+							}
+						}
+						if ($teamsDeleted)
+						{
+							$user->delete();
+						}
+					}
+				}
+			}
 		}
 		
 		private function maintainTeams()
@@ -203,6 +240,7 @@
 				$team = new team($teamid);
 				if (($lastMatch = $team->getNewestMatchTimestamp()) && $lastMatch < $three_months_in_past)
 				{
+					// remove users from team
 					$uids = $team->getUserIds();
 					foreach($uids AS $userid)
 					{
@@ -210,6 +248,7 @@
 						$user->removeTeamMembership($teamid);
 						$user->update();
 					}
+					// delete team
 					$team->delete();
 				}
 			}
@@ -289,6 +328,76 @@
 			}
 		}
 		
+		function updateCountries()
+		{
+			global $db;
+			
+			
+			$query = $db->prepare('SELECT `id` FROM `countries` WHERE `id`=? LIMIT 1');
+			$db->execute($query, '1');
+			$insert_entry = ($db->fetchRow($query) === false);
+			$db->free($query);
+			
+			if ($insert_entry)
+			{
+				$query = $db->prepare('INSERT INTO `countries` (`id`,`name`, `flagfile`) VALUES (?, ?, ?)');
+				$db->execute($query, array('1', 'here be dragons', ''));
+			}
+			
+			$dir = dirname(dirname(dirname(dirname(__FILE__)))) . '/Flags';
+			$countries = array();
+			if ($handle = opendir($dir))
+			{
+				while (false !== ($file = readdir($handle)))
+				{
+					if ($file != '.' && $file != '..' && $file != '.svn' && $file != '.DS_Store')
+					{
+						$countries[] = $file;
+					}
+				}
+				closedir($handle);
+			}
+			
+			$queryFlag = $db->prepare('SELECT `flagfile` FROM `countries` WHERE `name`=?');
+			$queryInsertCountry = $db->prepare('INSERT INTO `countries` (`name`, `flagfile`) VALUES (?, ?)');
+			$queryUpdateCountry = $db->prepare('UPDATE `countries` SET `flagfile`=? WHERE `name`=?');
+			foreach($countries as &$one_country)
+			{
+				$flag_name_stripped = str_replace('Flag_of_', '', $one_country);
+				$flag_name_stripped = str_replace('.png', '', $flag_name_stripped);
+				$flag_name_stripped = str_replace('_', ' ', $flag_name_stripped);
+				
+				$update_country = false;
+				$insert_entry = true;
+				
+				
+				// check if flag exists in database
+				$db->execute($queryFlag, $flag_name_stripped);
+				while ($row = $db->fetchRow($queryFlag))
+				{
+					if (!(strcmp($row['flagfile'], $one_country) === 0))
+					{
+						$update_country = true;
+						$insert_entry = false;
+					}
+				}
+				$db->free($queryFlag);
+				
+				
+				if ($update_country)
+				{
+					if ($insert_entry)
+					{
+						$db->execute($queryInsertCountry, array($flag_name_stripped, $one_country));
+						$db->free($queryInsertCountry);
+					} else
+					{
+						$db->execute($queryUpdateCountry, array($one_country, $flag_name_stripped));
+						$db->free($queryUpdateCountry);
+					}
+				}
+			}
+		}
 		
 		function updateTeamActivity($teamid=false)
 		{
@@ -385,78 +494,6 @@
 			unset($teamid);
 			unset($team_activity45);
 			unset($team_activity90);
-		}
-		
-		
-		function updateCountries()
-		{
-			global $db;
-			
-			
-			$query = $db->prepare('SELECT `id` FROM `countries` WHERE `id`=? LIMIT 1');
-			$db->execute($query, '1');
-			$insert_entry = ($db->fetchRow($query) === false);
-			$db->free($query);
-			
-			if ($insert_entry)
-			{
-				$query = $db->prepare('INSERT INTO `countries` (`id`,`name`, `flagfile`) VALUES (?, ?, ?)');
-				$db->execute($query, array('1', 'here be dragons', ''));
-			}
-			
-			$dir = dirname(dirname(dirname(dirname(__FILE__)))) . '/Flags';
-			$countries = array();
-			if ($handle = opendir($dir))
-			{
-				while (false !== ($file = readdir($handle)))
-				{
-					if ($file != '.' && $file != '..' && $file != '.svn' && $file != '.DS_Store')
-					{
-						$countries[] = $file;
-					}
-				}
-				closedir($handle);
-			}
-			
-			$queryFlag = $db->prepare('SELECT `flagfile` FROM `countries` WHERE `name`=?');
-			$queryInsertCountry = $db->prepare('INSERT INTO `countries` (`name`, `flagfile`) VALUES (?, ?)');
-			$queryUpdateCountry = $db->prepare('UPDATE `countries` SET `flagfile`=? WHERE `name`=?');
-			foreach($countries as &$one_country)
-			{
-				$flag_name_stripped = str_replace('Flag_of_', '', $one_country);
-				$flag_name_stripped = str_replace('.png', '', $flag_name_stripped);
-				$flag_name_stripped = str_replace('_', ' ', $flag_name_stripped);
-				
-				$update_country = false;
-				$insert_entry = true;
-				
-				
-				// check if flag exists in database
-				$db->execute($queryFlag, $flag_name_stripped);
-				while ($row = $db->fetchRow($queryFlag))
-				{
-					if (!(strcmp($row['flagfile'], $one_country) === 0))
-					{
-						$update_country = true;
-						$insert_entry = false;
-					}
-				}
-				$db->free($queryFlag);
-				
-				
-				if ($update_country)
-				{
-					if ($insert_entry)
-					{
-						$db->execute($queryInsertCountry, array($flag_name_stripped, $one_country));
-						$db->free($queryInsertCountry);
-					} else
-					{
-						$db->execute($queryUpdateCountry, array($one_country, $flag_name_stripped));
-						$db->free($queryUpdateCountry);
-					}
-				}
-			}
 		}
 	}
 ?>

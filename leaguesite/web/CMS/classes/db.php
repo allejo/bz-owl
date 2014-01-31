@@ -165,7 +165,7 @@
 			return true;
 		}
 		
-		function SQL($query, $file=false, $errorUserMSG='')
+		public function SQL($query, $file=false, $errorUserMSG='')
 		{
 			global $tmpl;
 			
@@ -215,11 +215,13 @@
 		}
 		
 		
-		function execute(database_result &$dbResult, $inputParameters)
+		public function execute(database_result &$dbResult, $inputParameters)
 		{
 			$handle = $dbResult->getHandle();
 			
-			if (!is_array($inputParameters))
+			// check if $inputParameters is passed to function ($numArgs >= 2, else 1)
+			$numArgs = func_num_args();
+			if ($numArgs > 1 && !is_array($inputParameters))
 			{
 				$inputParameters = array($inputParameters);
 			} else
@@ -231,16 +233,20 @@
 					if (is_array($value) and preg_match('/^:[a-z]\w*$/i', $param))
 					{
 						$handle->bindValue($param, $value[0], $value[1]);
-						unset($inputParameters[$param]);	// works correctly with foreach
+						// remove processed input parameters from array
+						// works correctly with foreach
+						unset($inputParameters[$param]);
 					}
 				}
+				// if all inputParameters have been processed do not bind them in the execute call
 				if (empty($inputParameters))
 				{
-					$inputParameters = NULL;
+					//$inputParameters = NULL;
+					$numArgs = 1;
 				}
 			}
 			
-			$result = $handle->execute($inputParameters);
+			$result = ($numArgs > 1) ? $handle->execute($inputParameters) : $handle->execute();
 			
 			if ($result === false)
 			{
@@ -259,7 +265,7 @@
 			return $result;
 		}
 		
-		function prepare($query)
+		public function prepare($query)
 		{
 			$result = $this->pdo->prepare($query);
 			// this error catching will only work if PDO::ATTR_EMULATE_PREPARES is false
@@ -279,12 +285,12 @@
 			return (new database_result($result, $query));
 		}
 		
-		function fetchRow(database_result $dbResult)
+		public function fetchRow(database_result $dbResult)
 		{
 			return $dbResult->getHandle()->fetch();
 		}
 		
-		function fetchAll(database_result $dbResult)
+		public function fetchAll(database_result $dbResult)
 		{
 			return $dbResult->getHandle()->fetchAll();
 		}

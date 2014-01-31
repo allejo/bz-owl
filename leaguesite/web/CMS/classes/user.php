@@ -6,6 +6,7 @@
 		private $origUserid = 0;
 		private $userid = 0;
 		private $teamid = false;
+		private $status = false;
 		
 		public function __construct($userid = 0)
 		{
@@ -23,6 +24,53 @@
 			}
 		}
 		
+		// permanently delete user from database
+		public function delete()
+		{
+			global $db;
+			
+			$query = $db->prepare('DELETE FROM `users` WHERE `id`=:userid LIMIT 1');
+			if ($db->execute($query, array(':userid' => array($this->userid, PDO::PARAM_INT))))
+			{
+				$query = $db->prepare('DELETE FROM `users_passwords` WHERE `userid`=:userid LIMIT 1');
+				if ($db->execute($query, array(':userid' => array($this->userid, PDO::PARAM_INT))))
+				{
+					$query = $db->prepare('DELETE FROM `users_profile` WHERE `userid`=:userid LIMIT 1');
+					if ($db->execute($query, array(':userid' => array($this->userid, PDO::PARAM_INT))))
+					{
+						$query = $db->prepare('DELETE FROM `visits` WHERE `userid`=:userid LIMIT 1');
+						if ($db->execute($query, array(':userid' => array($this->userid, PDO::PARAM_INT))))
+						{
+							return true;
+						}
+					}
+				}
+			}
+			return false;
+		}
+		
+		// get ids of all users
+		// returns array of integers, false on error
+		public static function getAllUserIds()
+		{
+			global $db;
+			
+			
+			$query = $db->prepare('SELECT `id` FROM `users`');
+			if ($db->execute($query))
+			{
+				$ids = array();
+				while ($row = $db->fetchRow($query))
+				{
+					$ids[] = $row['id'];
+				}
+				$db->free($query);
+				return $ids;
+			}
+			return false;
+		}
+		
+		// get id of visiting user
 		public static function getCurrentUserId()
 		{
 			$userid = 0;
@@ -35,6 +83,7 @@
 			return (int) $userid;
 		}
 		
+		// is visiting user logged in?
 		public static function getCurrentUserLoggedIn()
 		{
 			return (isset($_SESSION['user_logged_in']) && ($_SESSION['user_logged_in'] === true));
@@ -49,7 +98,8 @@
 		{
 			global $db;
 			
-			$query = $db->prepare('SELECT `last_login` FROM `users_profile` WHERE `userid`=:teamid LIMIT 1');
+			
+			$query = $db->prepare('SELECT `last_login` FROM `users_profile` WHERE `userid`=:userid LIMIT 1');
 			if ($db->execute($query, array(':userid' => array($this->userid, PDO::PARAM_INT))))
 			{
 				$row = $db->fetchRow($query);
@@ -58,6 +108,32 @@
 				$this->lastLoginTimestamp = $row['last_login'];
 				
 				return $this->lastLoginTimestamp;
+			}
+			return false;
+		}
+		
+		// obtain status of user
+		// valid status values: 'active', 'deleted', 'login disabled', 'banned'
+		// returns false on error
+		public function getStatus()
+		{
+			global $db;
+			
+			
+			if ($this->status !== false)
+			{
+				return $this->status;
+			}
+			
+			$query = $db->prepare('SELECT `status` FROM `users` WHERE `userid`=:userid LIMIT 1');
+			if ($db->execute($query, array(':userid' => array($this->origUserid, PDO::PARAM_INT))))
+			{
+				$row = $db->fetchRow($query);
+				$db->free($query);
+				
+				$this->status = $row['status'];
+				
+				return $this->status;
 			}
 			return false;
 		}
@@ -175,6 +251,31 @@
 			// error handling: log error and show it in end user visible result
 			$db->logError((__FILE__) . ': getName(' . strval($userid) . ') failed: transformed into (.' . $id . ').'); 
 			return '$user->getName(' . strval($userid) . ') failed.';
+		}
+		
+		// check if user belongs to a certain team
+		// input: teamid (integer)
+		// output: true if member, false otherwise
+		function getMemberOfTeam($teamid)
+		{
+			// no user is ever member of team with reserved id 0
+			if ($teamid === 0)
+			{
+				return false;
+			}
+			
+			
+			// collect teamid of user from database
+			$query = $db->prepare('SELECT `teamid` FROM `users` WHERE `id`=:userid LIMIT 1');
+			if ($db->execute($query, array(':userid' => array($this->origUserid, PDO::PARAM_INT))))
+			{
+				$userName = $db->fetchRow($query);
+				$db->free($query);
+				
+				return ((int) $userName['teamid']) === $teamid;
+			}
+			
+			return false;
 		}
 		
 		// removes user from team

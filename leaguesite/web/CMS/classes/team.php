@@ -11,6 +11,7 @@
 		private $getNameQuery;
 		private $teamid;
 		private $origTeamid;
+		private $open = null;
 		private $name = false;
 		private $score = false;
 		private $status = false;
@@ -143,6 +144,11 @@
 				return $ids;
 			}
 			return array();
+		}
+		
+		public function getID()
+		{
+			return $this->teamid;
 		}
 		
 		public static function getInactiveTeamIds()
@@ -289,7 +295,7 @@
 		}
 		
 		// obtain status of team
-		// valid status values: new, active, deleted, reactivated
+		// valid status values: 'new', 'active', 'deleted', 'reactivated'
 		// returns false on error
 		public function getStatus()
 		{
@@ -330,8 +336,6 @@
 			// error handling: log error and show it in end user visible result
 			$db->logError((__FILE__) . ': getName(' . strval($this->teamid) . ') failed.');
 			return false;
-			
-			
 		}
 		
 		public function getScore()
@@ -375,6 +379,13 @@
 		public function setName($name)
 		{
 			$this->name = $name;
+		}
+		
+		// sets team status to be either open or not
+		// input values: $open (boolean)
+		public function setOpen(bool $open)
+		{
+			$this->open = (bool) $open;
 		}
 		
 		// assign status to team
@@ -443,16 +454,22 @@
 				}
 				if ($status !== false)
 				{
-					
-					$query = $db->prepare('UPDATE `teams_overview` SET deleted=:status WHERE id=:id');
-					if ($db->execute($query, array(':status' => array($status, PDO::PARAM_INT),
-												   ':id' => array($this->teamid, PDO::PARAM_INT))))
+					$query = $db->prepare('UPDATE `teams_overview` SET deleted=:status WHERE teamid=:teamid');
+					if (!$db->execute($query, array(':status' => array($status, PDO::PARAM_INT),
+												   ':teamid' => array($this->teamid, PDO::PARAM_INT))))
 					{
-						return true;
+						return false;
 					}
-				} else
+				}
+				
+				if ($this->open !== null)
 				{
-					return true;
+					$query = $db->prepare('UPDATE `teams_overview` SET open=:open WHERE teamid=:teamid');
+					if (!$db->execute($query, array(':open' => array($this->status ? 1 : 0, PDO::PARAM_INT),
+												   ':teamid' => array($this->teamid, PDO::PARAM_INT))))
+					{
+						return false;
+					}
 				}
 			}
 			

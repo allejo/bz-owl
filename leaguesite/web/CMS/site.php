@@ -117,8 +117,8 @@
 				// invalidate key & value to prevent allowing sending stuff more than once
 				if (!(strcmp($value, '') === 0))
 				{
-					unset ($_SESSION[$key]);
-					unset ($_SESSION[$value]);
+					unset($_SESSION[$key]);
+					unset($_SESSION[$value]);
 				} else
 				{
 					// never return true on empty key & value combination

@@ -23,7 +23,7 @@ No menu found.
 </div>
 
 <div class="content">
-<a class="button" href="./?profile={$teamid}">Cancel &amp; back to team profile</a>
+<a class="button" href="./?profile={$teamid}">{if !isset($teamEditSuccessful) || $teamEditSuccessful === false}Cancel &amp; b{else}B{/if}ack to team profile</a>
 <br /><br />
 
 {if !isset($teamName) || $teamName === false}
@@ -34,12 +34,18 @@ No menu found.
 <div class="static_page_box">You have no permission to edit {$teamName}.</div>
 {else}
 <div class="static_page_box">
-<form enctype="application/x-www-form-urlencoded" method="post" action="?edit=40">
+{if isset($teamEditSuccessful) && $teamEditSuccessful}
+<p>Team edited successfully.</p>
+<p><a href="./?profile={$teamid}">Return to team profile.</a></p>
+{else}
+<form enctype="application/x-www-form-urlencoded" method="post" action="?edit={$teamid}">
 <div><input type="hidden" name="confirmed" value="1" /></div>
-<div><input type="hidden" name="key_name" value="randomkey_team0.19958100 1390653736" /></div>
-<div><input type="hidden" name="randomkey_team" value="1081898905" /></div>
-<p><label class="team_change" for="edit_team_name">Team name:</label>
-<input type="text" maxlength="30" size="30" name="edit_team_name" value="{($teamName)}" id="edit_team_name" /></p>
+<div><input type="hidden" name="key_name" value="{$keyName}" /></div>
+<div><input type="hidden" name="{$keyName}" value="{$keyValue}" /></div>
+<p>
+	<label class="team_change" for="team_name">Team name:</label>
+	<input type="text" maxlength="30" size="30" name="team_name" value="{($teamName)}" id="team_name" />
+</p>
 <p><label class="team_change" for="team_leader">Leader:</label>
 <select name="team_leader" id="team_leader">
 {if !isset($members) || !is_array($members) || empty($members)}
@@ -52,21 +58,31 @@ No menu found.
 </select>
 </p>
 <p>
-	<label class="team_change" for="any_teamless_player_can_join">Can any teamless player join the team?</label>
-	<input type="checkbox" name="any_teamless_player_can_join" value="1" id="any_teamless_player_can_join" />
+	<label class="team_change" for="team_open">Can any teamless player join the team?</label>
+	<input type="checkbox" name="team_open" value="1" id="team_open" />
 </p>
+{if isset($buttonsToFormat) && $buttonsToFormat|is_array}
+<div>
 {foreach item="button" from=$buttonsToFormat}
 {$button}
 {/foreach}
+</div>
+{/if}
 <div>
 	<label class="team_change" for="team_description">Edit team description:</label>
 	<span>
 		<textarea id="team_description" rows="10" cols="50" name="team_description">{if !empty($teamDescription)}{$teamDescription|escape}{else}Think of a good team description. Hint: This isn't one ;){/if}</textarea>
 	</span>
 </div>
-<p><label class="team_change" for="edit_avatar_url">Avatar URI:</label><input id="edit_avatar_url" type="text" name="logo_url" maxlength="200" size="60" value="{if isset($avatarURI) && $avatarURI}{$avatarURI|escape}{/if}" />
-</p></div><p><input type="submit" name="edit_team_data" value="Submit new team data" id="send"></p>
+<p>
+	<label class="team_change" for="edit_avatar_url">Avatar URI:</label>
+	<input id="edit_avatar_url" type="text" name="logo_url" maxlength="200" size="60" value="{if isset($avatarURI) && $avatarURI}{$avatarURI|escape}{/if}" />
+</p>
+<p>
+	<input type="submit" name="edit_team_data" value="Submit new team data" id="send" />
+</p>
 </form>
+{/if}
 </div>
 {/if}
 

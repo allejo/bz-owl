@@ -1,4 +1,7 @@
 <?php
+	// legacy maintenance code
+	// code is deprecated, use the maintenance add-on instead!
+	
 	// siteinfo class used all the time
 	if (!(isset($site)))
 	{
@@ -57,8 +60,11 @@
 	if ($maintenanceNeeded)
 	{
 		// do the maintenance
+		// deactivated, maintenance add-on should be used instead
+/*
 		$maint = new maintenance_old();
 		$maint->do_maintenance($site, $connection);
+*/
 		// call the new maintenance add-on directly to do the job
 		require_once(dirname(dirname(__FILE__)) . '/add-ons/maintenance/maintenance.php');
 		$maintenance = new maintenance();
