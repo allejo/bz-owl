@@ -518,6 +518,16 @@
 					}
 				}
 				
+				if ($this->leaderid !== false)
+				{
+					$query = $db->prepare('UPDATE `teams` SET leader_userid=:leaderid WHERE id=:teamid');
+					if (!$db->execute($query, array(':leaderid' => array($this->leaderid, PDO::PARAM_INT),
+												   ':teamid' => array($this->teamid, PDO::PARAM_INT))))
+					{
+						return false;
+					}
+				}
+				
 				if ($this->rawDescription !== false)
 				{
 					$query = $db->prepare('UPDATE `teams_profile` SET raw_description=:rawDescription WHERE teamid=:teamid');
