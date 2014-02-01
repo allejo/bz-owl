@@ -53,7 +53,7 @@
 			{
 				// try to update team
 				// show editing form on error
-				if (($validation = $this->sanityCheck()) !== true && $this->updateTeam() !== true)
+				if (($validation = $this->sanityCheck()) !== true || $this->updateTeam() !== true)
 				{
 					if ($validation !== true)
 					{
@@ -136,6 +136,8 @@
 				{
 					return 'Check your team leader, a team leader must be member of the team.';
 				}
+				
+				$this->team->setLeaderId($leaderid);
 			}
 			
 			// validate open team
@@ -153,11 +155,9 @@
 			// validate team description
 			if (isset($_POST['team_description']))
 			{
-				if (strlen(trim($_POST['team_description'])) > 0)
-				{
-					$this->team->setDescription((string) $_POST['team_description']);
-					$this->team->setRawDescription((string) $_POST['team_description']);
-				}
+				// just pass through the values to team class
+				$this->team->setDescription((string) $_POST['team_description']);
+				$this->team->setRawDescription((string) $_POST['team_description']);
 			}
 			
 			return true;
@@ -192,9 +192,6 @@
 		// returns true on success, error message as string on error
 		protected function updateTeam()
 		{
-			global $tmpl;
-			
-			
 			// update team using new data
 			$result = $this->team->update();
 			if ($result !== true)

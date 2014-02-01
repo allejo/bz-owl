@@ -31,12 +31,12 @@ No menu found.
 {else}
 
 {if !isset($canEditTeam) || !$canEditTeam}
-<div class="static_page_box">You have no permission to edit {$teamName}.</div>
+<div class="static_page_box">You have no permission to edit {$teamName|escape}.</div>
 {else}
 <div class="static_page_box">
 {if isset($teamEditSuccessful) && $teamEditSuccessful}
 <p>Team edited successfully.</p>
-<p><a href="./?profile={$teamid}">Return to team profile.</a></p>
+<p><a href="./?profile={$teamid|escape}">Return to team profile.</a></p>
 {else}
 {if isset($form_error)}
 {if $form_error === false}
@@ -45,13 +45,13 @@ No menu found.
 <p>{$form_error}</p>
 {/if}
 {/if}
-<form enctype="application/x-www-form-urlencoded" method="post" action="?edit={$teamid}">
+<form enctype="application/x-www-form-urlencoded" method="post" action="?edit={$teamid|escape}">
 <div><input type="hidden" name="confirmed" value="1" /></div>
 <div><input type="hidden" name="key_name" value="{$keyName}" /></div>
 <div><input type="hidden" name="{$keyName}" value="{$keyValue}" /></div>
 <p>
 	<label class="team_change" for="team_name">Team name:</label>
-	<input type="text" maxlength="30" size="30" name="team_name" value="{($teamName)}" id="team_name" />
+	<input type="text" maxlength="30" size="30" name="team_name" value="{($teamName|escape)}" id="team_name" />
 </p>
 <p><label class="team_change" for="team_leader">Leader:</label>
 <select name="team_leader" id="team_leader">
@@ -59,7 +59,7 @@ No menu found.
 	<option value="0">No leader</option>
 {else}
 {foreach item="member" from=$members}
-	<option value="{$member.id}"{if $member.id === $leaderId} selected="selected"{/if}>{$member.name}</option>
+	<option value="{$member.id}"{if $member.id === $leaderId} selected="selected"{/if}>{$member.name|escape}</option>
 {/foreach}
 {/if}
 </select>

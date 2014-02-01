@@ -42,7 +42,7 @@ There are no active teams.
 </tr>
 {foreach item="team" from=$activeTeams}
 <tr class="teams_overview">
-	<td><a href="{$team.profileLink}">{$team.name}</a></td>
+	<td><a href="{$team.profileLink}">{$team.name|escape}</a></td>
 	<td>{$team.score}<span class="{$team.scoreClass}"></span></td>
 	<td><a href="{$team.matchSearchLink}">{$team.matchCount}</a></td>
 	<td>{$team.memberCount}</td>

@@ -10,7 +10,7 @@
 		private $leaderid = false;
 		private $getNameQuery;
 		private $teamid;
-		private $origTeamid;
+		private $origTeamId;
 		private $open = null;
 		private $name = false;
 		private $score = false;
@@ -19,7 +19,7 @@
 		public function __construct($teamid = 0)
 		{
 			$this->teamid = $teamid;
-			$this->origTeamid = $teamid;
+			$this->origTeamId = $teamid;
 		}
 		
 		// sanitises team name
@@ -391,7 +391,18 @@
 		{
 			global $tmpl;
 			
-			$this->description = $tmpl->encodeBBCode($description);
+			$this->description = $tmpl->encodeBBCode((string) $description);
+		}
+		
+		// sets team leader to any member of the team
+		// input values: $userid (integer)
+		public function setLeaderId($userid)
+		{
+			$user = new user($userid);
+			if ($user->getMemberOfTeam($this->origTeamId))
+			{
+				$this->leaderid = $userid;
+			}
 		}
 		
 		// sets team status to be either open or not
@@ -405,7 +416,7 @@
 		// input values: $description (string)
 		public function setRawDescription($description)
 		{
-			$this->rawDescription = $description;
+			$this->rawDescription = (string) $description;
 		}
 		
 		public function setName($name)
@@ -446,7 +457,7 @@
 			
 			// teamid 0 is reserved, not to be used
 			// update not possible on new entry
-			if ($this->teamid === 0 || $this->origTeamid === 0)
+			if ($this->teamid === 0 || $this->origTeamId === 0)
 			{
 				return false;
 			}
@@ -457,11 +468,11 @@
 			}
 			
 			$query = $db->prepare('UPDATE `teams` SET id=:id, name=:name WHERE id=:origid');
-			if ($db->execute($query, array(':name' => array($this->name, PDO::PARAM_STR),
-										   ':id' => array($this->teamid, PDO::PARAM_INT),
-										   ':origid' => array($this->origTeamid, PDO::PARAM_INT))))
+			if ($db->execute($query, array(':id' => array($this->teamid, PDO::PARAM_INT),
+										   ':name' => array($this->name, PDO::PARAM_STR),
+										   ':origid' => array($this->origTeamId, PDO::PARAM_INT))))
 			{
-				$this->origTeamid = $this->teamid;
+				$this->origTeamId = $this->teamid;
 				
 				$status = false;
 				switch ($this->status)
@@ -506,6 +517,7 @@
 						return false;
 					}
 				}
+				
 				if ($this->rawDescription !== false)
 				{
 					$query = $db->prepare('UPDATE `teams_profile` SET raw_description=:rawDescription WHERE teamid=:teamid');
@@ -515,7 +527,8 @@
 						return false;
 					}
 				}
-
+				
+				return true;
 			}
 			
 			

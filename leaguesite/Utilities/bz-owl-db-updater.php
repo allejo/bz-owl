@@ -610,9 +610,9 @@
 			}
 		}
 		
+		status('Renaming any_teamless_player_can_join to team_open);
+		$db->SQL('ALTER TABLE `teams_overview` CHANGE `any_teamless_player_can_join` `open` TINYINT(1)  NOT NULL  DEFAULT \'1\'');
 		
-		$db->SQL('ALTER TABLE `teams_overview` CHANGE `any_teamless_player_can_join` `open` TINYINT(1)  NOT NULL  DEFAULT \'1\');
-
 		return true;
 	}
 ?>

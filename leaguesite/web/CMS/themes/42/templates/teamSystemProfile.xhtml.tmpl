@@ -24,7 +24,7 @@ No menu found.
 
 <div class="content">
 {if isset($canPMTeam) && $canPMTeam}<a class="button" href="{$pmLink}">Send message to team</a>{/if}
-{if isset($canEditTeam) && $canEditTeam}<a class="button" href="./?edit={$teamid}">edit</a>{/if}
+{if isset($canEditTeam) && $canEditTeam}<a class="button" href="./?edit={$teamid|escape}">edit</a>{/if}
 <a class="button" href="./?opponent_stats={$teamid}">opponent stats</a>
 <br /><br />
 
@@ -37,7 +37,7 @@ No menu found.
 <div class="team_area">
 
 	<div class="team_header">
-		<div class="team_name">{$team.name}</div>
+		<div class="team_name">{$team.name|escape}</div>
 {if isset($team.logo) && !empty($team.logo)}
 <img class="team_logo" src="{$team.logo|escape}" style="max-width:300px; max-height:200px" alt="team logo" />
 {/if}
@@ -70,7 +70,7 @@ No menu found.
 		<div class="team_profile_header_text">Team description</div>
 
 		<div class="team_description">
-		{$teamDescription}
+		{if $teamDescription|count_characters > 0}{$teamDescription}{else}(No team description set){/if}
 		</div>
 	</div>
 </div>
@@ -149,7 +149,7 @@ No menu found.
 {/if}
 
 </table>
-{if isset($showDeleteButton) && $showDeleteButton}<p><a class="button" href="./?delete={$teamid}">Delete this team</a></p>{/if}
+{if isset($showDeleteButton) && $showDeleteButton}<p><a class="button" href="./?delete={$teamid|escape}">Delete this team</a></p>{/if}
 {/if}
 
 
