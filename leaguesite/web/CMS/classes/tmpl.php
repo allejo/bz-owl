@@ -142,7 +142,7 @@
 		
 		
 		// process bbcode
-		function encodeBBCode(string $bbcode)
+		function encodeBBCode($bbcode)
 		{
 			global $config;
 			

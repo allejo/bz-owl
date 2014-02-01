@@ -258,6 +258,9 @@
 		// output: true if member, false otherwise
 		function getMemberOfTeam($teamid)
 		{
+			global $db;
+			
+			
 			// no user is ever member of team with reserved id 0
 			if ($teamid === 0)
 			{

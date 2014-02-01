@@ -387,7 +387,7 @@
 		
 		// sets team description, encodes bbcode if possible
 		// input values: $description (string)
-		public function setDescription(string $description)
+		public function setDescription($description)
 		{
 			global $tmpl;
 			
@@ -403,7 +403,7 @@
 		
 		// sets raw team description, does not change input
 		// input values: $description (string)
-		public function setRawDescription(string $description)
+		public function setRawDescription($description)
 		{
 			$this->rawDescription = $description;
 		}
