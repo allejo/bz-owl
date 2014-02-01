@@ -407,7 +407,7 @@
 		
 		// sets team status to be either open or not
 		// input values: $open (boolean)
-		public function setOpen(bool $open)
+		public function setOpen($open)
 		{
 			$this->open = (bool) $open;
 		}
