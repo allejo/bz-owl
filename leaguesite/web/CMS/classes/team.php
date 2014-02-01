@@ -176,6 +176,32 @@
 			return array();
 		}
 		
+		// is team status open or not
+		// return values: true on open team, false otherwise
+		public function getOpen()
+		{
+			global $db;
+			
+			
+			if ($this->open !== null)
+			{
+				return $this->open;
+			}
+			
+			$query = $db->prepare('SELECT `open` FROM `teams_overview` WHERE `teamid`=:teamid LIMIT 1');
+			if ($db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT))))
+			{
+				$row = $db->fetchRow($query);
+				$db->free($query);
+				
+				// convert db entry to boolean
+				$this->open = $row['open'] === '1' ? true : false;
+				
+				return $this->open;
+			}
+			return false;
+		}
+		
 		// gets description before bbcode is processed
 		public function getRawDescription()
 		{
@@ -501,7 +527,7 @@
 				if ($this->open !== null)
 				{
 					$query = $db->prepare('UPDATE `teams_overview` SET open=:open WHERE teamid=:teamid');
-					if (!$db->execute($query, array(':open' => array($this->status ? 1 : 0, PDO::PARAM_INT),
+					if (!$db->execute($query, array(':open' => array($this->open ? 1 : 0, PDO::PARAM_INT),
 												   ':teamid' => array($this->teamid, PDO::PARAM_INT))))
 					{
 						return false;

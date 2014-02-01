@@ -177,6 +177,9 @@
 			$tmpl->assign('keyName', $randomKeyName);
 			$tmpl->assign('keyValue', htmlent($randomkeyValue));
 			
+			// indicate if team is currently opened or closed
+			$tmpl->assign('teamOpen', $this->team->getOpen());
+			
 			// bbcode editor
 			include_once(dirname(dirname(dirname(__FILE__))) . '/bbcode_buttons.php');
 			$bbcode = new bbcode_buttons();
