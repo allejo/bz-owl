@@ -113,6 +113,11 @@
 			global $db;
 			
 			
+			if ($this->description)
+			{
+				return $this->description;
+			}
+			
 			$query = $db->prepare('SELECT `description` FROM `teams_profile` WHERE `teamid`=:teamid LIMIT 1');
 			if ($db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT))))
 			{
@@ -176,6 +181,11 @@
 		{
 			global $db;
 			
+			
+			if ($this->rawDescription)
+			{
+				return $this->rawDescription;
+			}
 			
 			$query = $db->prepare('SELECT `raw_description` FROM `teams_profile` WHERE `teamid`=:teamid LIMIT 1');
 			if ($db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT))))
@@ -375,10 +385,13 @@
 			return $ids;
 		}
 		
-		
-		public function setName($name)
+		// sets team description, encodes bbcode if possible
+		// input values: $description (string)
+		public function setDescription(string $description)
 		{
-			$this->name = $name;
+			global $tmpl;
+			
+			$this->description = $tmpl->encodeBBCode($description);
 		}
 		
 		// sets team status to be either open or not
@@ -386,6 +399,18 @@
 		public function setOpen(bool $open)
 		{
 			$this->open = (bool) $open;
+		}
+		
+		// sets raw team description, does not change input
+		// input values: $description (string)
+		public function setRawDescription(string $description)
+		{
+			$this->rawDescription = $description;
+		}
+		
+		public function setName($name)
+		{
+			$this->name = $name;
 		}
 		
 		// assign status to team
@@ -471,6 +496,26 @@
 						return false;
 					}
 				}
+				
+				if ($this->description !== false)
+				{
+					$query = $db->prepare('UPDATE `teams_profile` SET description=:description WHERE teamid=:teamid');
+					if (!$db->execute($query, array(':description' => array($this->description, PDO::PARAM_STR),
+												   ':teamid' => array($this->teamid, PDO::PARAM_INT))))
+					{
+						return false;
+					}
+				}
+				if ($this->rawDescription !== false)
+				{
+					$query = $db->prepare('UPDATE `teams_profile` SET raw_description=:rawDescription WHERE teamid=:teamid');
+					if (!$db->execute($query, array(':rawDescription' => array($this->rawDescription, PDO::PARAM_STR),
+												   ':teamid' => array($this->teamid, PDO::PARAM_INT))))
+					{
+						return false;
+					}
+				}
+
 			}
 			
 			

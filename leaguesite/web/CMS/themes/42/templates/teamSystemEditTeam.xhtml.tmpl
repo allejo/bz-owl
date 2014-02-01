@@ -38,6 +38,13 @@ No menu found.
 <p>Team edited successfully.</p>
 <p><a href="./?profile={$teamid}">Return to team profile.</a></p>
 {else}
+{if isset($form_error)}
+{if $form_error === false}
+<p>Something went wrong while submitting your form. Please check your form values.</p>
+{else}
+<p>{$form_error}</p>
+{/if}
+{/if}
 <form enctype="application/x-www-form-urlencoded" method="post" action="?edit={$teamid}">
 <div><input type="hidden" name="confirmed" value="1" /></div>
 <div><input type="hidden" name="key_name" value="{$keyName}" /></div>

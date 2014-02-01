@@ -45,17 +45,20 @@
 			
 			$tmpl->assign('members', $members);
 			
-			
 			if (!isset($_POST['confirmed']) || (string) $_POST['confirmed'] === '0')
 			{
 				$this->showForm();
 			}
-			if (!isset($_POST['confirmed']) || (string) $_POST['confirmed'] === '1')
+			if (isset($_POST['confirmed']) && (string) $_POST['confirmed'] === '1')
 			{
 				// try to update team
-				// show editing form on error 
-				if ($this->updateTeam() !== true)
+				// show editing form on error
+				if (($validation = $this->sanityCheck()) !== true && $this->updateTeam() !== true)
 				{
+					if ($validation !== true)
+					{
+						$tmpl->assign('form_error', $validation);
+					}
 					$this->showForm();
 				} else
 				{
@@ -64,49 +67,24 @@
 			}
 		}
 		
-		protected function showForm()
-		{
-			global $site;
-			global $tmpl;
-			
-			
-			// protected against cross site injection attempts
-			$randomKeyName = 'teamEdit_' . $this->team->getID() . '_' . microtime();
-			// convert some special chars to underscores
-			$randomKeyName = strtr($randomKeyName, array(' ' => '_', '.' => '_'));
-			$randomkeyValue = $site->setKey($randomKeyName);
-			$tmpl->assign('keyName', $randomKeyName);
-			$tmpl->assign('keyValue', htmlent($randomkeyValue));
-			
-			// bbcode editor
-			include_once(dirname(dirname(dirname(__FILE__))) . '/bbcode_buttons.php');
-			$bbcode = new bbcode_buttons();
-			// set up name of field to edit so javascript knows which element to manipulate
-			$tmpl->assign('buttonsToFormat', $bbcode->showBBCodeButtons('team_description'));
-			unset($bbcode);
-			
-			$tmpl->assign('teamDescription', $this->team->getRawDescription());
-			$tmpl->assign('avatarURI', $this->team->getAvatarURI());
-		}
 		
-		// does sanity checks on input values
-		// returns true on success, error message as string on error
-		protected function updateTeam()
+		// check if user submitted data is valid
+		// returns true on valid data, error message as string or false otherwise
+		protected function sanityCheck()
 		{
 			global $site;
-			global $tmpl;
 			
 			
 			// require random access key name
 			if (!isset($_POST['key_name']))
 			{
-				return false;
+				return 'Submitted validation key name invalid.';
 			}
 			
 			// require random access key value
 			if (!isset($_POST[$_POST['key_name']]))
 			{
-				return false;
+				return 'Submitted validation key content invalid.';
 			}
 			
 			// sanity check key
@@ -143,9 +121,9 @@
 			}
 			
 			// validate team leader
-			if (isset($_POST['team_name']))
+			if (isset($_POST['team_leader']))
 			{
-				$leaderid = (int) $_POST['team_name'];
+				$leaderid = (int) $_POST['team_leader'];
 				
 				if ($leaderid === 0)
 				{
@@ -171,6 +149,51 @@
 					$this->team->setOpen(true);
 				}
 			}
+			
+			// validate team description
+			if (isset($_POST['team_description']))
+			{
+				if (strlen(trim($_POST['team_description'])) > 0)
+				{
+					$this->team->setDescription((string) $_POST['team_description']);
+					$this->team->setRawDescription((string) $_POST['team_description']);
+				}
+			}
+			
+			return true;
+		}
+		
+		protected function showForm()
+		{
+			global $site;
+			global $tmpl;
+			
+			
+			// protected against cross site injection attempts
+			$randomKeyName = 'teamEdit_' . $this->team->getID() . '_' . microtime();
+			// convert some special chars to underscores
+			$randomKeyName = strtr($randomKeyName, array(' ' => '_', '.' => '_'));
+			$randomkeyValue = $site->setKey($randomKeyName);
+			$tmpl->assign('keyName', $randomKeyName);
+			$tmpl->assign('keyValue', htmlent($randomkeyValue));
+			
+			// bbcode editor
+			include_once(dirname(dirname(dirname(__FILE__))) . '/bbcode_buttons.php');
+			$bbcode = new bbcode_buttons();
+			// set up name of field to edit so javascript knows which element to manipulate
+			$tmpl->assign('buttonsToFormat', $bbcode->showBBCodeButtons('team_description'));
+			unset($bbcode);
+			
+			$tmpl->assign('teamDescription', $this->team->getRawDescription());
+			$tmpl->assign('avatarURI', $this->team->getAvatarURI());
+		}
+		
+		// does sanity checks on input values
+		// returns true on success, error message as string on error
+		protected function updateTeam()
+		{
+			global $tmpl;
+			
 			
 			// update team using new data
 			$result = $this->team->update();
