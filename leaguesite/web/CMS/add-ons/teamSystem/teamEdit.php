@@ -160,6 +160,39 @@
 				$this->team->setRawDescription((string) $_POST['team_description']);
 			}
 			
+			// validate team avatar uri
+			if (isset($_POST['team_avatar_uri']))
+			{
+				// image formats: GIF, JPEG, PNG and SVG are supported
+				// protocols: HTTP and HTTPS are supported
+				
+				// check for image suffix rather than connecting to uri
+				// reason: avoid to trigger other forms or to download image with copyright
+				$avatarURI = trim($_POST['team_avatar_uri']);
+				$allowedExtensions = array('.gif', '.jpg', '.jpeg', '.png', '.svg');
+				$extensionOK = false;
+				foreach($allowedExtensions AS $allowedExtension)
+				{
+					if (substr($avatarURI, -strlen($allowedExtension)) === $allowedExtension)
+					{
+						$extensionOK = true;
+						break;
+					}
+				}
+				
+				if (!$extensionOK)
+				{
+					return 'Check your avatar URI, it must end with .gif, .jpg, .jpeg, .png or .svg, other formats are not supported.';
+				}
+				
+				if (!(substr($avatarURI, 0, 7) == 'http://') && !(substr($avatarURI, 0, 8) == 'https://'))
+				{
+					return 'Check protocol of avatar URI, HTTP and HTTPS are supported.';
+				}
+				
+				$this->team->setAvatarURI($avatarURI);
+			}
+			
 			return true;
 		}
 		

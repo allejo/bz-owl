@@ -71,6 +71,7 @@
 			return false;
 		}
 		
+		// returns URI pointing to team avatar image
 		public function getAvatarURI()
 		{
 			global $db;
@@ -411,6 +412,13 @@
 			return $ids;
 		}
 		
+		// sets the team avatar uri
+		// the avatar is an image that serves as team logo
+		public function setAvatarURI($uri)
+		{
+				$this->avatarURI = trim($uri);
+		}
+		
 		// sets team description, encodes bbcode if possible
 		// input values: $description (string)
 		public function setDescription($description)
@@ -499,6 +507,17 @@
 										   ':origid' => array($this->origTeamId, PDO::PARAM_INT))))
 			{
 				$this->origTeamId = $this->teamid;
+				
+				// update avatar uri
+				if ($this->avatarURI !== false)
+				{
+					$query = $db->prepare('UPDATE `teams_profile` SET logo_url=:avataruri WHERE `teamid`=:teamid LIMIT 1');
+					if (!$db->execute($query, array(':avataruri' => array($this->avatarURI, PDO::PARAM_STR),
+												   ':teamid' => array($this->teamid, PDO::PARAM_INT))))
+					{
+						return false;
+					}
+				}
 				
 				$status = false;
 				switch ($this->status)
