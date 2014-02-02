@@ -11,7 +11,7 @@
 		public function __construct($userid = 0)
 		{
 			// instance based on current user should be built
-			$this->origUserid = $userid;
+			$this->origUserId = $userid;
 			$this->userid = $userid;
 			
 			// set default permissions for all users one time
@@ -70,6 +70,22 @@
 			return false;
 		}
 		
+		// can user join a certain team
+		// input: teamid (integer) of the team in question
+		// output: true = allowed to join, false = not allowed to join (boolean);
+		public function getAllowedToJoinTeam($teamid)
+		{
+			// not logged in user can never join
+			if ($this->origUserId === 0)
+			{
+				return;
+			}
+			
+			require_once(dirname(__FILE__) . '/invitation.php');
+			return $this->getPermission('allow_join_in_any_team') || (new team($teamid))->getOpen() || invitation::getInvitationsForTeam($this->origUserId, $teamid);
+		}
+		
+		
 		// get id of visiting user
 		public static function getCurrentUserId()
 		{
@@ -126,7 +142,7 @@
 			}
 			
 			$query = $db->prepare('SELECT `status` FROM `users` WHERE `userid`=:userid LIMIT 1');
-			if ($db->execute($query, array(':userid' => array($this->origUserid, PDO::PARAM_INT))))
+			if ($db->execute($query, array(':userid' => array($this->origUserId, PDO::PARAM_INT))))
 			{
 				$row = $db->fetchRow($query);
 				$db->free($query);
@@ -270,7 +286,7 @@
 			
 			// collect teamid of user from database
 			$query = $db->prepare('SELECT `teamid` FROM `users` WHERE `id`=:userid LIMIT 1');
-			if ($db->execute($query, array(':userid' => array($this->origUserid, PDO::PARAM_INT))))
+			if ($db->execute($query, array(':userid' => array($this->origUserId, PDO::PARAM_INT))))
 			{
 				$userName = $db->fetchRow($query);
 				$db->free($query);
@@ -283,7 +299,7 @@
 		
 		// find out userids belonging to a team
 		// input: teamid (integer)
-		// output: array of userids, false on error
+		// output: array of userids (int), false on error
 		public static function getMemberIdsOfTeam($teamid)
 		{
 			global $db;
@@ -302,6 +318,28 @@
 			}
 			
 			return false;
+		}
+		
+		// is user in no team
+		// output: false if user belongs to a team, false otherwise (bool)
+		public function getIsTeamless()
+		{
+			global $db;
+			
+			$teamless = false;
+			$query = $db->prepare('SELECT `id` FROM `users` WHERE `id`=:userid AND `teamid`=:teamid');
+			// if user belongs to team with reserved id 0 then user is in no team
+			if ($db->execute($query, array(':userid' => array($this->origUserId, PDO::PARAM_INT),
+										   ':teamid' => array(0, PDO::PARAM_INT))))
+			{
+				if ($db->fetchRow($query))
+				{
+					$teamless = true;
+				}
+				$db->free($query);
+			}
+			
+			return $teamless;
 		}
 		
 		// removes user from team
@@ -483,6 +521,7 @@
 			$this->setPermission('allow_edit_any_team_profile', false);
 			$this->setPermission('allow_delete_any_team', false);
 			$this->setPermission('allow_invite_in_any_team', false);
+			$this->setPermission('allow_join_in_any_team', false);
 			$this->setPermission('allow_reactivate_teams', false);
 			
 			
@@ -519,7 +558,7 @@
 			
 			// teamid 0 is reserved, not to be used
 			// update not possible on new entry
-			if ($this->userid === 0 || $this->origUserid === 0)
+			if ($this->userid === 0 || $this->origUserId === 0)
 			{
 				return false;
 			}
@@ -533,7 +572,7 @@
 			if ($db->execute($query, array(':id' => array($this->userid, PDO::PARAM_INT),
 										   ':origid' => array($this->origTeamid, PDO::PARAM_INT))))
 			{
-				$this->origUserid = $this->userid;
+				$this->origUserId = $this->userid;
 				if ($this->status !== false)
 				{
 					$query = $db->prepare('UPDATE `teams_overview` SET deleted=:status WHERE id=:id');

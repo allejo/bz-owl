@@ -55,9 +55,13 @@
 		
 		private function addToTeamList(team $team)
 		{
+				global $tmpl;
+				
+				
 				// rename db result fields and assemble some additional informations
 				
 				$prepared = array();
+				$prepared['id'] = $team->getID();
 				$prepared['profileLink'] = './?profile=' . $team->getID();
 				$prepared['name'] = $team->getName();
 				$prepared['score'] = $team->getScore();
@@ -73,6 +77,9 @@
 				$prepared['activityNew'] = $team->getActivityNew();
 				$prepared['activityOld'] = $team->getActivityOld();
 				$prepared['created'] = $team->getCreationTimestampStr();
+				$prepared['canJoin'] = (new user(user::getCurrentUserId()))->getIsTeamless() && (new user(user::getCurrentUserId()))->getAllowedToJoinTeam($team->getID());
+				
+				$tmpl->assign('showTeamActionOptions', $prepared['canJoin']);
 				
 				// return result data
 				return $prepared;

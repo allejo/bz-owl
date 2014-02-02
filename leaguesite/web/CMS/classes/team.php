@@ -240,7 +240,7 @@
 			return array();
 		}
 		
-		// is team status open or not
+		// is team open for any user or not
 		// return values: true on open team, false otherwise
 		public function getOpen()
 		{

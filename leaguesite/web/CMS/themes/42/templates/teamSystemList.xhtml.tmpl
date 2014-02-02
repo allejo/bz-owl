@@ -24,7 +24,7 @@ No menu found.
 <div class="content">
 {if isset($canReactivateTeams)}<a class="button" href="?reactivate">Reactivate a team</a>{/if}
 {if !isset($activeTeams) || empty($activeTeams)}
-There are no active teams.
+<div class="static_page_box">There are no active teams.</div>
 {/if}
 
 {if isset($activeTeams) && !empty($activeTeams)}
@@ -39,6 +39,9 @@ There are no active teams.
 	<th>Leader</th>
 	<th>Activity</th>
 	<th>Creation Date</th>
+	{if isset($showTeamActionOptions) && $showTeamActionOptions}
+	<th>Allowed actions</th>
+	{/if}
 </tr>
 {foreach item="team" from=$activeTeams}
 <tr class="teams_overview">
@@ -49,14 +52,12 @@ There are no active teams.
 	<td><a href="{$team.leaderLink}">{$team.leaderName}</a></td>
 	<td>{$team.activityNew|string_format:'%.2f'} ({$team.activityOld|string_format:'%.2f'})</td>
 	<td>{$team.created}</td>
+	{if isset($team.canJoin) && $team.canJoin}<td><a class="button" href="?join={$team.id}">Join team</a></td>{/if}
 </tr>
 {/foreach}
 </table>
 {/if}
 
-{if !isset($inactiveTeams) || empty($inactiveTeams)}
-There are no inactive teams.
-{/if}
 {if isset($inactiveTeams) && !empty($inactiveTeams)}
 {if isset($activeTeams) && !empty($activeTeams)}
 <br />
@@ -72,6 +73,9 @@ There are no inactive teams.
 	<th>Leader</th>
 	<th>Activity</th>
 	<th>Creation Date</th>
+	{if isset($showTeamActionOptions) && $showTeamActionOptions}
+	<th>Allowed actions</th>
+	{/if}
 </tr>
 {foreach item="team" from=$inactiveTeams}
 <tr class="teams_overview">
@@ -82,6 +86,7 @@ There are no inactive teams.
 	<td><a href="{$team.leaderLink}">{$team.leaderName}</a></td>
 	<td>{$team.activityNew|string_format:'%.2f'} ({$team.activityOld|string_format:'%.2f'})</td>
 	<td>{$team.created}</td>
+	{if isset($team.canJoin) && $team.canJoin}<td><a class="button" href="?join={$team.id}">Join team</a></td>{/if}
 </tr>
 {/foreach}
 </table>
