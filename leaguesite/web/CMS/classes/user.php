@@ -82,7 +82,7 @@
 			}
 			
 			require_once(dirname(__FILE__) . '/invitation.php');
-			return $this->getPermission('allow_join_in_any_team') || (new team($teamid))->getOpen() || invitation::getInvitationsForTeam($this->origUserId, $teamid);
+			return $this->getPermission('allow_join_any_team') || (new team($teamid))->getOpen() || invitation::getInvitationsForTeam($this->origUserId, $teamid);
 		}
 		
 		
@@ -395,6 +395,7 @@
 			$this->setPermission('allow_edit_any_team_profile', false);
 			$this->setPermission('allow_delete_any_team', false);
 			$this->setPermission('allow_invite_in_any_team', false);
+			$this->setPermission('allow_join_any_team', false);
 			$this->setPermission('allow_reactivate_teams', false);
 			
 			// user permissions
@@ -521,7 +522,7 @@
 			$this->setPermission('allow_edit_any_team_profile', false);
 			$this->setPermission('allow_delete_any_team', false);
 			$this->setPermission('allow_invite_in_any_team', false);
-			$this->setPermission('allow_join_in_any_team', false);
+			$this->setPermission('allow_join_any_team', false);
 			$this->setPermission('allow_reactivate_teams', false);
 			
 			

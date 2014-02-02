@@ -85,7 +85,7 @@
 																												 'allow_kick_any_team_members' => true,
 																												 'allow_edit_any_team_profile' => true,
 																												 'allow_invite_in_any_team' => true,
-																												 'allow_join_in_any_team' => true,
+																												 'allow_join_any_team' => true,
 																												 'allow_delete_any_team' => true,
 																												 'allow_reactivate_teams' => true,
 																												 // user permissions
