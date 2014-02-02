@@ -4,7 +4,10 @@
 	// not loaded by default!
 	class team
 	{
+		private $activityNew;
+		private $activityOld;
 		private $avatarURI = false;
+		private $created;
 		private $description = false;
 		private $rawDescription = false;
 		private $leaderid = false;
@@ -71,6 +74,42 @@
 			return false;
 		}
 		
+		// returns number of matches in last 45 days
+		public function getActivityNew()
+		{
+			global $db;
+			
+			$query = $db->prepare('SELECT `activityNew` FROM `teams_overview` WHERE `teamid`=:teamid LIMIT 1');
+			if ($db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT))))
+			{
+				$row = $db->fetchRow($query);
+				$db->free($query);
+				
+				$this->activityNew = $row['activityNew'];
+				
+				return $this->activityNew;
+			}
+			return false;
+		}
+		
+		// returns number of matches in last 90 days
+		public function getActivityOld()
+		{
+			global $db;
+			
+			$query = $db->prepare('SELECT `activityOld` FROM `teams_overview` WHERE `teamid`=:teamid LIMIT 1');
+			if ($db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT))))
+			{
+				$row = $db->fetchRow($query);
+				$db->free($query);
+				
+				$this->activityOld = $row['activityOld'];
+				
+				return $this->activityOld;
+			}
+			return false;
+		}
+		
 		// returns URI pointing to team avatar image
 		public function getAvatarURI()
 		{
@@ -89,6 +128,7 @@
 			return false;
 		}
 		
+		// returns array of teamids (integer) of active teams
 		public static function getActiveTeamIds()
 		{
 			global $db;
@@ -109,6 +149,29 @@
 			return array();
 		}
 		
+		// returns creation date of team as string
+		public function getCreationTimestampStr()
+		{
+			global $db;
+			
+			if (isset($this->created))
+			{
+				return $this->created;
+			}
+			
+			$query = $db->prepare('SELECT `created` FROM `teams_profile` WHERE `teamid`=:teamid');
+			if ($db->execute($query, array(':teamid' => array($this->origTeamId, PDO::PARAM_INT))))
+			{
+				$row = $db->fetchRow($query);
+				$this->created = $row['created'];
+				$db->free($query);
+				
+				return $this->created;
+			}
+			return array();
+		}
+		
+		// returns team description (string)
 		public function getDescription()
 		{
 			global $db;
@@ -245,6 +308,21 @@
 			return false;
 		}
 		
+		// returns number of team members (integer)
+		public function getMemberCount()
+		{
+			// ask user class how many users are in this team
+			return count(user::getMemberIdsOfTeam($this->origTeamId));
+		}
+		
+		// returns number of matches this team played
+		public function getMatchCount()
+		{
+			// ask match class how many matches have been played
+			require_once(dirname(__FILE__) . '/match.php');
+			return match::getMatchCountForTeamId($this->origTeamId);
+		}
+		
 		// returns team name belonging to teamid of current class instance
 		public function getName()
 		{
@@ -275,6 +353,27 @@
 			// error handling: log error and show it in end user visible result
 			$db->logError((__FILE__) . ': getName(' . strval($this->teamid) . ') failed.');
 			return '$team->getName(' . strval($this->teamid) . ') failed.';
+		}
+		
+		// returns array of ids (integer) of new teams
+		public static function getNewTeamIds()
+		{
+			global $db;
+			
+			
+			$query = $db->prepare('SELECT `teamid` FROM `teams_overview` WHERE `deleted`=:status');
+			if ($db->execute($query, array(':status' => array('0', PDO::PARAM_INT))))
+			{
+				$ids = array();
+				while ($row = $db->fetchRow($query))
+				{
+					$ids[] = $row['teamid'];
+				}
+				$db->free($query);
+				
+				return $ids;
+			}
+			return array();
 		}
 		
 		// FIXME: Probably better to call a match class and pass teamid as parameter
@@ -391,6 +490,21 @@
 				return $this->score;
 			}
 			return false;
+		}
+		
+		// function to obtain team instances from array of teamids
+		// input values: teamids in array
+		// return values: array of team instances
+		public static function getTeamsFromIds(array $teams)
+		{
+			$result = array();
+			foreach($teams AS &$team)
+			{
+				$result[] = new team($team);
+				$team = new team($team);
+			}
+			
+			return $teams;
 		}
 		
 		public function getUserIds()

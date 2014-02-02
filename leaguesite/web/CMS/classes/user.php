@@ -256,7 +256,7 @@
 		// check if user belongs to a certain team
 		// input: teamid (integer)
 		// output: true if member, false otherwise
-		function getMemberOfTeam($teamid)
+		public function getMemberOfTeam($teamid)
 		{
 			global $db;
 			
@@ -276,6 +276,29 @@
 				$db->free($query);
 				
 				return ((int) $userName['teamid']) === $teamid;
+			}
+			
+			return false;
+		}
+		
+		// find out userids belonging to a team
+		// input: teamid (integer)
+		// output: array of userids, false on error
+		public static function getMemberIdsOfTeam($teamid)
+		{
+			global $db;
+			
+			$query = $db->prepare('SELECT `id` FROM `users` WHERE `teamid`=:teamid');
+			if ($db->execute($query, array(':teamid' => array($teamid, PDO::PARAM_INT))))
+			{
+				$uids = array();
+				while ($row = $db->fetchRow($query))
+				{
+					$uids[] = $row['id'];
+				}
+				$db->free($query);
+				
+				return $uids;
 			}
 			
 			return false;

@@ -610,8 +610,23 @@
 			}
 		}
 		
-		status('Renaming any_teamless_player_can_join to team_open);
+		status('Renaming any_teamless_player_can_join to team_open');
 		$db->SQL('ALTER TABLE `teams_overview` CHANGE `any_teamless_player_can_join` `open` TINYINT(1)  NOT NULL  DEFAULT \'1\'');
+		
+		status('Removing leading and trailing whitespace from team names, unescape team names in db');
+		$query = $db->SQL('SELECT `id`,`name` FROM `teams`');
+		$updateQuery = $db->prepare('UPDATE `teams` SET name=:name WHERE id=:id');
+		while($row = $db->fetchRow($query))
+		{
+			if (!$db->execute($updateQuery, array(':id' => array((int) $row['id'], PDO::PARAM_INT),
+										   ':name' => array(htmlent_decode(trim($row['name'])), PDO::PARAM_STR))))
+			{
+				status('Unable to execute update query on team name: ' . $row['name']);
+				return false;
+			}
+		}
+		$db->free($query);
+		unset($updateQuery);
 		
 		return true;
 	}

@@ -8,11 +8,8 @@
 			global $tmpl;
 			global $user;
 			
-			if (!$tmpl->setTemplate('teamSystemEditTeam'))
-			{
-				$tmpl->noTemplateFound();
-				die();
-			}
+			
+			$this->setTemplate();
 			$tmpl->assign('title', 'Edit team');
 			
 			$this->team = new team($teamid);
@@ -67,6 +64,18 @@
 			}
 		}
 		
+		// set template to edit a team
+		protected function setTemplate()
+		{
+			global  $tmpl;
+			
+			
+			if (!$tmpl->setTemplate('teamSystemEditTeam'))
+			{
+				$tmpl->noTemplateFound();
+				die();
+			}
+		}
 		
 		// check if user submitted data is valid
 		// returns true on valid data, error message as string or false otherwise

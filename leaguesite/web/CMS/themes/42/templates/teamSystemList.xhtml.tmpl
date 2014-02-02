@@ -23,7 +23,7 @@ No menu found.
 
 <div class="content">
 {if isset($canReactivateTeams)}<a class="button" href="?reactivate">Reactivate a team</a>{/if}
-{if !isset($activeTeams) || empty($activeTeams) || !isset($inactiveTeams) || empty($inactiveTeams)}
+{if !isset($activeTeams) || empty($activeTeams)}
 There are no active teams.
 {/if}
 
@@ -54,6 +54,9 @@ There are no active teams.
 </table>
 {/if}
 
+{if !isset($inactiveTeams) || empty($inactiveTeams)}
+There are no inactive teams.
+{/if}
 {if isset($inactiveTeams) && !empty($inactiveTeams)}
 {if isset($activeTeams) && !empty($activeTeams)}
 <br />

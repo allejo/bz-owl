@@ -205,9 +205,9 @@
 			
 			// apply new status to any new, active, reactivated or inactive team
 			$teamIds = team::getNewTeamIds();
-			$teamIds = array_merge(team::getActiveTeamIds());
-			$teamIds = array_merge(team::getReactivatedTeamIds());
-			$teamIds = array_merge(team::getInactiveTeamIds());
+			$teamIds = array_merge($teamIds, team::getActiveTeamIds());
+			$teamIds = array_merge($teamIds, team::getReactivatedTeamIds());
+			$teamIds = array_merge($teamIds, team::getInactiveTeamIds());
 			foreach ($teamIds AS $teamid)
 			{
 				$team = new team($teamid);

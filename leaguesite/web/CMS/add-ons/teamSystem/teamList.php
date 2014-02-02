@@ -53,26 +53,26 @@
 		}
 		
 		
-		private function addToTeamList(&$row)
+		private function addToTeamList(team $team)
 		{
 				// rename db result fields and assemble some additional informations
 				
 				$prepared = array();
-				$prepared['profileLink'] = './?profile=' . $row['teamid'];
-				$prepared['name'] = $row['name'];
-				$prepared['score'] = $row['score'];
-				$prepared['scoreClass'] = $this->rankScore($row['score']);
-				$prepared['matchSearchLink'] = ('../Matches/?search_string=' . $row['name']
+				$prepared['profileLink'] = './?profile=' . $team->getID();
+				$prepared['name'] = $team->getName();
+				$prepared['score'] = $team->getScore();
+				$prepared['scoreClass'] = $this->rankScore($prepared['score']);
+				$prepared['matchSearchLink'] = ('../Matches/?search_string=' . $team->getName()
 												. '&amp;search_type=team+name'
 												. '&amp;search_result_amount=200'
 												. '&amp;search=Search');
-				$prepared['matchCount'] = $row['num_matches_played'];
-				$prepared['memberCount'] = $row['member_count'];
-				$prepared['leaderLink'] = '../Players/?profile=' . $row['leader_userid'];
-				$prepared['leaderName'] = $row['leader_name'];
-				$prepared['activityNew'] = $row['activityNew'];
-				$prepared['activityOld'] = $row['activityOld'];
-				$prepared['created'] = $row['created'];
+				$prepared['matchCount'] = $team->getMatchCount();
+				$prepared['memberCount'] = $team->getMemberCount();
+				$prepared['leaderLink'] = '../Players/?profile=' . $team->getLeaderId();
+				$prepared['leaderName'] = (new user($team->getLeaderId()))->getName();
+				$prepared['activityNew'] = $team->getActivityNew();
+				$prepared['activityOld'] = $team->getActivityOld();
+				$prepared['created'] = $team->getCreationTimestampStr();
 				
 				// return result data
 				return $prepared;
@@ -96,60 +96,44 @@
 			}
 			$tmpl->assign('title', 'Team overview');
 			
-			// get list of active, inactive and new teams (no deleted teams)
-			// TODO: move creation date in db from teams_profile to teams_overview
-			$query = $db->prepare('SELECT *'
-								  . ', (SELECT `name` FROM `users`'
-								  . ' WHERE `users`.`id`=`teams`.`leader_userid` LIMIT 1)'
-								  . ' AS `leader_name`'
-								  . ' FROM `teams`, `teams_overview`, `teams_profile`'
-								  . ' WHERE `teams`.`id`=`teams_overview`.`teamid`'
-								  . ' AND `teams`.`id`=`teams_profile`.`teamid`'
-								  . ' AND `teams_overview`.`deleted`<>?'
-								  . ' AND `teams_overview`.`activityNew`<>0'
-								  . ' ORDER BY `teams_overview`.`score` DESC'
-								  . ', `teams_overview`.`activityNew` DESC');
-			// value 2 in deleted column means team has been deleted
-			// see if query was successful
-			if ($db->execute($query, '2') == false)
-			{
-				// fatal error -> die
-				$db->logError('FATAL ERROR: Query in teamList.php (teamSystem add-on) by user '
-							  . user::getCurrentUserId() . ' failed, request URI: ' . $_SERVER['REQUEST_URI']);
-				$tmpl->setTemplate('NoPerm');
-				$tmpl->display();
-				die();
-			}
+			// get list of new, active, inactive and reactivated teams (no deleted and inactive teams)
+			$teams = team::getNewTeamIds();
+			$teams = array_merge($teams, team::getActiveTeamIds());
+			$teams = array_merge($teams, team::getReactivatedTeamIds());
+			$teams = array_merge($teams, team::getInactiveTeamIds());
 			
+			
+			$teams = team::getTeamsFromIds($teams);
+			
+			// sort teams by score, highest score first
+			function scoreSort(team $a, team $b)
+			{
+				if ($a->getScore() === $b->getScore())
+				{
+					return 0;
+				}
+				
+				return ($a->getScore() > $b->getScore()) ? -1 : 1;
+			}
+			usort($teams, 'scoreSort');
+			
+			// display all teams that are not deleted or inactive as active
 			$activeTeams = array();
-			while ($row = $db->fetchRow($query))
+			foreach($teams AS $team)
 			{
-				// use a temporary array for better readable (but slower) code
-				// append team data
-				$activeTeams[] = $this->addToTeamList($row);
+				$activeTeams[] = $this->addToTeamList($team);
 			}
-			$db->free($query);
 			
-			$query = $db->prepare('SELECT *'
-								  . ', (SELECT `name` FROM `users`'
-								  . ' WHERE `users`.`id`=`teams`.`leader_userid` LIMIT 1)'
-								  . ' AS `leader_name`'
-								  . ' FROM `teams`, `teams_overview`, `teams_profile`'
-								  . ' WHERE `teams`.`id`=`teams_overview`.`teamid`'
-								  . ' AND `teams`.`id`=`teams_profile`.`teamid`'
-								  . ' AND `teams_overview`.`deleted`<>?'
-								  . ' AND `teams_overview`.`activityNew`=0'
-								  . ' ORDER BY `teams_overview`.`score` DESC'
-								  . ', `teams_overview`.`activityNew` DESC');
-			$db->execute($query, '2');
+			$teams = team::getTeamsFromIds(team::getInactiveTeamIds());
+			usort($teams, 'scoreSort');
+			
 			$inactiveTeams = array();
-			while ($row = $db->fetchRow($query))
+			foreach($teams AS $team)
 			{
 				// use a temporary array for better readable (but slower) code
 				// append team data
-				$inactiveTeams[] = $this->addToTeamList($row);
+				$inactiveTeams[] = $this->addToTeamList($team);
 			}
-			$db->free($query);
 			
 			$tmpl->assign('activeTeams', $activeTeams);
 			$tmpl->assign('inactiveTeams', $inactiveTeams);
@@ -319,7 +303,7 @@
 			$tmpl->assign('allowDelete', $allowDelete);
 			
 			// get match data
-			// sort the data by id to find out if abusers entered data a loong time in the past
+			// sort the data by id to find out if abusers entered a match at a long time in the past
 			$query = $db->prepare('SELECT `timestamp`,`team1_id`,`team2_id`,'
 								  . '(SELECT `name` FROM `teams` WHERE `id`=`team1_id`) AS `team1_name`'
 								  . ',(SELECT `name` FROM `teams` WHERE `id`=`team2_id`) AS `team2_name`'

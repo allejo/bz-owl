@@ -130,7 +130,7 @@ No menu found.
 {foreach item="match" from=$matches}
 <tr class="matches_overview">
 <td>{$match.time}</td>
-<td><a href="{$match.team1Link}">{$match.team1Name}</a> - <a href="{$match.team2Link}">{$match.team2Name}</a></td>
+<td><a href="{$match.team1Link}">{$match.team1Name|escape}</a> - <a href="{$match.team2Link}">{$match.team2Name|escape}</a></td>
 <td>{$match.score1} - {$match.score2}</td>
 <td>{if isset($match.lastModByLink) && $match.lastModByLink !== 0}<a href="{$match.lastModByLink}">{/if}{$match.lastModByName}{if isset($match.lastModByLink) && $match.lastModByLink !== 0}</a>{/if}</td>
 {if $showMatchActionOptions}
