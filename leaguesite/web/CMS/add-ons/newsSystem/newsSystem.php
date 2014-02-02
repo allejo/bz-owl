@@ -15,21 +15,8 @@
 			global $tmpl;
 			global $user;
 			
-/*
-			if (isset($path) && (strcmp($path, 'News/') === 0
-							  || strcmp($path, 'Bans/') === 0))
-			{
-*/
-				$this->page_path = $path;
-/*
-			} else
-			{
-				$tmpl->setTemplate('404');
-				$tmpl->assign('errorMsg', "No support for $path as a newsSystem page.");
-				$tmpl->display();
-				die();
-			}
-*/
+			
+			$this->page_path = $path;
 			
 			$templateToUse = 'News';
 			if (!$tmpl->setTemplate($templateToUse))
