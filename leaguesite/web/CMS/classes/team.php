@@ -74,6 +74,23 @@
 			return false;
 		}
 		
+		// does team in database exist
+		// return: true or false (boolean)
+		public function exists()
+		{
+			global $db;
+			
+			$query = $db->prepare('SELECT `id` FROM `teams` WHERE `id`=:teamid LIMIT 1');
+			if ($db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT))))
+			{
+				$row = $db->fetchRow($query);
+				$db->free($query);
+				
+				return $row === false? false : true;
+			}
+			return false;
+		}
+		
 		// returns number of matches in last 45 days
 		public function getActivityNew()
 		{

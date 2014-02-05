@@ -155,12 +155,45 @@
 		
 		protected function maintainActiveTeams()
 		{
+			// mark any team that has not matched during last 45 days as inactive
+			// set teams other than deleted to active if matched during that timeframe
+			
+			$forty_five_days_in_past = strtotime('-45 days');
+			$forty_five_days_in_past = strftime('%Y-%m-%d %H:%M:%S', $forty_five_days_in_past);
+			
+			// apply new status to any new, active, reactivated or inactive team
+			$teamIds = team::getNewTeamIds();
+			$teamIds = array_merge($teamIds, team::getActiveTeamIds());
+			$teamIds = array_merge($teamIds, team::getReactivatedTeamIds());
+			$teamIds = array_merge($teamIds, team::getInactiveTeamIds());
+			foreach ($teamIds AS $teamid)
+			{
+				$team = new team($teamid);
+				$lastMatch = $team->getNewestMatchTimestamp()
+				// non deleted team did not match last 45 days -> inactive
+				if ($team->getStatus() !== 'inactive' && $lastMatch && $lastMatch < $forty_five_days_in_past)
+				{
+					$team->setStatus('inactive');
+				} else
+				{
+					// non deleted team did match last 45 days -> active
+					if ($team->getStatus() !== 'active' && $lastMatch && $lastMatch > $forty_five_days_in_past)
+					{
+						$team->setStatus('active');
+					}
+				}
+				$team->update();
+			}
+		}
+		
+		protected function maintainInctiveTeams()
+		{
 			// 6 months long inactive teams will be marked as deleted during maintenance
 			// inactive is defined as the team did not match and no member logged in during last 6 months
 			$six_months_in_past = strtotime('-6 months');
 			$six_months_in_past = strftime('%Y-%m-%d %H:%M:%S', $six_months_in_past);
 			
-			$teamIds = team::getActiveTeamIds();
+			$teamIds = team::getInactiveTeamIds();
 			foreach ($teamIds AS $teamid)
 			{
 				// check if team matched during last 6 months
@@ -192,39 +225,6 @@
 						$team->update();
 					}
 				}
-			}
-		}
-		
-		protected function maintainInactiveTeams()
-		{
-			// mark any team that has not matched during last 45 days as inactive
-			// set teams other than deleted to active if matched during that timeframe
-			
-			$forty_five_days_in_past = strtotime('-45 days');
-			$forty_five_days_in_past = strftime('%Y-%m-%d %H:%M:%S', $forty_five_days_in_past);
-			
-			// apply new status to any new, active, reactivated or inactive team
-			$teamIds = team::getNewTeamIds();
-			$teamIds = array_merge($teamIds, team::getActiveTeamIds());
-			$teamIds = array_merge($teamIds, team::getReactivatedTeamIds());
-			$teamIds = array_merge($teamIds, team::getInactiveTeamIds());
-			foreach ($teamIds AS $teamid)
-			{
-				$team = new team($teamid);
-				$lastMatch = $team->getNewestMatchTimestamp()
-				// non deleted team did not match last 45 days -> inactive
-				if ($team->getStatus() !== 'inactive' && $lastMatch && $lastMatch < $forty_five_days_in_past)
-				{
-					$team->setStatus('inactive');
-				} else
-				{
-					// non deleted team did match last 45 days -> active
-					if ($team->getStatus() !== 'active' && $lastMatch && $lastMatch > $forty_five_days_in_past)
-					{
-						$team->setStatus('active');
-					}
-				}
-				$team->update();
 			}
 		}
 		

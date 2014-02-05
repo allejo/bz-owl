@@ -24,6 +24,48 @@
 			}
 		}
 		
+		// add a user to a team
+		// checks join permission of user
+		// input: a teamid (integer)
+		// return: true on success, false otherwise (boolean)
+		public function addTeamMembership($teamid)
+		{
+			$team = new team($teamid);
+			
+			if (!$team->exists())
+			{
+				return false;
+			}
+			
+			// find out if team allows anyone to join
+			if ($team->exists($team->getOpen())
+			{
+				// anyone can join the team
+				// just set the teamid
+				$this->teamid = $teamid;
+			} else
+			{
+				// team is closed, valid invitation required
+				invitations::deleteOldInvitations();
+				$invitations = invitations::getInvitationsForTeam($this->origUserId, $teamid);
+				
+				// check if user has an invitation
+				if (count($invitations) === 0)
+				{
+					return false;
+				}
+				$this->teamid = $teamid;
+				// delete all invitations of team for user
+				// A user is not meant to join using one invite then leaving and joining again
+				foreach($invitations AS $invitation)
+				{
+					$invitation.delete();
+				}
+			}
+			
+			return true;
+		}
+		
 		// permanently delete user from database
 		public function delete()
 		{

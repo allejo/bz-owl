@@ -2,9 +2,11 @@
 	// handle invitations of users
 	class invitation
 	{
+		$this->invitationid;
+		
 		public function __construct($id = 0)
 		{
-			
+			$this->invitationid = $id;
 		}
 		
 		public static function deleteOldInvitations()
@@ -65,6 +67,19 @@
 			}
 			
 			return true;
+		}
+		
+		// deletes invitation from database
+		// returns true on success, false otherwise (boolean)
+		public function delete()
+		{
+			$query = $db->prepare('DELETE FROM `invitations` WHERE `id`=:invitationid');
+			if ($db->execute($query, array(':invitationid' => array((int) $this->invitationid, PDO::PARAM_INT)))
+			{
+				return true;
+			}
+			
+			return false;
 		}
 	}
 ?>

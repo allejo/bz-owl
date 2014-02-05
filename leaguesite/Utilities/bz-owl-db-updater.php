@@ -628,6 +628,13 @@
 		$db->free($query);
 		unset($updateQuery);
 		
+		status('Updating invitations table: rename column invited_playerid to userid');
+		$db->SQL('ALTER TABLE `invitations` DROP FOREIGN KEY `invitations_ibfk_1`');
+		$db->SQL('ALTER TABLE `invitations` DROP FOREIGN KEY `invitations_ibfk_2`');
+		$db->SQL('ALTER TABLE `invitations` CHANGE `invited_playerid` `userid` INT(11)  UNSIGNED  NOT NULL  DEFAULT \'0\'');
+		$db->SQL('ALTER TABLE `invitations` ADD FOREIGN KEY (`userid`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE');
+		$db->SQL('ALTER TABLE `invitations` ADD FOREIGN KEY (`teamid`) REFERENCES `teams` (`id`) ON DELETE CASCADE ON UPDATE CASCADE');
+		
 		return true;
 	}
 ?>
