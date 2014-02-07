@@ -447,6 +447,28 @@
 			return array();
 		}
 		
+		// find out how many members currently belong to the team
+		// if teamid is 0 then it will list number of teamless users
+		// return: number of members (integer), false on error (boolean)
+		public function getSize()
+		{
+			return \user::getNumberOfTeamMembers($this->origTeamId);
+		}
+		
+		// find out max number of members
+		// return: config value for team.default.maxTeamSize or default of 20 (integer)
+		public function getMaxSize()
+		{
+			global $config;
+			
+			if (($maxMembers = $config->getValue('team.default.maxTeamSize')) !== false)
+			{
+				return $maxMembers;
+			}
+			
+			return 20;
+		}
+		
 		// obtain status of team
 		// valid status values: 'new', 'active', 'deleted', 'reactivated'
 		// returns false on error

@@ -11,25 +11,30 @@
 			
 			if (isset($_GET['add']))
 			{
-				require_once dirname(__FILE__) . '/teamAdd.php';
+				require_once(dirname(__FILE__) . '/teamAdd.php');
 /* 				new pmSystemAddPM(); */
 				die();
 			} elseif (isset($_GET['edit']))
 			{
-				require_once dirname(__FILE__) . '/teamEdit.php';
+				require_once(dirname(__FILE__) . '/teamEdit.php');
 				new teamEdit((int) $_GET['edit']);
 			} elseif (isset($_GET['delete']))
 			{
-				require_once dirname(__FILE__) . '/teamDelete.php';
+				require_once(dirname(__FILE__) . '/teamDelete.php');
 /* 				new pmDelete($folder, intval($_GET['delete'])); */
+			elseif (isset($_GET['join']))
+			{
+				require_once(dirname(__FILE__) . '/teamJoin');
+				new teamJoin($_GET['join'])
+			}
 			} elseif (isset($_GET['opponent_stats']))
 			{
-				require_once dirname(__FILE__) . '/teamOpponents.php';
+				require_once(dirname(__FILE__) . '/teamOpponents.php');
 				$teamOpponents = new teamOpponents();
 				$teamOpponents->showOpponentStats(intval($_GET['opponent_stats']));
 			} else
 			{
-				require_once dirname(__FILE__) . '/teamList.php';
+				require_once(dirname(__FILE__) . '/teamList.php');
 				$display = new teamList();
 				
 				switch(isset($_GET['profile']))

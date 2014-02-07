@@ -127,6 +127,11 @@
 			return $this->getPermission('allow_join_any_team') || (new team($teamid))->getOpen() || invitation::getInvitationsForTeam($this->origUserId, $teamid);
 		}
 		
+		// get instance of current user
+		public static function getCurrentUser()
+		{
+			return new static(statuc::getCurrentUserId());
+		}
 		
 		// get id of visiting user
 		public static function getCurrentUserId()
@@ -357,6 +362,27 @@
 				$db->free($query);
 				
 				return $uids;
+			}
+			
+			return false;
+		}
+		
+		// find out how many members currently belong to the team
+		// if teamid is 0 then it will list number of teamless users
+		// return: number of members (integer), false on error (boolean)
+		public static function getNumberOfTeamMembers($teamid = 0)
+		{
+			global $db;
+			
+			$query = $db->prepare('SELECT COUNT(*) AS `numMembers` FROM `users` WHERE `teamid`=:teamid');
+			if ($db->execute($query, array(':teamid' => array($teamid, PDO::PARAM_INT))))
+			{
+				$numMembers = 0;
+				$row = $db->fetchRow($query);
+				$numMembers = $row['numMembers'];
+				$db->free($query);
+				
+				return $numMembers;
 			}
 			
 			return false;

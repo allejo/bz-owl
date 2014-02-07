@@ -14,6 +14,8 @@
 						 'cms.addon.gallerySystem.picturePath' => realpath(dirname(__FILE__) . '/gallerySystem/'),
 						 // show postings as anon
 						 'cms.addon.newsSystem.hideIdentity' => array('path' => 'Bans/', 'anonUser' => 'GU League Council'),
+						 // allow authors to change timestamp of original message
+						 'cms.addon.newsSystem.permissions.allowChangeTimestampOnEdit' => false,
 						 // new teams start with that team score
 						 'cms.addon.matchServices.teamStartingScore' => 1200,
 						 // show unfinished (and thus likely not properly working) themes in config chooser, too
@@ -116,8 +118,8 @@
 													 . 'See you on the battlefield.'),
 						 // welcome summary, displayed at first login
 						 'login.welcome.summary' => 'Welcome and thanks for registering on this website.',
-						 // allow authors to change timestamp of original message
-						 'newsSystem.permissions.allowChangeTimestampOnEdit' => false,
+						 // maximum team size by default
+						 'team.default.maxTeamSize' => 30,
 						 // regenerate session id after x seconds, default 15 minutes (60*15)
 						 // the lower x: safer, higher x faster
 						 'sessionRegenTime' => 60*15,

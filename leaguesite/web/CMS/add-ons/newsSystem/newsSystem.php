@@ -307,7 +307,7 @@
 			}
 			
 			// let authors change timestamp, if allowed in config
-			if ($config->getValue('newsSystem.permissions.allowChangeTimestampOnEdit'))
+			if ($config->getValue('cms.addon.newsSystem.permissions.allowChangeTimestampOnEdit'))
 			{
 				if ($readonly || isset($_POST['confirmationStep']) && isset($_POST['time']))
 				{
@@ -516,7 +516,7 @@
 				default:
 					if (isset($_POST['time']))
 					{
-						if ($config->getValue('newsSystem.permissions.allowChangeTimestampOnEdit'))
+						if ($config->getValue('cms.addon.newsSystem.permissions.allowChangeTimestampOnEdit'))
 						{
 							if (strtotime($_POST['time']) === false)
 							{

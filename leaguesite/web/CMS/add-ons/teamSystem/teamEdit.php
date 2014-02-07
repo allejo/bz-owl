@@ -45,8 +45,7 @@
 			if (!isset($_POST['confirmed']) || (string) $_POST['confirmed'] === '0')
 			{
 				$this->showForm();
-			}
-			if (isset($_POST['confirmed']) && (string) $_POST['confirmed'] === '1')
+			} elseif (isset($_POST['confirmed']) && (string) $_POST['confirmed'] === '1')
 			{
 				// try to update team
 				// show editing form on error
@@ -99,7 +98,7 @@
 			// sanity check key
 			if (!$site->validateKey($_POST['key_name'], $_POST[$_POST['key_name']]))
 			{
-				return false;
+				return 'Validation key/value pair invalid.';
 			}
 			
 			// validate team name
