@@ -3,10 +3,10 @@
 	class user
 	{
 		private $lastLoginTimestamp;
-		private $origUserid = 0;
+		private $origUserId = 0;
 		private $userid = 0;
-		private $teamid = false;
-		private $status = false;
+		private $teamid;
+		private $status;
 		
 		public function __construct($userid = 0)
 		{
@@ -38,7 +38,27 @@
 			}
 			
 			// find out if team allows anyone to join
-			if ($team->exists($team->getOpen())
+			if (static::getAllowedToJoinTeam($teamid))
+			{
+				// join the team
+				$this->teamid = $teamid;
+				
+				// delete all invitations to team for this user
+				// Do not allow to join using one invite then leaving and joining same team using next invite
+/* 				require_once(dirname(__FILE__) . '/invitation.php'); */
+				invitation::deleteOldInvitations();
+				$invitations = invitation::getInvitationsForTeam($this->origUserId, $teamid);
+				foreach($invitations AS $invitation)
+				{
+					$invitation.delete();
+				}
+				
+				return true;
+			}
+			
+			return false;
+			
+			if ($team->exists($team->getOpen()))
 			{
 				// anyone can join the team
 				// just set the teamid
@@ -122,7 +142,7 @@
 			{
 				return;
 			}
-			
+			$team = new team($teamid);
 			require_once(dirname(__FILE__) . '/invitation.php');
 			return $this->getPermission('allow_join_any_team') || (new team($teamid))->getOpen() || invitation::getInvitationsForTeam($this->origUserId, $teamid);
 		}
@@ -130,7 +150,7 @@
 		// get instance of current user
 		public static function getCurrentUser()
 		{
-			return new static(statuc::getCurrentUserId());
+			return new static(static::getCurrentUserId());
 		}
 		
 		// get id of visiting user
@@ -632,32 +652,43 @@
 				return false;
 			}
 			
-			if ($this->name === false)
+			if (isset($this->name))
 			{
 				$this->name = $this->getName();
 			}
 			
-			$query = $db->prepare('UPDATE `users` SET id=:id WHERE id=:origid');
-			if ($db->execute($query, array(':id' => array($this->userid, PDO::PARAM_INT),
-										   ':origid' => array($this->origTeamid, PDO::PARAM_INT))))
+			// update id
+			$query = $db->prepare('UPDATE `users` SET `id`=:id WHERE `id`=:origid');
+			if (!$db->execute($query, array(':id' => array($this->userid, PDO::PARAM_INT),
+										   ':origid' => array($this->origUserId, PDO::PARAM_INT))))
 			{
-				$this->origUserId = $this->userid;
-				if ($this->status !== false)
+				return false;
+			}
+			$this->origUserId = $this->userid;
+			
+			// update status
+			if (isset($this->status))
+			{
+				$query = $db->prepare('UPDATE `users` SET `status`=:status WHERE `id`=:id');
+				if (!$db->execute($query, array(':status' => array($this->status, PDO::PARAM_INT),
+											   ':id' => array($this->userid, PDO::PARAM_INT))))
 				{
-					$query = $db->prepare('UPDATE `teams_overview` SET deleted=:status WHERE id=:id');
-					if ($db->execute($query, array(':status' => array($this->status, PDO::PARAM_INT),
-												   ':id' => array($this->teamid, PDO::PARAM_INT))))
-					{
-						return true;
-					}
-				} else
-				{
-					return true;
+					return false;
 				}
 			}
 			
+			// update team memberships
+			if (isset($this->teamid))
+			{
+				$query = $db->prepare('UPDATE `users` SET `teamid`=:teamid WHERE `id`=:id');
+				if (!$db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT),
+											   ':id' => array($this->userid, PDO::PARAM_INT))))
+				{
+					return false;
+				}
+			}
 			
-			return false;
+			return true;
 		}
 	}
 ?>

@@ -2,7 +2,7 @@
 	// handle invitations of users
 	class invitation
 	{
-		$this->invitationid;
+		private $invitationid;
 		
 		public function __construct($id = 0)
 		{
@@ -74,7 +74,7 @@
 		public function delete()
 		{
 			$query = $db->prepare('DELETE FROM `invitations` WHERE `id`=:invitationid');
-			if ($db->execute($query, array(':invitationid' => array((int) $this->invitationid, PDO::PARAM_INT)))
+			if ($db->execute($query, array(':invitationid' => array((int) $this->invitationid, PDO::PARAM_INT))))
 			{
 				return true;
 			}

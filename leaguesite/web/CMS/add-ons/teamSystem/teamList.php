@@ -189,6 +189,8 @@
 			$team = array();
 			while ($row = $db->fetchRow($query))
 			{
+				$tmpl->assign('title', 'Team ' . htmlent($row['name']));
+				
 				$teamLeader = intval($row['leader_userid']);
 				
 				

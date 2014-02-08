@@ -22,16 +22,21 @@
 			{
 				require_once(dirname(__FILE__) . '/teamDelete.php');
 /* 				new pmDelete($folder, intval($_GET['delete'])); */
-			elseif (isset($_GET['join']))
+			} elseif (isset($_GET['join']))
 			{
-				require_once(dirname(__FILE__) . '/teamJoin');
-				new teamJoin($_GET['join'])
-			}
+				require_once(dirname(__FILE__) . '/teamJoin.php');
+				new teamJoin($_GET['join']);
 			} elseif (isset($_GET['opponent_stats']))
 			{
 				require_once(dirname(__FILE__) . '/teamOpponents.php');
 				$teamOpponents = new teamOpponents();
 				$teamOpponents->showOpponentStats(intval($_GET['opponent_stats']));
+			} elseif (isset($_GET['remove']))
+			{
+/*
+				require_once(dirname(__FILE__) . '/teamLeave');
+				new teamRemove($_GET['remove']);
+*/
 			} else
 			{
 				require_once(dirname(__FILE__) . '/teamList.php');

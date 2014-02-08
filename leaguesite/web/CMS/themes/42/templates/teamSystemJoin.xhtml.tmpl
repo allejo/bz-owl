@@ -5,7 +5,7 @@
 <meta content="text/html; charset=utf-8" http-equiv="content-type" />
 	<link href="{$baseURL}themes/{$curTheme}/{$curTheme}.css" rel="stylesheet" type="text/css" />
 	<link rel="icon" type="image/png" href="{$faviconURL}" />
-<title>{$title}</title>
+<title>{if isset($teamName)}Join {$teamName|escape}{else}Join a team{/if}</title>
 </head>
 <body>
 <div class="logo"></div>
@@ -28,9 +28,14 @@ No menu found.
 <p>You have no permission to join this team.</p>
 </div>
 {else}
+{if isset($error) && $error !== ''}
+<div class="static_page_box">
+	<p>An error prevented joining the team: {$error|escape}</p>
+</div>
+{else}
 {if isset($teamJoinSuccessful) && $teamJoinSuccessful === true}
 <div class="static_page_box">
-	<p>Congratulations, you joined <a href="./profile={$teamid}">{$teamName|escape}</a>.</p>
+	<p>Congratulations, you joined <a href="./?profile={$teamid}">{$teamName|escape}</a>.</p>
 </div>
 {else}
 <div class="static_page_box">
@@ -39,12 +44,14 @@ No menu found.
 			<input type="hidden" name="confirmed" value="1"></div>
 			<div><input type="hidden" name="key_name" value="{$keyName}" /></div>
 			<div><input type="hidden" name="{$keyName}" value="{$keyValue}" /></div>
-			<p>Do you really want to join the team {$teamName|escape}?</p>
+			<div><input type="hidden" name="confirmed" value="1" /></div>
+			<p>Do you really want to join the team <a href="./?profile={$teamid}">{$teamName|escape}</a>?</p>
 			<div style="display:inline"><input type="submit" name="join_team" value="Join the team" id="send"></div>
 		</form>
 
 </div>
-{if}
+{/if}
+{/if}
 {/if}
 
 

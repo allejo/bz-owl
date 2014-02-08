@@ -2,6 +2,7 @@
 	class teamJoin
 	{
 		private $team;
+		private $user;
 		
 		public function __construct($teamid)
 		{
@@ -11,33 +12,35 @@
 			$tmpl->setTemplate('teamSystemJoin');
 			
 			// check if team exists
-			$this->team = new team($teamid)
+			$this->team = new team($teamid);
 			if (!$this->team->exists())
 			{
 				$tmpl->assign('canJoinTeam', false);
 				return;
 			}
+			$tmpl->assign('teamid', $this->team->getID());
 			
 			// team exists, pass team name to template
 			$tmpl->assign('teamName', $this->team->getName());
 			
 			// check if user has permission
-			$user = user::getCurrentUser();
-			if (!$user->getAllowedToJoinTeam($this->team->getID()))
+			$this->user = user::getCurrentUser();
+			if (!$this->user->getAllowedToJoinTeam($this->team->getID()))
 			{
 				$tmpl->assign('canJoinTeam', false);
 				return;
 			}
+			$tmpl->assign('canJoinTeam', true);
 			
 			// step 0: display confirmation question
 			// step 1: join team
-			$confirmed = !isset($_GET['confirmed'] ? 0 : $_GET['confirmed'];
+			$confirmed = !isset($_POST['confirmed']) ? 0 : (int) $_POST['confirmed'];
 			if ($confirmed === 0)
 			{
 				$this->showForm();
 			} elseif ($confirmed === 1)
 			{
-				$this->joinTeam($user);
+				$this->joinTeam($this->user);
 			}
 		}
 		
@@ -45,7 +48,6 @@
 		// returns true on valid data, error message as string or false otherwise
 		protected function sanityCheck()
 		{
-			global $config;
 			global $site;
 			
 			
@@ -61,19 +63,22 @@
 				return 'Submitted validation key content invalid.';
 			}
 			
-			// sanity check key
+			// check key and value combination
 			if (!$site->validateKey($_POST['key_name'], $_POST[$_POST['key_name']]))
 			{
 				return 'Validation key/value pair invalid.';
 			}
 			
-			
 			// check if max team size allows joining
-			$this->team->getNumberOfTeamMembers();
-			$this->team->getMaxSize();
+			if (!($memberCount = $this->team->getSize()) || !($memberMax = $this->team->getMaxSize()) || $memberCount+1 > $memberMax)
+			{
+				return 'Joining team failed. There are too many members in the team.';
+			}
+			
+			return true;
 		}
 		
-		protected showForm()
+		protected function showForm()
 		{
 			global $site;
 			global $tmpl;
@@ -88,24 +93,24 @@
 			$tmpl->assign('keyValue', htmlent($randomkeyValue));
 		}
 		
-		protected joinTeam(user $user)
+		protected function joinTeam(user $user)
 		{
 			global $tmpl;
 			
 			
 			// perform sanity checks
-			if (($result = $this->sanityCheck()) !=== true)
+			if (($result = $this->sanityCheck()) !== true)
 			{
 				$tmpl->assign('error', $result === false ? 'An unknown error occurred while checking your request' : $result);
 			}
 			
 			// join team
-			if (!$user->addTeamMembership($this->team->getID()))
+			if (!$this->user->addTeamMembership($this->team->getID()) || !$this->user->update())
 			{
 				$tmpl->assign('error', 'An unknown error occurred while joining the team.');
 			} else
 			{
-				$tmpl->assign('$teamJoinSuccessful', true);
+				$tmpl->assign('teamJoinSuccessful', true);
 			}
 		}
 	}
