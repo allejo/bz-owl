@@ -550,6 +550,15 @@
 				 PRIMARY KEY (`id`)
 				 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT=\'Log failed logins with their reason\'');
 		
+		$db->SQL('CREATE TABLE `users_permissions` (
+				 `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+				 `userid` int(11) unsigned NOT NULL,
+				 `permissions` varchar(1023) NOT NULL DEFAULT \'\',
+				 PRIMARY KEY (`id`),
+				 KEY `userid` (`userid`),
+				 CONSTRAINT `users_permissions_ibfk_1` FOREIGN KEY (`userid`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+				 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT=\'Applies to local login only at the moment\'');
+		
 		$db->SQL('ALTER TABLE `users_profile` DROP FOREIGN KEY `users_profile_ibfk_1`');
 		$db->SQL('ALTER TABLE `users_profile` CHANGE `playerid` `userid` INT(11)  UNSIGNED  NOT NULL  DEFAULT \'0\'');
 		$db->SQL('ALTER TABLE `users_profile` ADD FOREIGN KEY (`userid`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE');
