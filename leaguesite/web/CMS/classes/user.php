@@ -140,9 +140,18 @@
 			// not logged in user can never join
 			if ($this->origUserId === 0)
 			{
-				return;
+				return false;
 			}
+			
+			// investigate team
 			$team = new team($teamid);
+			
+			// can not join closed team
+			if ($team->getStatus() === 'deleted')
+			{
+				return false;
+			}
+			
 			require_once(dirname(__FILE__) . '/invitation.php');
 			return $this->getPermission('allow_join_any_team') || (new team($teamid))->getOpen() || invitation::getInvitationsForTeam($this->origUserId, $teamid);
 		}
