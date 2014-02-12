@@ -474,6 +474,9 @@
 		// returns false on error
 		public function getStatus()
 		{
+			global $db;
+			
+			
 			if ($this->teamid === 0)
 			{
 				return false;
@@ -491,7 +494,7 @@
 				$teamStatus = $db->fetchRow($query);
 				$db->free($query);
 				
-				switch ($teamStatus['name'])
+				switch ($teamStatus['deleted'])
 				{
 					case 0:
 						$this->status = 'new';

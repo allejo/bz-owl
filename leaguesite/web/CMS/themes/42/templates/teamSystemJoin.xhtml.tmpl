@@ -35,7 +35,22 @@ No menu found.
 {else}
 {if isset($teamJoinSuccessful) && $teamJoinSuccessful === true}
 <div class="static_page_box">
-	<p>Congratulations, you joined <a href="./?profile={$teamid}">{$teamName|escape}</a>.</p>
+	<script type="text/javascript">
+	setTimeout(function ()
+		{ldelim}
+			var uri = window.location.href;
+			uri = uri.search('\\?');
+			if (uri > 0)
+			{
+				uri = window.location.href.slice(0, uri);
+			}
+			uri += '?profile={$teamid}';
+			window.location.href = uri;
+		{rdelim},
+		5000
+		)
+	</script>
+	<p><strong>Congratulations, you joined <a href="./?profile={$teamid}">{$teamName|escape}</a>.</strong></p>
 </div>
 {else}
 <div class="static_page_box">

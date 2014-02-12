@@ -30,7 +30,17 @@
 				$tmpl->assign('canJoinTeam', false);
 				return;
 			}
+			
+			// check if user is already in a team
+			// technically a user might be member of several teams, depending on the user class
+			// but this add-on allows a user to be only member of one team
+			if (!$this->user->getIsTeamless())
+			{
+				$tmpl->assign('canJoinTeam', false);
+				return;
+			}
 			$tmpl->assign('canJoinTeam', true);
+			
 			
 			// step 0: display confirmation question
 			// step 1: join team
