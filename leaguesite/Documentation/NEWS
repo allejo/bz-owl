@@ -12,6 +12,8 @@ bz-owl release notes
 * match rss now built by matchServicesRSSSystem
 * renamed players* classes to users*
 * updated smarty engine
+* team page is now handled by new teamSystem add-on
+* classes have been enhanced to follow the MVC scheme
 
 1.3.2 (2011-07-25)
 --
