@@ -50,7 +50,7 @@ Use either htaccess.suggested or setup similar rewrite rules.
 
 lighttpd:
 url.rewrite-if-not-file = (
-"^/path/to/web/(js|themes|Flags|Matches|Players|Teams|Visits|Servertracker)/.*" => "$0",
+"^/path/to/web/(js|themes|Flags|Matches|Players|Visits|Servertracker)/.*" => "$0",
                 "^/path/to/web/\?(.+)" => "/path/to/web/index.php?path=/&$1",
                 "^/path/to/web/(.+)\?(.+)" => "//path/to/web/index.php?path=$1&$2",
                 "^/path/to/web/(.+)" => "/path/to/web/index.php?path=$1" )
