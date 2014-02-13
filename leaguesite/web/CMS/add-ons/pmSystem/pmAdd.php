@@ -1,5 +1,5 @@
 <?php
-	class pmSystemAddPM extends pmSystemPM
+	class pmSystemAdd
 	{
 		private $editor;
 		private $pm;

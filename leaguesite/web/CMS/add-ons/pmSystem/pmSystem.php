@@ -24,9 +24,6 @@
 				die();
 			}
 			
-			include(dirname(__FILE__) . '/classes/pm.php');
-			
-			
 			// show messages in current mail folder
 			// inbox is default
 			$folder = 'inbox';
@@ -38,7 +35,7 @@
 			if (isset($_GET['add']))
 			{
 				require_once dirname(__FILE__) . '/pmAdd.php';
-				new pmSystemAddPM();
+				new pmSystemAdd();
 				die();
 /*
 			} elseif (isset($_GET['edit']))
@@ -48,11 +45,11 @@
 			} elseif (isset($_GET['delete']))
 			{
 				require_once dirname(__FILE__) . '/pmDelete.php';
-				new pmDelete($folder, intval($_GET['delete']));
+				new pmSystemDelete($folder, intval($_GET['delete']));
 			} else
 			{
-				require_once dirname(__FILE__) . '/List.php';
-				$display = new pmDisplay();
+				require_once dirname(__FILE__) . '/pmDisplay.php';
+				$display = new pmSystemDisplay();
 				
 				switch(isset($_GET['view']))
 				{

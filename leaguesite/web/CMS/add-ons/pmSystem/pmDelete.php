@@ -1,8 +1,8 @@
 <?php
-	require_once dirname(__FILE__) . '/List.php';
-	class pmDelete extends pmDisplay
+	require_once dirname(__FILE__) . '/pmDisplay.php';
+	class pmSystemDelete extends pmSystemDisplay
 	{
-		function __construct($folder, $id)
+		public function __construct($folder, $id)
 		{
 			// get confirmation step info
 			$confirmed = isset($_POST['confirmationStep']) ? $_POST['confirmationStep'] : 0;
@@ -24,7 +24,7 @@
 		}
 		
 		
-		function delete($folder, $id)
+		protected function delete($folder, $id)
 		{
 			global $tmpl;
 			global $db;
@@ -74,6 +74,7 @@
 		
 		function preview($folder, $id)
 		{
+			global $site;
 			global $tmpl;
 			
 			
@@ -82,16 +83,49 @@
 			$tmpl->setTemplate('PMDelete');
 			$tmpl->assign('showPreview', true);
 			$tmpl->assign('title', 'Delete ' . $tmpl->getTemplateVars('title'));
+			
+			// protected against cross site injection attempts
+			$randomKeyName = 'pmDelete_' . microtime();
+			// convert some special chars to underscores
+			$randomKeyName = strtr($randomKeyName, array(' ' => '_', '.' => '_'));
+			$randomkeyValue = $site->setKey($randomKeyName);
+			$tmpl->assign('keyName', $randomKeyName);
+			$tmpl->assign('keyValue', htmlent($randomkeyValue));
 		}
 		
+		private function randomKeyMatch()
+		{
+			global $site;
+			
+			
+			$randomKeyValue = '';
+			$randomKeyName = '';
+			
+			if (isset($_POST['key_name']))
+			{
+				$randomKeyName = htmlent_decode($_POST['key_name']);
+				
+				if (isset($_POST[$randomKeyName]))
+				{
+					$randomKeyValue = htmlent_decode($_POST[$randomKeyName]);
+				}
+			}
+			
+			return $randomkeysmatch = $site->validateKey($randomKeyName, $randomKeyValue);
+		}
 		
-		function sanityCheck(&$confirmed)
+		protected function sanityCheck(&$confirmed)
 		{
 			// we do not need to know if user owns this message
 			// because delete operation can not delete message
 			// from different user
 			
 			if ($confirmed < 0 || $confirmed > 1)
+			{
+				$confirmed = 0;
+			}
+			
+			if (!$this->randomKeyMatch())
 			{
 				$confirmed = 0;
 			}

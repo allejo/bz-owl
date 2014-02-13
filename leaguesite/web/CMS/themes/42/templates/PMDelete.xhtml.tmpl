@@ -86,6 +86,8 @@ No menu found.
 <div class="msg_view_button_list">
 
 <form class="msg_buttons" action="?delete={$msgID}&amp;folder={$curFolder}" method="post">
+<div><input type="hidden" name="key_name" value="{$keyName}" /></div>
+<div><input type="hidden" name="{$keyName}" value="{$keyValue}" /></div>
 <div><input type="hidden" name="confirmationStep" value="1" /></div>
 <p><input type="submit" value="Delete this message" /></p>
 </form>

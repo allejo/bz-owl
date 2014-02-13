@@ -1,7 +1,7 @@
 <?php
-	class pmDisplay extends pmSystemPM
+	class pmSystemDisplay
 	{
-		function sanityCheck(&$confirmed)
+		protected function sanityCheck(&$confirmed)
 		{
 			global $tmpl;
 			
@@ -23,7 +23,7 @@
 			return true;
 		}
 		
-		function folderNav($folder)
+		private function folderNav($folder)
 		{
 			global $tmpl;
 			
@@ -31,7 +31,7 @@
 			$tmpl->assign('curFolder', $folder);
 		}
 		
-		function showMail($folder, $id)
+		public function showMail($folder, $id)
 		{
 			global $config;
 			global $tmpl;
@@ -189,7 +189,7 @@
 			$db->execute($query, array('read', $id, $folder, user::getCurrentUserId()));
 		}
 		
-		function showMails($folder)
+		public function showMails($folder)
 		{
 			global $config;
 			global $tmpl;
