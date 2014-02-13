@@ -186,7 +186,7 @@
 			}
 		}
 		
-		protected function maintainInctiveTeams()
+		protected function maintainInactiveTeams()
 		{
 			// 6 months long inactive teams will be marked as deleted during maintenance
 			// inactive is defined as the team did not match and no member logged in during last 6 months
