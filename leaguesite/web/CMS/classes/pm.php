@@ -1,5 +1,5 @@
 <?php
-	class PMComposer
+	class pm
 	{
 		private $users = array();
 		private $teams = array();
@@ -277,7 +277,7 @@
 		
 		// send private message to players and teams
 		// if an error occurs, $error will contain its description and the function will return false
-		function send($author_id=0, $ReplyToMSGID=0)
+		public function send($author_id=0, $ReplyToMSGID=0)
 		{
 			global $config;
 			global $db;
@@ -394,7 +394,7 @@
 			return true;
 		}
 		
-		function removeDuplicates(array &$someArray)
+		protected function removeDuplicates(array &$someArray)
 		{
 			$filtered = array();
 			$seen = array();
@@ -418,7 +418,9 @@
 			return false;
 		}
 		
-		function playersInTeam($teamid)
+		
+		// seems to be an unused function
+		protected function playersInTeam($teamid)
 		{
 			global $db;
 			

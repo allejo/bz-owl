@@ -203,15 +203,14 @@
 									. ' about organising and playing matches.' . "\n\n"
 									. 'See you on the battlefield.');
 			// prepare welcome message
-			include(dirname(dirname(dirname(__FILE__))) . '/pmSystem/classes/PMComposer.php');
-			$pmComposer = new pmComposer();
-			$pmComposer->setSubject($subject);
-			$pmComposer->setContent($content);
-			$pmComposer->setTimestamp(date('Y-m-d H:i:s'));
-			$pmComposer->addUserID($id);
+			$pm = new pm();
+			$pm->setSubject($subject);
+			$pm->setContent($content);
+			$pm->setTimestamp(date('Y-m-d H:i:s'));
+			$pm->addUserID($id);
 			
 			// send it
-			$pmComposer->send();
+			$pm->send();
 		}
 		
 		

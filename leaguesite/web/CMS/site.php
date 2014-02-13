@@ -31,18 +31,21 @@
 			}
 			
 			// database connectivity
-			include dirname(__FILE__) . '/classes/db.php';
+			include(dirname(__FILE__) . '/classes/db.php');
 			$db = new database();
 			
 			// user information
-			require dirname(__FILE__) . '/classes/user.php';
+			require(dirname(__FILE__) . '/classes/user.php');
 			$user = new user(user::getCurrentUserId());
 			
 			// user invitations
-			require dirname(__FILE__) . '/classes/invitation.php';
+			require(dirname(__FILE__) . '/classes/invitation.php');
+			
+			// private messages
+			require(dirname(__FILE__) . '/classes/pm.php');
 			
 			// template builder
-			require dirname(__FILE__) . '/classes/tmpl.php';
+			require(dirname(__FILE__) . '/classes/tmpl.php');
 			$tmpl = new tmpl();
 			
 			

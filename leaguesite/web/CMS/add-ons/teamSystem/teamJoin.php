@@ -120,6 +120,17 @@
 				$tmpl->assign('error', 'An unknown error occurred while joining the team.');
 			} else
 			{
+				// notify team members using a private message
+				$pm = new pm();
+				$pm->setSubject($user->getName() . ' joined your team');
+				$pm->setContent('Congratulations, ' . $user->getName() . ' just joined your team.');
+				$pm->setTimestamp(date('Y-m-d H:i:s'));
+				$pm->addTeamID($this->team->getID());
+				
+				// send it
+				$pm->send();
+				
+				// tell joined user that join was successful
 				$tmpl->assign('teamJoinSuccessful', true);
 			}
 		}
