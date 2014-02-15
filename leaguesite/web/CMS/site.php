@@ -38,6 +38,9 @@
 			require(dirname(__FILE__) . '/classes/user.php');
 			$user = new user(user::getCurrentUserId());
 			
+			// countries
+			require(dirname(__FILE__) . '/classes/country.php');
+			
 			// user invitations
 			require(dirname(__FILE__) . '/classes/invitation.php');
 			

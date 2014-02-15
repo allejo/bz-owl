@@ -156,7 +156,6 @@
 		public function showTeam($teamid)
 		{
 			global $tmpl;
-			global $user;
 			global $db;
 			
 			
@@ -239,7 +238,7 @@
 			$tmpl->assign('canPMTeam', \user::getCurrentUserId() > 0 ? true : false);
 			
 			// tell template if user can edit this team
-			$tmpl->assign('canEditTeam', (\user::getCurrentUserId() === $teamLeader) || $user->getPermission('allow_edit_any_team_profile'));
+			$tmpl->assign('canEditTeam', (\user::getCurrentUserId() === $teamLeader) || \user::getCurrentUser()->getPermission('allow_edit_any_team_profile'));
 			
 			// tell template if user can delete this team
 			// either user has deletion permission for team
@@ -249,72 +248,60 @@
 			
 			$showMemberActionOptions = false;
 			if (\user::getCurrentUserId() === $teamLeader
-				|| $user->getPermission('allow_kick_any_team_members'))
+				|| \user::getCurrentUser()->getPermission('allow_kick_any_team_members'))
 			{
 				$showMemberActionOptions = true;
 			}
 			$members = array();
-			$query = $db->prepare('SELECT `users`.`name` AS `player_name`'
-								  . ', `users`.`id` AS `userid`'
-								  . ', (SELECT `name` FROM `countries`'
-								  . ' WHERE `countries`.`id`=`users_profile`.`location`'
-								  . ' AND `users_profile`.`userid`=`users`.`id` LIMIT 1)'
-								  . ' AS `country_name`'
-								  . ', (SELECT `flagfile` FROM `countries`'
-								  . ' WHERE `countries`.`id`=`users_profile`.`location`'
-								  . ' AND `users_profile`.`userid`=`users`.`id` LIMIT 1)'
-								  . ' AS `flagfile`'
-								  . ', `users_profile`.`joined`'
-								  . ', `users_profile`.`last_login`'
-								  . ' FROM `users`,`users_profile`'
-								  . 'WHERE `users`.`id`=`users_profile`.`userid`'
-								  . ' AND `teamid`=?');
-			$db->execute($query, $teamid);
-			while ($row = $db->fetchRow($query))
+			$memberids = $team->getUserIds();
+			foreach($memberids AS $memberid)
 			{
+				$user = new \user($memberid);
+				$member = array();
 				// rename db result fields and assemble some additional informations
 				// use a temporary array for better readable (but slower) code
-				$prepared = array();
-				if (!$showMemberActionOptions && user::getCurrentUserId() === intval($row['userid']))
+				if (!$showMemberActionOptions && \user::getCurrentUserId() === intval($row['userid']))
 				{
 					$showMemberActionOptions = true;
 				}
-				$prepared['profileLink'] = '../Players/?profile=' . $row['userid'];
-				$prepared['userName'] = $row['player_name'];
-				$prepared['permissions'] = $teamLeader === intval($row['userid']) ? 'Leader' : 'Standard';
-				$prepared['countryName'] = $row['country_name'];
-				if (strlen($row['flagfile']) > 0)
+				$member['profileLink'] = '../Players/?profile=' . $user->getID();
+				$member['userName'] = $user->getName();
+				$member['permissions'] = $teamLeader === $user->getID() ? 'Leader' : 'Standard';
+				if (($country = $user->getCountry()))
 				{
-					$prepared['countryFlag'] = '../Flags/' . $row['flagfile'];
+					$member['countryName'] = $country->getName();
+					if (strlen($country->getFlag()) > 0)
+					{
+						$member['countryFlag'] = $country->getFlag();
+					}
 				}
-				$prepared['joined'] = $row['joined'];
-				$prepared['last_login'] = $row['last_login'];
+				
+				$member['joined'] = $user->getJoinTimestampStr();
+				$member['last_login'] = $user->getLastLoginTimestampStr();
 				
 				// show leave/kick links if permission is given
 				// a team leader can neither leave or be kicked
 				// a leader must first give someone else leadership
 				if ((user::getCurrentUserId() === $teamLeader
-					|| user::getCurrentUserId() === intval($row['userid'])
-					|| $user->getPermission('allow_kick_any_team_members'))
-					&& $user->getID() !== $teamLeader)
+					|| \user::getCurrentUserId() === intval($row['userid'])
+					|| \user::getCurrentUser()->getPermission('allow_kick_any_team_members'))
+					&& user::getCurrentUserId() !== $teamLeader)
 				{
-					$prepared['removeLink'] = './?remove=' . intval($row['userid']) . '&amp;team=' . $teamid;
-					
-					if (user::getCurrentUserId() === intval($row['userid']))
+					$member['removeLink'] = './?remove=' . $user->getID() . '&amp;team=' . $teamid;
+					if (\user::getCurrentUserId() === $user->getID())
 					{
-						$prepared['removeDescription'] = 'Leave team';
+						$member['removeDescription'] = 'Leave team';
 					} else
 					{
-						$prepared['removeDescription'] = 'Kick member from team';
+						$member['removeDescription'] = 'Kick member from team';
 					}
 				}
 				
 				// append current member data
-				$members[] = $prepared;
+				$members[] = $member;
+				unset($user);
 			}
-			$db->free($query);
-			unset($prepared);
-/* 			echo('<pre>'); print_r($members); echo('</pre>'); */
+			
 			$tmpl->assign('members', $members);
 			$tmpl->assign('showMemberActionOptions', $showMemberActionOptions);
 			
@@ -323,8 +310,8 @@
 			$matches = array();
 			
 			// show available options if any available
-			$allowEdit = $user->getPermission('allow_edit_match');
-			$allowDelete = $user->getPermission('allow_delete_match');
+			$allowEdit = \user::getCurrentUser()->getPermission('allow_edit_match');
+			$allowDelete = \user::getCurrentUser()->getPermission('allow_delete_match');
 			$tmpl->assign('showMatchActionOptions', $allowEdit || $allowDelete);
 			$tmpl->assign('allowEdit', $allowEdit);
 			$tmpl->assign('allowDelete', $allowDelete);

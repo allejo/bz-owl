@@ -2,7 +2,9 @@
 	// handle user related data
 	class user
 	{
+		private $country;
 		private $lastLoginTimestamp;
+		private $location;
 		private $origUserId = 0;
 		private $userid = 0;
 		private $teamid;
@@ -11,8 +13,8 @@
 		public function __construct($userid = 0)
 		{
 			// instance based on current user should be built
-			$this->origUserId = $userid;
-			$this->userid = $userid;
+			$this->origUserId = (int) $userid;
+			$this->userid = (int) $userid;
 			
 			// set default permissions for all users one time
 			// make sure not to do it more than once because it would reset perms then
@@ -156,6 +158,30 @@
 			return $this->getPermission('allow_join_any_team') || (new team($teamid))->getOpen() || invitation::getInvitationsForTeam($this->origUserId, $teamid);
 		}
 		
+		// get location of user
+		// return: instance of country class, false (boolean) on error
+		public function getCountry()
+		{
+			global $db;
+			
+			if (isset($this->country))
+			{
+				return $this->country;
+			}
+			
+			$query = $db->prepare('SELECT `location` FROM `users_profile` WHERE `userid`=:userid LIMIT 1');
+			if ($db->execute($query, array(':userid' => array($this->userid, PDO::PARAM_INT))))
+			{
+				$row = $db->fetchRow($query);
+				$db->free($query);
+				
+				$this->country = (int) $row['location'];
+				
+				return new \country($this->country);
+			}
+			return false;
+		}
+		
 		// get instance of current user
 		public static function getCurrentUser()
 		{
@@ -240,6 +266,28 @@
 			return $internalID;
 		}
 		
+		// time of user registration
+		// return: YYYY-MM-DD HH:MM:SS (string) of registration, false (boolean) on error
+		public function getJoinTimestampStr()
+		{
+			global $db;
+			
+			
+			$query = $db->prepare('SELECT `joined` FROM `users_profile` WHERE `userid`=:userid LIMIT 1');
+			if ($db->execute($query, array(':userid' => array($this->userid, PDO::PARAM_INT))))
+			{
+				$row = $db->fetchRow($query);
+				$db->free($query);
+				
+				$this->userJoinedTimestamp = $row['joined'];
+				
+				return $this->userJoinedTimestamp;
+			}
+			return false;
+		}
+		
+		// time as string user last logged in
+		// return: YYYY-MM-DD HH:MM:SS (string) of last login, false (boolean) on error
 		public function getLastLoginTimestampStr()
 		{
 			global $db;
