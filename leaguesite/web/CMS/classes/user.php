@@ -299,7 +299,8 @@
 			return $theme;
 		}
 		
-		
+		// find out if user owns a permission
+		// return: permission value (flexible type), false if permission unknown
 		function getPermission($permission)
 		{
 			if (isset($_SESSION[$permission]))
@@ -440,11 +441,17 @@
 		}
 		
 		// removes user from team
+		// return: true if possible, false otherwise
 		public function removeTeamMembership($teamid)
 		{
 			$this->teamid = 0;
+			
+			return true;
 		}
 		
+		// sets a permission with the specified value
+		// if the permission already exists, its value will be overwritten
+		// otherwise a new permission with the value will be registered
 		function setPermission($permission, $value=true)
 		{
 			$_SESSION[$permission] = $value;

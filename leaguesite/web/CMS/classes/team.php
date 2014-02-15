@@ -307,6 +307,8 @@
 			return false;
 		}
 		
+		// get the userid of team leader
+		// return: id of team leader (integer), false otherwise (boolean)
 		public function getLeaderId()
 		{
 			global $db;

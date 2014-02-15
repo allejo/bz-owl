@@ -19,6 +19,7 @@
 			parent::__construct();
 			parent::assign('faviconURL', $config->getValue('favicon'));
 			parent::assign('baseURL', $config->getValue('baseaddress'));
+			parent::assign('userid', \user::getCurrentUserId());
 		}
 		
 		

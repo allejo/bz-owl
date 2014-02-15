@@ -88,6 +88,7 @@
 			return true;
 		}
 		
+		// fill form with values
 		protected function showForm()
 		{
 			global $site;
@@ -103,6 +104,7 @@
 			$tmpl->assign('keyValue', htmlent($randomkeyValue));
 		}
 		
+		// add user to team
 		protected function joinTeam(user $user)
 		{
 			global $tmpl;

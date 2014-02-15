@@ -31,21 +31,18 @@
 				require_once(dirname(__FILE__) . '/teamOpponents.php');
 				$teamOpponents = new teamOpponents();
 				$teamOpponents->showOpponentStats(intval($_GET['opponent_stats']));
-			} elseif (isset($_GET['remove']))
+			} elseif (isset($_GET['remove']) && isset($_GET['team']))
 			{
-/*
-				require_once(dirname(__FILE__) . '/teamLeave');
-				new teamRemove($_GET['remove']);
-*/
+				require_once(dirname(__FILE__) . '/teamLeave.php');
+				new teamLeave((int) $_GET['remove'], (int) $_GET['team']);
 			} else
 			{
 				require_once(dirname(__FILE__) . '/teamList.php');
-				$display = new teamList();
 				
 				switch(isset($_GET['profile']))
 				{
-					case true: $display->showTeam(intval($_GET['profile'])); break;
-					default: $display->showTeams(); break;
+					case true: $display = new teamList($_GET['profile']); break;
+					default: $display = new teamList(); break;
 				}
 			}
 			

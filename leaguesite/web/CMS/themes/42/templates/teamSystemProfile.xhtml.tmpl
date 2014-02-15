@@ -25,6 +25,7 @@ No menu found.
 <div class="content">
 {if isset($canPMTeam) && $canPMTeam}<a class="button" href="{$pmLink}">Send message to team</a>{/if}
 {if isset($canEditTeam) && $canEditTeam}<a class="button" href="./?edit={$teamid|escape}">edit</a>{/if}
+{if isset($canDeleteTeam) && $canDeleteTeam}<a class="button" href="./?delete={$teamid|escape}">delete</a>{/if}
 <a class="button" href="./?opponent_stats={$teamid}">opponent stats</a>
 <br /><br />
 
@@ -59,7 +60,7 @@ No menu found.
 		<td>{$team.wins}</td>
 		<td>{$team.draws}</td>
 		<td>{$team.losses}</td>
-		<td><a href="{$team.matchSearchLink}">{$team.total}</a></td>
+		<td><a href="{$team.matchSearchLink}">{$team.matchCount}</a></td>
 	</tr>
 	</table>
 <br />

@@ -1,9 +1,15 @@
 <?php
 	class teamList
 	{
-		public function __construct()
+		public function __construct($teamid = 0)
 		{
-		
+			if ($teamid === 0)
+			{
+				$this->showTeams();
+				return;
+			}
+			
+			$this->showTeam($teamid);
 		}
 		
 		
@@ -186,7 +192,15 @@
 				die();
 			}
 			
-			$team = array();
+			$team = new team($teamid);
+			if (!$team->exists())
+			{
+				$tmpl->setTemplate('NoPerm');
+				return;
+			}
+			
+			
+			$teamData = array();
 			while ($row = $db->fetchRow($query))
 			{
 				$tmpl->assign('title', 'Team ' . htmlent($row['name']));
@@ -194,43 +208,45 @@
 				$teamLeader = intval($row['leader_userid']);
 				
 				
-				$team['profileLink'] = './?profile=' . $row['id'];
-				$team['name'] = $row['name'];
-				$team['score'] = $row['score'];
-				$team['scoreClass'] = $this->rankScore($row['score']);
-				$team['matchSearchLink'] = ('../Matches/?search_string=' . $row['name']
+				$teamData['profileLink'] = './?profile=' . $team->getID();
+				$teamData['name'] = $team->getName();
+				$teamData['score'] = $team->getScore();
+				$teamData['scoreClass'] = $this->rankScore($teamData['score']);
+				$teamData['matchSearchLink'] = ('../Matches/?search_string=' . $teamData['name']
 												. '&amp;search_type=team+name'
 												. '&amp;search_result_amount=200'
 												. '&amp;search=Search');
-				$team['matchCount'] = $row['num_matches_played'];
-				$team['memberCount'] = $row['member_count'];
-				$team['leaderLink'] = '../Players/?profile=' . $row['leader_userid'];
-				$team['leaderName'] = $row['leader_name'];
-				$team['activityNew'] = $row['activityNew'];
-				$team['activityOld'] = $row['activityOld'];
-				$team['created'] = $row['created'];
+				$teamData['matchCount'] = $team->getMatchCount();
+				$teamData['memberCount'] = $team->getSize();
+				$teamData['leaderLink'] = '../Players/?profile=' . $team->getLeaderId();
+				$teamData['leaderName'] = (new \user($team->getLeaderId()))->getName();
+				$teamData['activityNew'] = $team->getActivityNew();
+				$teamData['activityOld'] = $team->getActivityOld();
+				$teamData['created'] = $row['created'];
 				
-				$team['wins'] = intval($row['num_matches_won']);
-				$team['draws'] = intval($row['num_matches_draw']);
-				$team['losses'] = intval($row['num_matches_lost']);
-				$team['total'] = $team['wins'] + $team['draws'] + $team['losses'];
+				$teamData['wins'] = intval($row['num_matches_won']);
+				$teamData['draws'] = intval($row['num_matches_draw']);
+				$teamData['losses'] = intval($row['num_matches_lost']);
 				
-				$team['logo'] = $row['logo_url'];
+				$teamData['logo'] = $team->getAvatarURI();
 				
-				$tmpl->assign('teamDescription', $row['description']);
+				$tmpl->assign('teamDescription', $team->getDescription());
 			}
 			$db->free($query);
-			$tmpl->assign('team', $team);
+			$tmpl->assign('team', $teamData);
 			
 			$tmpl->assign('teamid', $teamid);
-			$tmpl->assign('canPMTeam', user::getCurrentUserId() > 0 ? true : false);
+			$tmpl->assign('canPMTeam', \user::getCurrentUserId() > 0 ? true : false);
 			
 			// tell template if user can edit this team
-			$tmpl->assign('canEditTeam', (user::getCurrentUserId() === $teamLeader) || $user->getPermission('allow_edit_any_team_profile'));
+			$tmpl->assign('canEditTeam', (\user::getCurrentUserId() === $teamLeader) || $user->getPermission('allow_edit_any_team_profile'));
 			
+			// tell template if user can delete this team
+			// deleting a team is not a permission, instead a user can delete team if he is the only member of the team
+/* 			$tmpl->assign('canDeleteTeam', \user->); */
 			
 			$showMemberActionOptions = false;
-			if (user::getCurrentUserId() === $teamLeader
+			if (\user::getCurrentUserId() === $teamLeader
 				|| $user->getPermission('allow_kick_any_team_members'))
 			{
 				$showMemberActionOptions = true;
@@ -280,7 +296,7 @@
 					|| $user->getPermission('allow_kick_any_team_members'))
 					&& user::getCurrentUserId() !== $teamLeader)
 				{
-					$prepared['removeLink'] = './?remove=' . intval($row['userid']);
+					$prepared['removeLink'] = './?remove=' . intval($row['userid']) . '&amp;team=' . $teamid;
 					
 					if (user::getCurrentUserId() === intval($row['userid']))
 					{
