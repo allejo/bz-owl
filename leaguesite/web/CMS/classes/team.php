@@ -212,6 +212,8 @@
 			return false;
 		}
 		
+		// find out what teams have status deleted
+		// return: an array containing team ids (array of integers), empty if no team has status deleted
 		public static function getDeletedTeamIds()
 		{
 			global $db;
@@ -320,7 +322,7 @@
 				$row = $db->fetchRow($query);
 				$db->free($query);
 				
-				$this->leaderid = $row['leader_userid'];
+				$this->leaderid = (int) $row['leader_userid'];
 				
 				return $this->leaderid;
 			}
@@ -334,12 +336,14 @@
 			return count(user::getMemberIdsOfTeam($this->origTeamId));
 		}
 		
-		// returns number of matches this team played
-		public function getMatchCount()
+		// how many matches of a certain type have been played?
+		// input: type (string): 'all' | 'won' | 'draw' | 'lost'
+		// return: number of matches this team played
+		public function getMatchCount($type = 'all')
 		{
 			// ask match class how many matches have been played
 			require_once(dirname(__FILE__) . '/match.php');
-			return match::getMatchCountForTeamId($this->origTeamId);
+			return match::getMatchCountForTeamId($this->origTeamId, $type);
 		}
 		
 		// returns team name belonging to teamid of current class instance

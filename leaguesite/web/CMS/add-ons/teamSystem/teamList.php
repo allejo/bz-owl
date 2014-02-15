@@ -205,7 +205,7 @@
 			{
 				$tmpl->assign('title', 'Team ' . htmlent($row['name']));
 				
-				$teamLeader = intval($row['leader_userid']);
+				$teamLeader = $team->getLeaderId();
 				
 				
 				$teamData['profileLink'] = './?profile=' . $team->getID();
@@ -224,9 +224,9 @@
 				$teamData['activityOld'] = $team->getActivityOld();
 				$teamData['created'] = $row['created'];
 				
-				$teamData['wins'] = intval($row['num_matches_won']);
-				$teamData['draws'] = intval($row['num_matches_draw']);
-				$teamData['losses'] = intval($row['num_matches_lost']);
+				$teamData['wins'] = $team->getMatchCount('won');
+				$teamData['draws'] = $team->getMatchCount('draw');
+				$teamData['losses'] = $team->getMatchCount('lost');
 				
 				$teamData['logo'] = $team->getAvatarURI();
 				
@@ -242,8 +242,10 @@
 			$tmpl->assign('canEditTeam', (\user::getCurrentUserId() === $teamLeader) || $user->getPermission('allow_edit_any_team_profile'));
 			
 			// tell template if user can delete this team
-			// deleting a team is not a permission, instead a user can delete team if he is the only member of the team
-/* 			$tmpl->assign('canDeleteTeam', \user->); */
+			// either user has deletion permission for team
+			// or user is leader of team and there are one or less members in team
+			$tmpl->assign('canDeleteTeam', \user::getCurrentUser()->getPermission('team.allowDelete ' . $team->getID()) ||
+						 (\user::getCurrentUserId() === $team->getLeaderId() && $team->getSize() < 2 && $team->getSize() !== false));
 			
 			$showMemberActionOptions = false;
 			if (\user::getCurrentUserId() === $teamLeader
@@ -289,12 +291,12 @@
 				$prepared['last_login'] = $row['last_login'];
 				
 				// show leave/kick links if permission is given
-				// a team leader can not leave or be kicked
-				// you must first give someone else leadership
+				// a team leader can neither leave or be kicked
+				// a leader must first give someone else leadership
 				if ((user::getCurrentUserId() === $teamLeader
 					|| user::getCurrentUserId() === intval($row['userid'])
 					|| $user->getPermission('allow_kick_any_team_members'))
-					&& user::getCurrentUserId() !== $teamLeader)
+					&& $user->getID() !== $teamLeader)
 				{
 					$prepared['removeLink'] = './?remove=' . intval($row['userid']) . '&amp;team=' . $teamid;
 					

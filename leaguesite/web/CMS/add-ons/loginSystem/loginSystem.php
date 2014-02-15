@@ -174,7 +174,7 @@
 			if ($externalLogin)
 			{
 				// lookup internal id using external id
-				$uid = $userOperations->findIDByExternalLogin($moduleInstance->getID());
+				$uid = \user::getIdByExternalId($moduleInstance->getID());
 			} else
 			{
 				// local login id is equal to internal login id by definition
@@ -190,7 +190,7 @@
 				if ($externalLogin)
 				{
 					// try to recover uid by username based db lookup
-					$uid_list = $userOperations->findIDByName($moduleInstance->getName());
+					$uid_list = \user::getIdByName($moduleInstance->getName());
 					
 					// iterate through the list, trying to update old callsigns
 					// and hoping to find the proper user account for this login attempt
@@ -235,7 +235,7 @@
 					if ($uid = $userOperations->registerAccount($moduleInstance, $externalLogin))
 					{
 						// send welcome message if registering was successful
-						$userOperations->sendWelcomeMessage($uid);
+						\pm::sendWelcomeMessage($uid);
 					}
 				} else
 				{
@@ -263,22 +263,23 @@
 				}
 			}
 			
+			$user = new \user($uid);
 			
 			// re-activate deleted accounts
 			// stop processing disabled/banned or broken accounts
 			// call logout as bandaid for erroneous login modules
-			$status = $userOperations->getAccountStatus($uid);
+			$status = $user->getStatus();
 			switch ($status)
 			{
-				case 'active' : break;
-				case 'deleted':	$userOperations->activateAccount($uid); break;
-				case 'login disabled' :
+				case 'active': break;
+				case 'deleted':	$user->setStatus('active'); break;
+				case 'login disabled':
 					$this->moduleOutput[] = 'Your account is disabled: No login possible.';
 					$user->logout();
 					return false;
 					break;
 					// TODO: implement site wide ban list
-				case 'banned' :
+				case 'banned':
 					$this->moduleOutput[] = 'You have been banned from this website.';
 					$user->logout();
 					return false;

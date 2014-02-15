@@ -1,14 +1,6 @@
 <?php
 	class userOperations extends database
 	{
-		public function activateAccount($id)
-		{
-			$query = $this->prepare('UPDATE `users` SET `status`=:status WHERE `id`=:id');
-			$this->execute($query, array(':status' => array('active', PDO::PARAM_STR, 6),
-										 ':id' => array($id, PDO::PARAM_INT)));
-			$this->free($query);
-		}
-		
 		public function addToVisitsLog($id)
 		{
 			// insert login of user to visits log
@@ -21,67 +13,6 @@
 						  // try to detect original ip-address in case proxies are used
 						  , htmlent(getenv('HTTP_X_FORWARDED_FOR')), date('Y-m-d H:i:s'));
 			$this->execute($query, $args);
-		}
-		
-		
-		public function findIDByExternalLogin($id)
-		{
-			// internal id is an integer of length 11 by definition
-			$internalID = 0;
-			
-			$query = $this->prepare('SELECT `id` FROM `users` WHERE `external_id`=:id LIMIT 1');
-			// the id can be of any data type and of any length
-			// just assume it's a 50 characters long string
-			$this->execute($query, array(':id' => array($id, PDO::PARAM_STR, 50)));
-			
-			if ($row = $this->fetchRow($query))
-			{
-				$internalID = intval($row['id']);
-			}
-			$this->free($query);
-			
-			return $internalID;
-		}
-		
-		
-		public function findIDByName($name)
-		{
-			// internal id is an array of integers of length 11 by database definition
-			$internalID = array();
-			
-			// search for name in player database, there can be several matches
-			$query = $this->prepare('SELECT `id`, `external_id` FROM `users` WHERE `name`=:name');
-			
-			// the id can be of any data type and of any length
-			// just assume it's a 50 characters long string
-			$this->execute($query, array(':name' => array($name, PDO::PARAM_STR, 50)));
-			
-			while ($row = $this->fetchRow($query))
-			{
-				$internalID[] = array('id' => intval($row['id']),
-									  'external_id' => strval($row['external_id']));
-			}
-			$this->free($query);
-			
-			return $internalID;
-		}
-		
-		
-		public function getAccountStatus($id)
-		{
-			$query = $this->prepare('SELECT `status` FROM `users` WHERE `id`=:uid LIMIT 1');
-			$this->execute($query, array(':uid' => array($id, PDO::PARAM_INT)));
-			
-			// init status to "login disabled" to block login on error
-			$status = 'login disabled';
-			
-			if ($row = $this->fetchRow($query))
-			{
-				$status = $row['status'];
-			}
-			$this->free($query);
-			
-			return $status;
 		}
 		
 		
@@ -185,32 +116,6 @@
 			$this->execute($query, array($uid, $curDate));
 			
 			return $uid;
-		}
-		
-		
-		public function sendWelcomeMessage($id)
-		{
-			global $config;
-			
-			
-			$subject = ($config->getValue('login.welcome.subject') ?
-						$config->getValue('login.welcome.subject') :
-						'Welcome');
-			$content = ($config->getValue('login.welcome.content') ?
-						$config->getValue('login.welcome.content') :
-						'Welcome and thanks for registering at this website!' . "\n"
-									. 'In the FAQ you can find the most important informations'
-									. ' about organising and playing matches.' . "\n\n"
-									. 'See you on the battlefield.');
-			// prepare welcome message
-			$pm = new pm();
-			$pm->setSubject($subject);
-			$pm->setContent($content);
-			$pm->setTimestamp(date('Y-m-d H:i:s'));
-			$pm->addUserID($id);
-			
-			// send it
-			$pm->send();
 		}
 		
 		

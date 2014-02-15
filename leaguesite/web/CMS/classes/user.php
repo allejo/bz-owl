@@ -181,9 +181,63 @@
 			return (isset($_SESSION['user_logged_in']) && ($_SESSION['user_logged_in'] === true));
 		}
 		
-		function getID()
+		// get the user's id
+		// return: internal id (integer) of user
+		public function getID()
 		{
 			return $this->userid;
+		}
+
+		// searches for internal id that is mapped to external id
+		// input: external id (variable type)
+		// return: internal id (integer)
+		public static function getIdByExternalId($id)
+		{
+			global $db;
+			
+			// internal id is an integer of length 11 by definition
+			$internalID = 0;
+			
+			$query = $db->prepare('SELECT `id` FROM `users` WHERE `external_id`=:id LIMIT 1');
+			// the id can be of any data type and of any length
+			// just assume it's a 50 characters long string
+			$db->execute($query, array(':id' => array($id, PDO::PARAM_STR, 50)));
+			
+			if ($row = $db->fetchRow($query))
+			{
+				$internalID = intval($row['id']);
+			}
+			$db->free($query);
+			
+			return $internalID;
+		}
+		
+		// find out the internal id bases on username
+		// input: username (string)
+		// return: array of matching internal ids.
+		public static function getIdByName($name)
+		{
+			global $db;
+			
+			
+			// internal id is an array of integers of length 11 by database definition
+			$internalID = array();
+			
+			// search for name in player database, there can be several matches
+			$query = $db->prepare('SELECT `id`, `external_id` FROM `users` WHERE `name`=:name');
+			
+			// the id can be of any data type and of any length
+			// just assume it's a 50 characters long string
+			$db->execute($query, array(':name' => array($name, PDO::PARAM_STR, 50)));
+			
+			while ($row = $db->fetchRow($query))
+			{
+				$internalID[] = array('id' => intval($row['id']),
+									  'external_id' => strval($row['external_id']));
+			}
+			$db->free($query);
+			
+			return $internalID;
 		}
 		
 		public function getLastLoginTimestampStr()
@@ -212,12 +266,12 @@
 			global $db;
 			
 			
-			if ($this->status !== false)
+			if (isset($this->status))
 			{
 				return $this->status;
 			}
 			
-			$query = $db->prepare('SELECT `status` FROM `users` WHERE `userid`=:userid LIMIT 1');
+			$query = $db->prepare('SELECT `status` FROM `users` WHERE `id`=:userid LIMIT 1');
 			if ($db->execute($query, array(':userid' => array($this->origUserId, PDO::PARAM_INT))))
 			{
 				$row = $db->fetchRow($query);
@@ -236,9 +290,10 @@
 			$_SESSION['user_logged_in'] = (intval($id) > 0) ?  true : false;
 		}
 		
+		// sets the user's id (integer)
 		function setID($userid)
 		{
-			$this->userid = $userid;
+			$this->userid = (int) $userid;
 		}
 		
 		function getTheme()

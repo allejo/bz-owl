@@ -394,6 +394,34 @@
 			return true;
 		}
 		
+		// send welcome message to user
+		// you can customise the message using config values
+		// input: id of recipient user (integer)
+		public static function sendWelcomeMessage($id)
+		{
+			global $config;
+			
+			
+			$subject = ($config->getValue('login.welcome.subject') ?
+						$config->getValue('login.welcome.subject') :
+						'Welcome');
+			$content = ($config->getValue('login.welcome.content') ?
+						$config->getValue('login.welcome.content') :
+						'Welcome and thanks for registering at this website!' . "\n"
+									. 'In the FAQ you can find the most important informations'
+									. ' about organising and playing matches.' . "\n\n"
+									. 'See you on the battlefield.');
+			// prepare welcome message
+			$pm = new pm();
+			$pm->setSubject($subject);
+			$pm->setContent($content);
+			$pm->setTimestamp(date('Y-m-d H:i:s'));
+			$pm->addUserID($id);
+			
+			// send it
+			$pm->send();
+		}
+		
 		protected function removeDuplicates(array &$someArray)
 		{
 			$filtered = array();
