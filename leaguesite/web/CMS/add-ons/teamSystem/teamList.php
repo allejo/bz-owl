@@ -171,26 +171,6 @@
 			// the team's leader
 			$teamLeader = 0;
 			
-			$query = $db->prepare('SELECT *'
-								  . ', (SELECT `name` FROM `users`'
-								  . ' WHERE `users`.`id`=`teams`.`leader_userid` LIMIT 1)'
-								  . ' AS `leader_name`'
-								  . ' FROM `teams`, `teams_overview`, `teams_profile`'
-								  . ' WHERE `teams`.`id`=`teams_overview`.`teamid`'
-								  . ' AND `teams`.`id`=`teams_profile`.`teamid`'
-								  . ' AND `teams`.`id`=:teamid'
-								  . ' LIMIT 1');
-			// see if query was successful
-			if ($db->execute($query, array(':teamid' => array(intval($teamid), PDO::PARAM_INT))) == false)
-			{
-				// fatal error -> die
-				$db->logError('FATAL ERROR: Query in teamList.php (teamSystem add-on) by user '
-							  . user::getCurrentUserId() . ' failed, request URI: ' . $_SERVER['REQUEST_URI']);
-				$tmpl->setTemplate('NoPerm');
-				$tmpl->display();
-				die();
-			}
-			
 			$team = new team($teamid);
 			if (!$team->exists())
 			{
@@ -200,38 +180,36 @@
 			
 			
 			$teamData = array();
-			while ($row = $db->fetchRow($query))
-			{
-				$tmpl->assign('title', 'Team ' . htmlent($row['name']));
-				
-				$teamLeader = $team->getLeaderId();
-				
-				
-				$teamData['profileLink'] = './?profile=' . $team->getID();
-				$teamData['name'] = $team->getName();
-				$teamData['score'] = $team->getScore();
-				$teamData['scoreClass'] = $this->rankScore($teamData['score']);
-				$teamData['matchSearchLink'] = ('../Matches/?search_string=' . $teamData['name']
-												. '&amp;search_type=team+name'
-												. '&amp;search_result_amount=200'
-												. '&amp;search=Search');
-				$teamData['matchCount'] = $team->getMatchCount();
-				$teamData['memberCount'] = $team->getSize();
-				$teamData['leaderLink'] = '../Players/?profile=' . $team->getLeaderId();
-				$teamData['leaderName'] = (new \user($team->getLeaderId()))->getName();
-				$teamData['activityNew'] = $team->getActivityNew();
-				$teamData['activityOld'] = $team->getActivityOld();
-				$teamData['created'] = $row['created'];
-				
-				$teamData['wins'] = $team->getMatchCount('won');
-				$teamData['draws'] = $team->getMatchCount('draw');
-				$teamData['losses'] = $team->getMatchCount('lost');
-				
-				$teamData['logo'] = $team->getAvatarURI();
-				
-				$tmpl->assign('teamDescription', $team->getDescription());
-			}
-			$db->free($query);
+
+			$tmpl->assign('title', 'Team ' . htmlent($team->getName()));
+			
+			$teamLeader = $team->getLeaderId();
+			
+			
+			$teamData['profileLink'] = './?profile=' . $team->getID();
+			$teamData['name'] = $team->getName();
+			$teamData['score'] = $team->getScore();
+			$teamData['scoreClass'] = $this->rankScore($teamData['score']);
+			$teamData['matchSearchLink'] = ('../Matches/?search_string=' . $teamData['name']
+											. '&amp;search_type=team+name'
+											. '&amp;search_result_amount=200'
+											. '&amp;search=Search');
+			$teamData['matchCount'] = $team->getMatchCount();
+			$teamData['memberCount'] = $team->getSize();
+			$teamData['leaderLink'] = '../Players/?profile=' . $team->getLeaderId();
+			$teamData['leaderName'] = (new \user($team->getLeaderId()))->getName();
+			$teamData['activityNew'] = $team->getActivityNew();
+			$teamData['activityOld'] = $team->getActivityOld();
+			$teamData['created'] = $team->getCreationTimestampStr();
+			
+			$teamData['wins'] = $team->getMatchCount('won');
+			$teamData['draws'] = $team->getMatchCount('draw');
+			$teamData['losses'] = $team->getMatchCount('lost');
+			
+			$teamData['logo'] = $team->getAvatarURI();
+			
+			$tmpl->assign('teamDescription', $team->getDescription());
+			
 			$tmpl->assign('team', $teamData);
 			
 			$tmpl->assign('teamid', $teamid);
