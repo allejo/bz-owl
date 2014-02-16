@@ -47,7 +47,6 @@
 				
 				// delete all invitations to team for this user
 				// Do not allow to join using one invite then leaving and joining same team using next invite
-/* 				require_once(dirname(__FILE__) . '/invitation.php'); */
 				invitation::deleteOldInvitations();
 				$invitations = invitation::getInvitationsForTeam($this->origUserId, $teamid);
 				foreach($invitations AS $invitation)
@@ -109,6 +108,23 @@
 						}
 					}
 				}
+			}
+			return false;
+		}
+		
+		// does user in database exist
+		// return: true or false (boolean)
+		public function exists()
+		{
+			global $db;
+			
+			$query = $db->prepare('SELECT `id` FROM `users` WHERE `id`=:userid LIMIT 1');
+			if ($db->execute($query, array(':userid' => array($this->userid, PDO::PARAM_INT))))
+			{
+				$row = $db->fetchRow($query);
+				$db->free($query);
+				
+				return $row === false ? false : true;
 			}
 			return false;
 		}

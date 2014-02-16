@@ -10,7 +10,7 @@
 		private $created;
 		private $description = false;
 		private $rawDescription = false;
-		private $leaderid = false;
+		private $leaderid;
 		private $getNameQuery;
 		private $teamid;
 		private $origTeamId;
@@ -86,7 +86,7 @@
 				$row = $db->fetchRow($query);
 				$db->free($query);
 				
-				return $row === false? false : true;
+				return $row === false ? false : true;
 			}
 			return false;
 		}
@@ -315,6 +315,10 @@
 		{
 			global $db;
 			
+			if (isset($this->leaderid))
+			{
+				return $this->leaderid;
+			}
 			
 			$query = $db->prepare('SELECT `leader_userid` FROM `teams` WHERE `id`=:teamid LIMIT 1');
 			if ($db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT))))
@@ -567,7 +571,7 @@
 			{
 				while ($row = $db->fetchRow($query))
 				{
-					$ids[] = $row['id'];
+					$ids[] = (int) $row['id'];
 				}
 				$db->free($query);
 			}

@@ -260,13 +260,13 @@
 				$member = array();
 				// rename db result fields and assemble some additional informations
 				// use a temporary array for better readable (but slower) code
-				if (!$showMemberActionOptions && \user::getCurrentUserId() === intval($row['userid']))
+				if (!$showMemberActionOptions && \user::getCurrentUserId() === $memberid)
 				{
 					$showMemberActionOptions = true;
 				}
 				$member['profileLink'] = '../Players/?profile=' . $user->getID();
 				$member['userName'] = $user->getName();
-				$member['permissions'] = $teamLeader === $user->getID() ? 'Leader' : 'Standard';
+				$member['permissions'] = $teamLeader === $memberid ? 'Leader' : 'Standard';
 				if (($country = $user->getCountry()))
 				{
 					$member['countryName'] = $country->getName();
@@ -281,11 +281,10 @@
 				
 				// show leave/kick links if permission is given
 				// a team leader can neither leave or be kicked
-				// a leader must first give someone else leadership
-				if ((user::getCurrentUserId() === $teamLeader
-					|| \user::getCurrentUserId() === intval($row['userid'])
+				// a leader must first give someone else leadership to leave
+				if ((\user::getCurrentUserId() === $teamLeader
 					|| \user::getCurrentUser()->getPermission('allow_kick_any_team_members'))
-					&& user::getCurrentUserId() !== $teamLeader)
+					&& $user->getID() !== $teamLeader)
 				{
 					$member['removeLink'] = './?remove=' . $user->getID() . '&amp;team=' . $teamid;
 					if (\user::getCurrentUserId() === $user->getID())
