@@ -6,7 +6,6 @@
 		public function __construct($teamid)
 		{
 			global $tmpl;
-			global $user;
 			
 			
 			$this->setTemplate();
@@ -18,7 +17,7 @@
 			$tmpl->assign('teamid', $teamid);
 			$tmpl->assign('teamName', $this->team->getName());
 			
-			$editPermission = $user->getPermission('allow_edit_any_team_profile') || 
+			$editPermission = \user::getCurrentUser()->getPermission('allow_edit_any_team_profile') || 
 							  $this->team->getPermission('edit', user::getCurrentUserId());
 			
 			$tmpl->assign('canEditTeam', $editPermission);

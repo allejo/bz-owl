@@ -12,7 +12,7 @@
 			if (isset($_GET['add']))
 			{
 				require_once(dirname(__FILE__) . '/teamAdd.php');
-/* 				new pmSystemAddPM(); */
+/* 				new teamAdd(); */
 				die();
 			} elseif (isset($_GET['edit']))
 			{
@@ -21,11 +21,11 @@
 			} elseif (isset($_GET['delete']))
 			{
 				require_once(dirname(__FILE__) . '/teamDelete.php');
-/* 				new pmDelete($folder, intval($_GET['delete'])); */
+				new teamDelete((int) $_GET['delete']);
 			} elseif (isset($_GET['join']))
 			{
 				require_once(dirname(__FILE__) . '/teamJoin.php');
-				new teamJoin($_GET['join']);
+				new teamJoin((int) $_GET['join']);
 			} elseif (isset($_GET['opponent_stats']))
 			{
 				require_once(dirname(__FILE__) . '/teamOpponents.php');
@@ -41,7 +41,7 @@
 				
 				switch(isset($_GET['profile']))
 				{
-					case true: $display = new teamList($_GET['profile']); break;
+					case true: $display = new teamList((int) $_GET['profile']); break;
 					default: $display = new teamList(); break;
 				}
 			}
