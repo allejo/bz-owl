@@ -23,30 +23,24 @@ No menu found.
 </div>
 
 <div class="content">
-<a class="button" href="./?profile={$teamid|escape}">{if !isset($teamLeaveSuccessful) || $teamLeaveSuccessful === false}Cancel &amp; b{else}B{/if}ack to team profile</a>
-<br /><br />
 
-{if isset($teamLeaveSuccessful) && $teamLeaveSuccessful}
+{if isset($teamDeleteSuccessful) && $teamDeleteSuccessful}
 <div class="static_page_box">
-{if $userRequestsLeave}
-	<p>You left the team {$teamName|escape} successfully.</p>
-{else}
-	<p>{$targetUserName|escape} is no longer member of {$teamName|escape}.</p>
-{/if}
+<p>You successfully deleted the team {$teamName|escape}.</p>
 </div>
 {else}
 {if isset($error) && $error !== ''}
 <div class="static_page_box">
-	<p>An error prevented removing team membership from user: {$error|escape}</p>
+	<p>An error prevented team deletion: {$error|escape}</p>
 </div>
 {else}
 <div class="static_page_box">
-<form enctype="application/x-www-form-urlencoded" method="post" action="?remove={$targetUserId}&amp;team={$teamid|escape}">
+<form enctype="application/x-www-form-urlencoded" method="post" action="?delete={$teamid|escape}">
 <div><input type="hidden" name="confirmed" value="1" /></div>
 <div><input type="hidden" name="key_name" value="{$keyName}" /></div>
 <div><input type="hidden" name="{$keyName}" value="{$keyValue}" /></div>
-<p style="display:inline">{if $userRequestsLeave}Do you really want to leave your team <a href="./?profile={$teamid|escape}">{$teamName|escape}</a>?{else}Remove {$targetUserName|escape} from team <a href="./?profile={$teamid|escape}">{$teamName|escape}</a>?{/if}</p>
-<div style="display:inline"><input type="submit" name="kick_user_from_team" value="Leave the team" id="send" /></div>
+<p style="display:inline">Do you really want to delete the team <a href="./?profile={$teamid|escape}">{$teamName|escape}</a>?</p>
+<div style="display:inline"><input type="submit" name="delete_team" value="Delete the team" id="send" /></div>
 </form>
 
 </div>

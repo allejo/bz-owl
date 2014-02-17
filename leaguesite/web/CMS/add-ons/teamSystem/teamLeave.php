@@ -138,7 +138,7 @@
 			// remove user from team
 			if (!$this->user->removeTeamMembership($this->team->getID()) || !$this->user->update())
 			{
-				$tmpl->assign('error', 'An unknown error occurred while joining the team.');
+				$tmpl->assign('error', 'An unknown error occurred while leaving the team.');
 			} else
 			{
 				// notify team members using a private message

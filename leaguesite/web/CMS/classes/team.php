@@ -559,6 +559,8 @@
 			return $teams;
 		}
 		
+		// get ids of users belong to the team
+		// return: array with user ids (array containing integers)
 		public function getUserIds()
 		{
 			global $db;
@@ -576,6 +578,21 @@
 				$db->free($query);
 			}
 			return $ids;
+		}
+		
+		// get instances of users belonging to the team
+		// similar to the getUserIds function
+		// return: array with user class instances (array containing users)
+		public function getUsers()
+		{
+			$userids = $this->getUserIds();
+			$members = array();
+			foreach($userids AS $userid)
+			{
+				$members[] = new \user($userid);
+			}
+			
+			return $members;
 		}
 		
 		// sets the team avatar uri
