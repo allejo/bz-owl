@@ -1,13 +1,13 @@
 # ************************************************************
 # Sequel Pro SQL dump
-# Version 4004
+# Version 4096
 #
 # http://www.sequelpro.com/
 # http://code.google.com/p/sequel-pro/
 #
-# Host: localhost (MySQL 5.1.68)
+# Host: localhost (MySQL 5.1.72)
 # Datenbank: bz-owl
-# Erstellungsdauer: 2013-04-20 18:06:23 +0200
+# Erstellungsdauer: 2014-02-18 13:55:38 +0000
 # ************************************************************
 
 
@@ -108,13 +108,13 @@ DROP TABLE IF EXISTS `invitations`;
 
 CREATE TABLE `invitations` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `invited_playerid` int(11) unsigned NOT NULL DEFAULT '0',
+  `userid` int(11) unsigned NOT NULL DEFAULT '0',
   `teamid` int(11) unsigned NOT NULL DEFAULT '0',
   `expiration` varchar(20) NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
-  KEY `invited_playerid` (`invited_playerid`),
+  KEY `invited_playerid` (`userid`),
   KEY `teamid` (`teamid`),
-  CONSTRAINT `invitations_ibfk_1` FOREIGN KEY (`invited_playerid`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `invitations_ibfk_1` FOREIGN KEY (`userid`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `invitations_ibfk_2` FOREIGN KEY (`teamid`) REFERENCES `teams` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -346,7 +346,7 @@ CREATE TABLE `teams_overview` (
   PRIMARY KEY (`teamid`),
   KEY `teamid` (`teamid`),
   CONSTRAINT `teams_overview_ibfk_1` FOREIGN KEY (`teamid`) REFERENCES `teams` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='deleted: 0 new; 1 active; 2 deleted; 3 re-activated';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='deleted: 0 new; 1 active; 2 deleted; 3 re-activated; 4 inact';
 
 
 
