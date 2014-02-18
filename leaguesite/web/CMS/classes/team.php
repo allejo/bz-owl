@@ -6,18 +6,18 @@
 	{
 		private $activityNew;
 		private $activityOld;
-		private $avatarURI = false;
+		private $avatarURI;
 		private $created;
-		private $description = false;
-		private $rawDescription = false;
+		private $description;
+		private $rawDescription;
 		private $leaderid;
 		private $getNameQuery;
 		private $teamid;
 		private $origTeamId;
-		private $open = null;
-		private $name = false;
-		private $score = false;
-		private $status = false;
+		private $open;
+		private $name;
+		private $score;
+		private $status;
 		
 		public function __construct($teamid = 0)
 		{
@@ -194,7 +194,7 @@
 			global $db;
 			
 			
-			if ($this->description)
+			if (isset($this->description))
 			{
 				return $this->description;
 			}
@@ -266,7 +266,7 @@
 			global $db;
 			
 			
-			if ($this->open !== null)
+			if (isset($this->open))
 			{
 				return $this->open;
 			}
@@ -291,7 +291,7 @@
 			global $db;
 			
 			
-			if ($this->rawDescription)
+			if (isset($this->rawDescription))
 			{
 				return $this->rawDescription;
 			}
@@ -362,7 +362,7 @@
 				return '$team->getName(0): reserved teamid';
 			}
 			
-			if ($this->name !== false)
+			if (isset($this->name))
 			{
 				return $this->name;
 			}
@@ -424,15 +424,14 @@
 		{
 			// userid 0 is reserved and never has any permission
 			// any user not identified or logged in has id 0
-			if ($userid === 0)
+			if ((int) $userid === 0)
 			{
 				return false;
 			}
 			
 			switch ($permission)
 			{
-				case 'edit':
-					return $this->getLeaderId() === $userid;
+				case 'edit': return $this->getLeaderId() === (int) $userid;
 				default: return false;
 			}
 		}
@@ -492,7 +491,7 @@
 				return false;
 			}
 			
-			if ($this->status !== false)
+			if (isset($this->status))
 			{
 				return $this->status;
 			}
@@ -608,7 +607,7 @@
 		{
 			global $tmpl;
 			
-			$this->description = $tmpl->encodeBBCode((string) $description);
+			$this->description = (string) $tmpl->encodeBBCode((string) $description);
 		}
 		
 		// sets team leader to any member of the team
@@ -638,7 +637,7 @@
 		
 		public function setName($name)
 		{
-			$this->name = $name;
+			$this->name = (string) $name;
 		}
 		
 		// assign status to team
@@ -662,7 +661,7 @@
 		
 		public function setTeamid($teamid)
 		{
-			$this->teamid = $teamid;
+			$this->teamid = (int) $teamid;
 		}
 		
 		// update team in db
@@ -679,7 +678,7 @@
 				return false;
 			}
 			
-			if ($this->name === false)
+			if (!isset($this->name))
 			{
 				$this->name = $this->getName();
 			}
@@ -726,7 +725,7 @@
 					}
 				}
 				
-				if ($this->open !== null)
+				if (isset($this->open))
 				{
 					$query = $db->prepare('UPDATE `teams_overview` SET open=:open WHERE teamid=:teamid');
 					if (!$db->execute($query, array(':open' => array($this->open ? 1 : 0, PDO::PARAM_INT),
@@ -736,7 +735,7 @@
 					}
 				}
 				
-				if ($this->description !== false)
+				if (isset($this->description))
 				{
 					$query = $db->prepare('UPDATE `teams_profile` SET description=:description WHERE teamid=:teamid');
 					if (!$db->execute($query, array(':description' => array($this->description, PDO::PARAM_STR),
@@ -746,7 +745,7 @@
 					}
 				}
 				
-				if ($this->leaderid !== false)
+				if (isset($this->leaderid))
 				{
 					$query = $db->prepare('UPDATE `teams` SET leader_userid=:leaderid WHERE id=:teamid');
 					if (!$db->execute($query, array(':leaderid' => array($this->leaderid, PDO::PARAM_INT),
@@ -756,7 +755,7 @@
 					}
 				}
 				
-				if ($this->rawDescription !== false)
+				if (isset($this->rawDescription))
 				{
 					$query = $db->prepare('UPDATE `teams_profile` SET raw_description=:rawDescription WHERE teamid=:teamid');
 					if (!$db->execute($query, array(':rawDescription' => array($this->rawDescription, PDO::PARAM_STR),
