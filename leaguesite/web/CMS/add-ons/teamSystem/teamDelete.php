@@ -7,6 +7,7 @@
 		{
 			global $tmpl;
 			
+			
 			$tmpl->setTemplate('teamSystemDelete');
 			
 			// teamid 0 is reserved and can not be deleted
@@ -58,7 +59,7 @@
 			
 			
 			// protected against cross site injection attempts
-			$randomKeyName = 'teamLeave_' . $this->team->getID() . '_' . microtime();
+			$randomKeyName = 'teamDelete_' . $this->team->getID() . '_' . microtime();
 			// convert some special chars to underscores
 			$randomKeyName = strtr($randomKeyName, array(' ' => '_', '.' => '_'));
 			$randomkeyValue = $site->setKey($randomKeyName);

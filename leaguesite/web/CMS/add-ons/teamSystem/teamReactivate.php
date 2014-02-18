@@ -1,67 +1,23 @@
 <?php
-	class teamLeave
+	class teamReactivate
 	{
-		private $team;
 		private $user;
+		private $team;
 		
-		public function __construct($userid, $teamid)
+		public function __construct()
 		{
 			global $tmpl;
 			
 			
-			$tmpl->setTemplate('teamSystemLeave');
+			$tmpl->setTemplate('teamSystemReactivate');
 			
-			// userid and teamid must not be reserved ids
-			if ($userid === 0 || $teamid === 0)
+			// user (that opens form must have permission to reactivate teams
+			if (!\user::getCurrentUser()->getPermission('allow_reactivate_teams'))
 			{
 				$tmpl->setTemplate('NoPerm');
 				return;
 			}
-			
-			$tmpl->assign('teamid', $teamid);
-			
-			$this->user = new user($userid);
-			$this->team = new team($teamid);
-			
-			$tmpl->assign('teamName', $this->team->getName());
-			
-			// user and team must exist, user must belong to team
-			if (!\user::getCurrentUserLoggedIn() || !$this->user->exists() || !$this->team->exists() || !$this->user->getMemberOfTeam($teamid))
-			{
-				$tmpl->setTemplate('NoPerm');
-				return;
-			}
-			
-			// user (visitor) that opens form must have permission to remove the selected user in form
-			// require a visitor to be logged in, anonymous user removal from teams not allowed
-			if (!\user::getCurrentUserLoggedIn()
-				|| (\user::getCurrentUserId() !== $this->team->getLeaderId()
-				&& !\user::getCurrentUser()->getPermission('allow_kick_any_team_members')))
-			{
-				$tmpl->setTemplate('NoPerm');
-				return;
-			}
-			
-			// no leader can leave the team
-			// ensures that team always has at least one leader
-			if ($this->user->getId() === $this->team->getLeaderId())
-			{
-				$tmpl->assign('title', 'Leave ' . htmlent($this->team->getName()));
-				$tmpl->assign('error', 'A team leader can not leave a team. You should set someone else in charge of leadership first.');
-				return;
-			}
-			
-			$tmpl->assign('targetUserName', $this->user->getName());
-			$tmpl->assign('targetUserId', $this->user->getID());
-			if ($this->user->getID() === \user::getCurrentUserId())
-			{
-					$tmpl->assign('userRequestsLeave', true);
-				$tmpl->assign('title', 'Leave ' . htmlent($this->team->getName()));
-			} else
-			{
-				$tmpl->assign('userRequestsLeave', false);
-				$tmpl->assign('title', 'Remove ' . htmlent($this->user->getName()) . ' from ' . htmlent($this->team->getName()));
-			}
+			$tmpl->assign('title', 'Reactivate a team');
 			
 			
 			$confirmed = !isset($_POST['confirmed']) ? 0 : (int) $_POST['confirmed'];
@@ -70,7 +26,7 @@
 				$this->showForm();
 			} elseif ($confirmed === 1)
 			{
-				$this->leaveTeam();
+				$this->reactivateTeam();
 			}
 		}
 		
@@ -82,7 +38,7 @@
 			
 			
 			// protected against cross site injection attempts
-			$randomKeyName = 'teamLeave_' . $this->team->getID() . '_' . microtime();
+			$randomKeyName = 'teamReactivate_' . microtime();
 			// convert some special chars to underscores
 			$randomKeyName = strtr($randomKeyName, array(' ' => '_', '.' => '_'));
 			$randomkeyValue = $site->setKey($randomKeyName);
@@ -124,8 +80,8 @@
 			return true;
 		}
 		
-		// remove user from team
-		protected function leaveTeam()
+		// reactivate team with chosen leader
+		protected function reactivateTeam()
 		{
 			global $tmpl;
 			

@@ -31,6 +31,10 @@
 				require_once(dirname(__FILE__) . '/teamOpponents.php');
 				$teamOpponents = new teamOpponents();
 				$teamOpponents->showOpponentStats(intval($_GET['opponent_stats']));
+			} elseif (isset($_GET['reactivate']))
+			{
+				require_once(dirname(__FILE__) . '/teamReactivate.php');
+				new teamReactivate();
 			} elseif (isset($_GET['remove']) && isset($_GET['team']))
 			{
 				require_once(dirname(__FILE__) . '/teamLeave.php');

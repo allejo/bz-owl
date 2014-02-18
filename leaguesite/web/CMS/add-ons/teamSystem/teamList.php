@@ -99,8 +99,11 @@
 			global $db;
 			
 			
-			// tell template if user can reactivate maintained/deleted teams
-			$tmpl->assign('canReactivateTeams', $user->getPermission('allow_reactivate_teams'));
+			// tell template if user can reactivate maintained/deleted teams and there are teams that could be reactivated
+			if ($user->getPermission('allow_reactivate_teams'))
+			{
+				$tmpl->assign('canReactivateTeams', count(\team::getDeletedTeamIds()) > 0);
+			}
 			
 			if (!$tmpl->setTemplate('teamSystemList'))
 			{
