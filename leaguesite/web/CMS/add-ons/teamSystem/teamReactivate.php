@@ -44,6 +44,31 @@
 			$randomkeyValue = $site->setKey($randomKeyName);
 			$tmpl->assign('keyName', $randomKeyName);
 			$tmpl->assign('keyValue', htmlent($randomkeyValue));
+			
+			// display teams that can be reactivated
+			$teamids = \team::getDeletedTeamIds();
+			$teamData = array();
+			foreach($teamids AS $teamid)
+			{
+				$teamData[] = array('id' => $teamid, 'name' => (new team($teamid))->getName());
+			}
+			$tmpl->assign('teams', $teamData);
+			
+			// a team must always have a leader
+			// display user choice to admin
+			
+			// get all teamless users
+			$users = \user::getTeamlessUsers();
+			$userData = array();
+			foreach($users AS $user)
+			{
+				// a team should only be reactivated so it can play...no point of inactive, disabled or banned user
+				if ($user->getStatus() === 'active')
+				{
+					$userData[] = array('id' => $user->getID(), 'name'=> $user->getName());
+				}
+			}
+			$tmpl->assign('users', $userData);
 		}
 		
 		// check if user submitted data is valid
@@ -94,15 +119,8 @@
 			{
 				// notify team members using a private message
 				$pm = new pm();
-				if (\user::getCurrentUserId() === $this->user->getID())
-				{
-					$pm->setSubject($this->user->getName() . ' left your team');
-					$pm->setContent('Player ' . $this->user->getName() . ' just left your team.');
-				} else
-				{
-					$pm->setSubject($this->user->getName() . ' got kicked from your team');
-					$pm->setContent('Player ' . $this->user->getName() . ' got kicked from your team by ' . \user::getCurrentUser()->getName() . '.');
-				}
+				$pm->setSubject($this->user->getName() . ' got kicked from your team');
+				$pm->setContent('Player ' . $this->user->getName() . ' got kicked from your team by ' . \user::getCurrentUser()->getName() . '.');
 				
 				$pm->setTimestamp(date('Y-m-d H:i:s'));
 				$pm->addTeamID($this->team->getID());
@@ -110,8 +128,8 @@
 				// send it
 				$pm->send();
 				
-				// tell joined user that join was successful
-				$tmpl->assign('teamLeaveSuccessful', true);
+				// tell user that team reactivation was successful
+				$tmpl->assign('teamReactivationSuccessful', true);
 			}
 		}
 	}

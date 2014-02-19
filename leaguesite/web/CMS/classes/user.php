@@ -348,6 +348,26 @@
 			return false;
 		}
 		
+		// get user instances that do not belong to any team
+		// return: array filled with instances of user class (array of users)
+		public static function getTeamlessUsers()
+		{
+			global $db;
+			
+			$users = array();
+			// teamless := team is set to 0 (no team)
+			$query = $db->prepare('SELECT `id` FROM `users` WHERE `teamid`=:teamid');
+			if ($db->execute($query, array(':teamid' => array(0, PDO::PARAM_INT))))
+			{
+				while($row = $db->fetchRow($query))
+				{
+					$users[] = new \user((int) $row['id']);
+				}
+				$db->free($query);
+			}
+			return $users;
+		}
+		
 		public static function setCurrentUserID($id=0)
 		{
 			$_SESSION['viewerid'] = intval($id);

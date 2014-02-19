@@ -43,7 +43,9 @@ No menu found.
 	<label for="reactivate_team">Select the team to be reactivated:</label>
 	<span>
 		<select id="reactivate_team" name="reactivate_team_id">
-			<option value="851">      s Of The Battlfield</option>
+{foreach item="team" from=$teams}
+			<option value="{$team.id|escape}">{$team.name|escape}</option>
+{/foreach}
 		</select>
 	</span>
 </p>
@@ -51,7 +53,9 @@ No menu found.
 	<label for="reactivate_team_new_leader">Select the new team leader:</label>
 	<span>
 		<select id="reactivate_team_new_leader" name="reactivate_team_new_leader_id">
-			<option value="3670">153497</option>
+{foreach item="user" from=$users}
+			<option value="{$user.id|escape}">{$user.name|escape}</option>
+{/foreach}
 		</select>
 	</span>
 </p>
