@@ -116,7 +116,7 @@
 			}
 			
 			// check if max team size allows joining
-			if ($this->team->getSize() < 0)
+			if ($this->team->getMemberCount() < 0)
 			{
 				return 'Leaving or removing user from team failed. There are already no members in the team.';
 			}

@@ -593,7 +593,7 @@
 		$db->SQL('INSERT INTO `CMS` (`id`, `request_path`, `title`, `addon`) VALUES (NULL, \'Matches/\', \'Matches\', \'matchServices\')');
 		
 		status('Renaming CMS table to cms_paths');
-		$db->SQL('RENAME TABLE `CMS` TO `cms_paths`)';
+		$db->SQL('RENAME TABLE `CMS` TO `cms_paths`');
 		
 		
 		// delete maintenance log file, new version uses database instead
@@ -608,13 +608,13 @@
 				status('Could not delete file ' . $installationPath . 'CMS/maintenance/maintenance.txt');
 				return false;
 			}
-			$maintDir = scandir($installationPath . 'CMS/maintenance/';
+			$maintDir = scandir($installationPath . 'CMS/maintenance/');
 			if ($maintDir !== false && count(scandir($maintDir)) === 0 && rmdir($maintDir))
 			{
 				status('Deleted empty maintenance folder');
 			} else
 			{
-				status('Could not delete maintenance folder')
+				status('Could not delete maintenance folder');
 				return false;
 			}
 		}
@@ -643,6 +643,18 @@
 		$db->SQL('ALTER TABLE `invitations` CHANGE `invited_playerid` `userid` INT(11)  UNSIGNED  NOT NULL  DEFAULT \'0\'');
 		$db->SQL('ALTER TABLE `invitations` ADD FOREIGN KEY (`userid`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE');
 		$db->SQL('ALTER TABLE `invitations` ADD FOREIGN KEY (`teamid`) REFERENCES `teams` (`id`) ON DELETE CASCADE ON UPDATE CASCADE');
+		
+		status('Updating teams profile: Add cached value for total matches played');
+		$db->SQL('ALTER TABLE `teams_profile` ADD `num_matches_total` INT(11)  NOT NULL  DEFAULT \'0\'  AFTER `teamid`');
+		$query = $db->SQL('SELECT * FROM `teams_profile`');
+		while($row = $db->fetchRow($query))
+		{
+			$total = (int) $row['num_matches_won'] + (int) $row['num_matches_draw'] + (int) $row['num_matches_lost'];
+			$db->SQL('UPDATE `teams_profile` SET `num_matches_total`=' . $total . ' WHERE `teamid`=' . $row['teamid']);
+			unset($total);
+			unset($teamid);
+		}
+		$db->free($query);
 		
 		return true;
 	}

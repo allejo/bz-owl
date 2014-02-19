@@ -71,12 +71,6 @@
 				return 'Validation key/value pair invalid.';
 			}
 			
-			// check if max team size allows joining
-			if ($this->team->getSize() < 0)
-			{
-				return 'Leaving or removing user from team failed. There are already no members in the team.';
-			}
-			
 			return true;
 		}
 		

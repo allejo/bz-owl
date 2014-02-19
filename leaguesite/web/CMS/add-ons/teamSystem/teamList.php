@@ -76,7 +76,7 @@
 												. '&amp;search_type=team+name'
 												. '&amp;search_result_amount=200'
 												. '&amp;search=Search');
-				$prepared['matchCount'] = $team->getMatchCount();
+				$prepared['matchCount'] = $team->getMatchCount('all');
 				$prepared['memberCount'] = $team->getMemberCount();
 				$prepared['leaderLink'] = '../Players/?profile=' . $team->getLeaderId();
 				$prepared['leaderName'] = (new user($team->getLeaderId()))->getName();
@@ -198,7 +198,7 @@
 											. '&amp;search_result_amount=200'
 											. '&amp;search=Search');
 			$teamData['matchCount'] = $team->getMatchCount();
-			$teamData['memberCount'] = $team->getSize();
+			$teamData['memberCount'] = $team->getMemberCount();
 			$teamData['leaderLink'] = '../Players/?profile=' . $team->getLeaderId();
 			$teamData['leaderName'] = (new \user($team->getLeaderId()))->getName();
 			$teamData['activityNew'] = $team->getActivityNew();

@@ -118,8 +118,8 @@
 													 . 'See you on the battlefield.'),
 						 // welcome summary, displayed at first login
 						 'login.welcome.summary' => 'Welcome and thanks for registering on this website.',
-						 // maximum team size by default
-						 'team.default.maxTeamSize' => 30,
+						 // maximum amount of team members by default
+						 'team.default.maxMemberCount' => 20,
 						 // regenerate session id after x seconds, default 15 minutes (60*15)
 						 // the lower x: safer, higher x faster
 						 'sessionRegenTime' => 60*15,

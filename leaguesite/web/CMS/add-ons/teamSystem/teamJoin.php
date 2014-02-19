@@ -80,7 +80,7 @@
 			}
 			
 			// check if max team size allows joining
-			if (!($memberCount = $this->team->getSize()) || !($memberMax = $this->team->getMaxSize()) || $memberCount+1 > $memberMax)
+			if (!($memberCount = $this->team->getMemberCount()) || !($memberMax = $this->team->getMaxMemberCount()) || $memberCount+1 > $memberMax)
 			{
 				return 'Joining team failed. There are too many members in the team.';
 			}

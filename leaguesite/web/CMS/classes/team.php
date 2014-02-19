@@ -15,6 +15,8 @@
 		private $teamid;
 		private $origTeamId;
 		private $open;
+		private $matchCount = array();
+		private $memberCount;
 		private $name;
 		private $score;
 		private $status;
@@ -176,7 +178,7 @@
 				return $this->created;
 			}
 			
-			$query = $db->prepare('SELECT `created` FROM `teams_profile` WHERE `teamid`=:teamid');
+			$query = $db->prepare('SELECT `created` FROM `teams_profile` WHERE `teamid`=:teamid LIMIT 1');
 			if ($db->execute($query, array(':teamid' => array($this->origTeamId, PDO::PARAM_INT))))
 			{
 				$row = $db->fetchRow($query);
@@ -321,7 +323,7 @@
 			}
 			
 			$query = $db->prepare('SELECT `leader_userid` FROM `teams` WHERE `id`=:teamid LIMIT 1');
-			if ($db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT))))
+			if ($db->execute($query, array(':teamid' => array($this->origTeamId, PDO::PARAM_INT))))
 			{
 				$row = $db->fetchRow($query);
 				$db->free($query);
@@ -333,21 +335,92 @@
 			return false;
 		}
 		
-		// returns number of team members (integer)
+		// how many members belong to team?
+		// use this function for fast, cached results
+		// if you want to verify this using uncached results there are two SLOW solutions
+		// count(user::getMemberIdsOfTeam($teamid))
+		// \user::getNumberOfTeamMembers($teamid)
+		// return: cached number of team members (integer), false on error (boolean)
 		public function getMemberCount()
 		{
-			// ask user class how many users are in this team
-			return count(user::getMemberIdsOfTeam($this->origTeamId));
+			global $db;
+			
+			if (isset($this->memberCount))
+			{
+				return $this->memberCount;
+			}
+			
+			$query = $db->prepare('SELECT `member_count` FROM `teams_overview` WHERE `teamid`=:teamid LIMIT 1');
+			if ($db->execute($query, array(':teamid' => array($this->origTeamId, PDO::PARAM_INT))))
+			{
+				$row = $db->fetchRow($query);
+				$db->free($query);
+				
+				$this->memberCount = (int) $row['member_count'];
+				return $this->memberCount;
+			}
+			
+			return false;
+		}
+		
+		// find out max number of members
+		// return: config value for team.default.maxTeamSize or default of 20 (integer)
+		public function getMaxMemberCount()
+		{
+			global $config;
+			
+			if (($maxMembers = $config->getValue('team.default.maxMemberCount')) !== false)
+			{
+				return $maxMembers;
+			}
+			
+			return 20;
 		}
 		
 		// how many matches of a certain type have been played?
+		// use this function for fast, cached results
+		// if you want to verify this using uncached results there is SLOW
+		// match::getMatchCountForTeamId($teamid, $type)
 		// input: type (string): 'all' | 'won' | 'draw' | 'lost'
-		// return: number of matches this team played
+		// return: cached number of matches this team played
 		public function getMatchCount($type = 'all')
 		{
-			// ask match class how many matches have been played
-			require_once(dirname(__FILE__) . '/match.php');
-			return match::getMatchCountForTeamId($this->origTeamId, $type);
+			global $db;
+			
+			if (isset($this->matchCount[$type]))
+			{
+				return $this->matchCount[$type];
+			}
+			
+			$column = 'num_matches_';
+			switch($type)
+			{
+				case 'won':
+					$column .= 'won';
+					break;
+				case 'draw':
+					$column .= 'draw';
+					break;
+				case 'lost':
+					$column .= 'lost';
+					break;
+				case 'all':
+					$column .= 'total';
+					break;
+				default:
+					return false;
+			}
+			
+			$query = $db->prepare('SELECT `'. $column .'` FROM `teams_profile` WHERE `teamid`=:teamid LIMIT 1');
+			if ($db->execute($query, array(':teamid' => array($this->origTeamId, PDO::PARAM_INT))))
+			{
+				$row = $db->fetchRow($query);
+				$db->free($query);
+				
+				$this->matchCount[$type] = (int) $row[$column];
+				return $this->matchCount[$type];
+			}
+			return false;
 		}
 		
 		// returns team name belonging to teamid of current class instance
@@ -454,28 +527,6 @@
 				return $ids;
 			}
 			return array();
-		}
-		
-		// find out how many members currently belong to the team
-		// if teamid is 0 then it will list number of teamless users
-		// return: number of members (integer), false on error (boolean)
-		public function getSize()
-		{
-			return \user::getNumberOfTeamMembers($this->origTeamId);
-		}
-		
-		// find out max number of members
-		// return: config value for team.default.maxTeamSize or default of 20 (integer)
-		public function getMaxSize()
-		{
-			global $config;
-			
-			if (($maxMembers = $config->getValue('team.default.maxTeamSize')) !== false)
-			{
-				return $maxMembers;
-			}
-			
-			return 20;
 		}
 		
 		// obtain status of team

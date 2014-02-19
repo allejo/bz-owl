@@ -9,7 +9,10 @@
 			
 		}
 		
+		// SLOW FUNCTION
 		// find out number of matches for specified team
+		// this queries the matches table, it is faster to ask team class for match count
+		// use this function to validate team class results in tests
 		// input: teamid (integer), type (string): 'all' | 'won' | 'draw' | 'lost'
 		// output: count of matches (integer) played for teamid
 		public static function getMatchCountForTeamId($teamid, $type = 'all')
