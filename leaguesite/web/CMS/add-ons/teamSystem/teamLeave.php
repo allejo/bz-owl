@@ -146,19 +146,37 @@
 				$pm = new pm();
 				if (\user::getCurrentUserId() === $this->user->getID())
 				{
+					// notify team members about left member
 					$pm->setSubject($this->user->getName() . ' left your team');
 					$pm->setContent('Player ' . $this->user->getName() . ' just left your team.');
+					
+					$pm->setTimestamp(date('Y-m-d H:i:s'));
+					$pm->addTeamID($this->team->getID());
+					
+					// send it
+					$pm->send();
 				} else
 				{
+					// notify team members of kicked member
 					$pm->setSubject($this->user->getName() . ' got kicked from your team');
 					$pm->setContent('Player ' . $this->user->getName() . ' got kicked from your team by ' . \user::getCurrentUser()->getName() . '.');
+					$pm->setTimestamp(date('Y-m-d H:i:s'));
+					$pm->addTeamID($this->team->getID());
+					
+					// send it
+					$pm->send();
+					
+					// notify kicked member of the kick
+					$pm = new pm();
+					$pm->setSubject('You got kicked from your team by ' . \user::getCurrentUser()->getName());
+					$pm->setContent('Player ' . \user::getCurrentUser()->getName() . ' just kicked you from your team.');
+					$pm->setTimestamp(date('Y-m-d H:i:s'));
+					$pm->addTeamID($this->team->getID());
+					
+					// send it
+					$pm->send();
 				}
 				
-				$pm->setTimestamp(date('Y-m-d H:i:s'));
-				$pm->addTeamID($this->team->getID());
-				
-				// send it
-				$pm->send();
 				
 				// tell joined user that join was successful
 				$tmpl->assign('teamLeaveSuccessful', true);

@@ -105,13 +105,14 @@
 			if (($result = $this->sanityCheck()) !== true)
 			{
 				$tmpl->assign('error', $result === false ? 'An unknown error occurred while checking your request' : $result);
+				return;
 			}
 			
 			
 			// notify team members using a private message first because later we won't have the membership info
 			$pm = new pm();
-			$pm->setSubject($this->user->getName() . ' deleted ' . $this->team->getName());
-			$pm->setContent('Player ' . $this->user->getName() . ' just deleted the team '. $this->team->getName() .' you were member of.');
+			$pm->setSubject(\user::getCurrentUser()->getName() . ' deleted ' . $this->team->getName());
+			$pm->setContent('Player ' . \user::getCurrentUser()->getName() . ' just deleted the team '. $this->team->getName() .' you were member of.');
 			$pm->setTimestamp(date('Y-m-d H:i:s'));
 			$pm->addTeamID($this->team->getID());
 			
@@ -119,7 +120,7 @@
 			$pm->send();
 			
 			// remove the members from team
-			$members = $team->getUsers();
+			$members = $this->team->getUsers();
 			foreach($members AS $member)
 			{
 				$member->removeTeamMembership($this->team->getID());

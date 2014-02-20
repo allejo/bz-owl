@@ -40,26 +40,12 @@
 			}
 			
 			// find out if team allows anyone to join
-			if (static::getAllowedToJoinTeam($teamid))
+			if (!static::getAllowedToJoinTeam($teamid))
 			{
-				// join the team
-				$this->teamid = $teamid;
-				
-				// delete all invitations to team for this user
-				// Do not allow to join using one invite then leaving and joining same team using next invite
-				invitation::deleteOldInvitations();
-				$invitations = invitation::getInvitationsForTeam($this->origUserId, $teamid);
-				foreach($invitations AS $invitation)
-				{
-					$invitation.delete();
-				}
-				
-				return true;
+				return false;
 			}
 			
-			return false;
-			
-			if ($team->exists($team->getOpen()))
+			if ($team->getOpen())
 			{
 				// anyone can join the team
 				// just set the teamid
@@ -67,8 +53,8 @@
 			} else
 			{
 				// team is closed, valid invitation required
-				invitations::deleteOldInvitations();
-				$invitations = invitations::getInvitationsForTeam($this->origUserId, $teamid);
+				\invitation::deleteOldInvitations();
+				$invitations = \invitation::getInvitationsForTeam($this->origUserId, $teamid);
 				
 				// check if user has an invitation
 				if (count($invitations) === 0)
@@ -80,9 +66,12 @@
 				// A user is not meant to join using one invite then leaving and joining again
 				foreach($invitations AS $invitation)
 				{
-					$invitation.delete();
+					$invitation->delete();
 				}
 			}
+			
+			$team->setMemberCount($team->getMemberCount()+1);
+			$team->update();
 			
 			return true;
 		}
@@ -155,7 +144,7 @@
 		// output: true = allowed to join, false = not allowed to join (boolean);
 		public function getAllowedToJoinTeam($teamid)
 		{
-			// not logged in user can never join
+			// not logged in or unidentified user can never join
 			if ($this->origUserId === 0)
 			{
 				return false;

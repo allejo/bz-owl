@@ -55,7 +55,7 @@
 			return $this->subject;
 		}
 		
-		function setSubject($subject)
+		public function setSubject($subject)
 		{
 			// remove whitespace from beginning and end of subject
 			$cleanedSubject = trim(strval($subject));
@@ -82,7 +82,7 @@
 			return $this->content;
 		}
 		
-		function setContent($content)
+		public function setContent($content)
 		{
 			$this->content = $content;
 		}
@@ -93,13 +93,13 @@
 			return $this->timestamp;
 		}
 		
-		function setTimestamp($timestamp)
+		public function setTimestamp($timestamp)
 		{
-			$this->timestamp = $timestamp;
+			$this->timestamp = (string) $timestamp;
 		}
 		
 		
-		function addUserID($id, $lookupName=false)
+		public function addUserID($id, $lookupName=false)
 		{
 			$id = intval($id);
 			$userID = array('id' => $id);
@@ -114,7 +114,7 @@
 			$this->users[] = $userID;
 		}
 		
-		function addUserName($recipientName, $preview=false)
+		public function addUserName($recipientName, $preview=false)
 		{
 			global $db;
 		

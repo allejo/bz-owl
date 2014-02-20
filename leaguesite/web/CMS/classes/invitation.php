@@ -2,11 +2,30 @@
 	// handle invitations of users
 	class invitation
 	{
+		private $expiration;
 		private $invitationid;
+		private $userids = array();
 		
 		public function __construct($id = 0)
 		{
+			$this->expiration = strtotime('+7 days');
 			$this->invitationid = $id;
+		}
+		
+		// deletes invitation from database
+		// returns true on success, false otherwise (boolean)
+		public function delete()
+		{
+			global $db;
+			
+			
+			$query = $db->prepare('DELETE FROM `invitations` WHERE `id`=:invitationid');
+			if ($db->execute($query, array(':invitationid' => array((int) $this->invitationid, PDO::PARAM_INT))))
+			{
+				return true;
+			}
+			
+			return false;
 		}
 		
 		public static function deleteOldInvitations()
@@ -20,6 +39,13 @@
 			{
 				$db->logError('Could not delete expired invitations.');
 			}
+		}
+		
+		// for who is the invitation valid
+		// input: id of a user (integer)
+		public function forUserId($userid)
+		{
+			$this->userids[] = (int) $userid;
 		}
 		
 		// find out if user has invitations to a team
@@ -69,17 +95,55 @@
 			return true;
 		}
 		
-		// deletes invitation from database
-		// returns true on success, false otherwise (boolean)
-		public function delete()
+		// enter the invitation into database
+		// input: Should a private message be issued to target audience (boolean)
+		// return: true on success, false on error (boolean)
+		public function insert($sendPM = true)
 		{
-			$query = $db->prepare('DELETE FROM `invitations` WHERE `id`=:invitationid');
-			if ($db->execute($query, array(':invitationid' => array((int) $this->invitationid, PDO::PARAM_INT))))
+			global $db;
+			
+			
+			if (count($this->teamids) > 0)
 			{
-				return true;
+				foreach($this->teamids AS $teamid)
+				{
+					if (count($this->userids) > 0)
+					{
+						$query = $db->prepare('INSERT INTO `invitations` (`userid`, `teamid`, `expiration`) VALUES (:userid, :teamid, :expiration)');
+						foreach($this->userids AS $userid)
+						{
+							if (!$db->execute($query, array(':userid' => array((int) $userid, PDO::PARAM_INT),
+														   ':teamid' => array((int) $teamid, PDO::PARAM_INT),
+														   ':expiration' => array(strftime('%Y-%m-%d %H:%M:%S', $this->expiration), PDO::PARAM_STR))))
+							{
+								return false;
+							}
+							if ($sendPM)
+							{
+								$pm = new pm();
+								$pm->setSubject(\user::getCurrentUser()->getName() . ' invited you to ' . (new team($teamid))->getName());
+								$pm->setContent('Congratulations: ' . \user::getCurrentUser()->getName() . ' invited you to ' . (new team($teamid))->getName()
+												. '. The invitation is valid until ' . strftime('%Y-%m-%d %H:%M:%S', $this->expiration) . '.');
+								
+								$pm->setTimestamp(date('Y-m-d H:i:s'));
+								$pm->addUserID($userid);
+								
+								// send it
+								$pm->send();
+							}
+						}
+					}
+				}
 			}
 			
-			return false;
+			return true;
+		}
+		
+		// where should the target audience of the invite be able to join?
+		// input: id of team to be able to join (integer)
+		public function toTeam($teamid)
+		{
+			$this->teamids[] = (int) $teamid;
 		}
 	}
 ?>

@@ -96,6 +96,40 @@
 				return 'Validation key/value pair invalid.';
 			}
 			
+			// check team to be reactivated
+			if (!isset($_POST['reactivate_team_id']))
+			{
+				return 'You did not specify which team should be reactivated.';
+			}
+			
+			$this->team = new team((int) $_POST['reactivate_team_id']);
+			if (!$this->team->exists())
+			{
+				return 'The specified team does not exist.';
+			}
+			
+			if ($this->team->getStatus() !== 'deleted')
+			{
+				return 'You can only reactivate deleted teams.';
+			}
+			
+			// check chosen team leader
+			if (!isset($_POST['reactivate_team_new_leader_id']))
+			{
+				return 'You did not specify any leader for the team.';
+			}
+			
+			$this->user = new user((int) $_POST['reactivate_team_new_leader_id']);
+			if (!$this->user->exists())
+			{
+				return 'The specified team leader does not exist.';
+			}
+			
+			if (!$this->user->getIsTeamless())
+			{
+				return 'The team leader is not teamless. A leader must be teamless.';
+			}
+			
 			return true;
 		}
 		
@@ -109,21 +143,35 @@
 			if (($result = $this->sanityCheck()) !== true)
 			{
 				$tmpl->assign('error', $result === false ? 'An unknown error occurred while checking your request' : $result);
+				return;
 			}
 			
-			// remove user from team
-			if (!$this->user->removeTeamMembership($this->team->getID()) || !$this->user->update())
-			{
-				$tmpl->assign('error', 'An unknown error occurred while leaving the team.');
+			$tmpl->assign('teamName', $this->team->getName());
+			$tmpl->assign('teamid', $this->team->getID());
+			$tmpl->assign('userName', $this->user->getName());
+			$tmpl->assign('userid', $this->user->getID());
+			
+			// reactivate team with chosen leader
+			// issue an invitation for team leader so he can join
+			$invitation = new invitation();
+			$invitation->forUserId($this->user->getID());
+			$invitation->toTeam($this->team->getID());
+			$invitation->insert(false);
+			// now change team status to reactivate and add the user to team then make the user leader
+			if (!$this->team->setStatus('reactivated') || !$this->team->update()
+				|| !$this->user->addTeamMembership($this->team->getID()) || !$this->user->update()
+				|| !$this->team->setLeaderId($this->user->getID()) || !$this->team->update())
+			{/* var_dump($this->user->addTeamMembership($this->team->getID())); */
+				$tmpl->assign('error', 'An unknown error occurred while reactivating the team.');
 			} else
 			{
 				// notify team members using a private message
 				$pm = new pm();
-				$pm->setSubject($this->user->getName() . ' got kicked from your team');
-				$pm->setContent('Player ' . $this->user->getName() . ' got kicked from your team by ' . \user::getCurrentUser()->getName() . '.');
+				$pm->setSubject(\user::getCurrentUser()->getName() . ' reactivated team ' . $this->team->getName());
+				$pm->setContent('Congratulations: Player ' . \user::getCurrentUser()->getName() . ' reactivated team ' . $this->team->getName() . ' with you as its leader.');
 				
 				$pm->setTimestamp(date('Y-m-d H:i:s'));
-				$pm->addTeamID($this->team->getID());
+				$pm->addUserID($this->user->getID());
 				
 				// send it
 				$pm->send();

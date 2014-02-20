@@ -24,7 +24,7 @@ No menu found.
 
 <div class="content">
 
-{if isset($teamReactivateSuccessful) && $teamReactivateSuccessful}
+{if isset($teamReactivationSuccessful) && $teamReactivationSuccessful}
 <div class="static_page_box">
 <p>You successfully reactivated the team {$teamName|escape} with {$userName|escape} as its leader.</p>
 </div>
@@ -59,7 +59,7 @@ No menu found.
 		</select>
 	</span>
 </p>
-<div style="display:inline"><input type="submit" name="reactivate_team" value="Reactivate the team" id="send" /></div>
+<div style="display:inline"><input type="submit" name="reactivate_team_button" value="Reactivate the team" id="send" /></div>
 </form>
 
 </div>

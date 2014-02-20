@@ -549,30 +549,33 @@
 			
 			// collect name from database
 			$query = $db->prepare('SELECT `deleted` FROM `teams_overview` WHERE `teamid`=:teamid LIMIT 1');
-			if ($db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT))))
+			if ($db->execute($query, array(':teamid' => array($this->origTeamId, PDO::PARAM_INT))))
 			{
 				$teamStatus = $db->fetchRow($query);
 				$db->free($query);
 				
-				switch ($teamStatus['deleted'])
+				switch((int) $teamStatus['deleted'])
 				{
 					case 0:
 						$this->status = 'new';
+						break;
 					case 1:
 						$this->status = 'active';
+						break;
 					case 2:
 						$this->status = 'deleted';
+						break;
 					case 3:
 						$this->status = 'reactivated';
+						break;
 					case 4:
 						$this->status = 'inactive';
+						break;
 				}
-
+				
 				return $this->status;
 			}
 			
-			// error handling: log error and show it in end user visible result
-			$db->logError((__FILE__) . ': getName(' . strval($this->teamid) . ') failed.');
 			return false;
 		}
 		
@@ -582,7 +585,7 @@
 			
 			
 			$query = $db->prepare('SELECT `score` FROM `teams_overview` WHERE `teamid`=:teamid LIMIT 1');
-			if ($db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT))))
+			if ($db->execute($query, array(':teamid' => array($this->origTeamId, PDO::PARAM_INT))))
 			{
 				$row = $db->fetchRow($query);
 				$db->free($query);
@@ -662,14 +665,18 @@
 		}
 		
 		// sets team leader to any member of the team
-		// input values: $userid (integer)
+		// input: id of user (integer)
+		// return: true on success, false on error (boolean)
 		public function setLeaderId($userid)
 		{
 			$user = new user($userid);
 			if ($user->getMemberOfTeam($this->origTeamId))
 			{
 				$this->leaderid = $userid;
+				return true;
 			}
+			
+			return false;
 		}
 		
 		// sets team status to be either open or not
@@ -686,6 +693,13 @@
 			$this->rawDescription = (string) $description;
 		}
 		
+		// set cached member count value
+		// input: new member count (integer)
+		public function setMemberCount($numMembers)
+		{
+			$this->memberCount = (int) $numMembers;
+		}
+	
 		public function setName($name)
 		{
 			$this->name = (string) $name;
@@ -693,21 +707,28 @@
 		
 		// assign status to team
 		// valid status values: new, active, deleted, reactivated
+		// return: true on success, false on error (boolean)
 		public function setStatus($status)
 		{
 			switch ($status)
 			{
 				case 'new':
-					$this->status = 0;
+					$this->status = 'new';
+					return true;
 				case 'active':
-					$this->status = 1;
+					$this->status = 'active';
+					return true;
 				case 'deleted':
-					$this->status = 2;
+					$this->status = 'deleted';
+					return true;
 				case 'reactivated':
-					$this->status = 3;
+					$this->status = 'reactivated';
+					return true;
 				case 'inactive':
-					$this->status = 4;
+					$this->status = 'inactive';
+					return true;
 			}
+			return false;
 		}
 		
 		public function setTeamid($teamid)
@@ -757,14 +778,19 @@
 				{
 					case 'new':
 						$status = 0;
+						break;
 					case 'active':
 						$status = 1;
+						break;
 					case 'deleted':
 						$status = 2;
+						break;
 					case 'reactivated':
 						$status = 3;
+						break;
 					case 'inactive':
 						$status = 4;
+						break;
 				}
 				if ($status !== false)
 				{
@@ -800,6 +826,16 @@
 				{
 					$query = $db->prepare('UPDATE `teams` SET leader_userid=:leaderid WHERE id=:teamid');
 					if (!$db->execute($query, array(':leaderid' => array($this->leaderid, PDO::PARAM_INT),
+												   ':teamid' => array($this->teamid, PDO::PARAM_INT))))
+					{
+						return false;
+					}
+				}
+				
+				if (isset($this->memberCount))
+				{
+					$query = $db->prepare('UPDATE `teams_overview` SET member_count=:memberCount WHERE teamid=:teamid');
+					if (!$db->execute($query, array(':memberCount' => array($this->memberCount, PDO::PARAM_STR),
 												   ':teamid' => array($this->teamid, PDO::PARAM_INT))))
 					{
 						return false;

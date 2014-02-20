@@ -114,6 +114,7 @@
 			if (($result = $this->sanityCheck()) !== true)
 			{
 				$tmpl->assign('error', $result === false ? 'An unknown error occurred while checking your request' : $result);
+				return;
 			}
 			
 			// join team
