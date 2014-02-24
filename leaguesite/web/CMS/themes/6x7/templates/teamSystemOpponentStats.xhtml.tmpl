@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="content-type" />
+	<link href="{$baseURL}themes/{$curTheme}/{$curTheme}.css" rel="stylesheet" type="text/css" />
+	<link rel="icon" type="image/png" href="{$faviconURL}" />
+<title>{$title}</title>
+</head>
+<body>
+<div class="logo"></div>
+
+{foreach $menu as $menuItem}{$menuItem}{foreachelse}
+No menu found.
+{/foreach}
+
+
+<div class="userbuttons">
+	<span class="date">{$date}</span>
+	<span class="Servers">Match servers: <a href="{$baseURL}Servertracker/">{$onlinePlayers}</a></span>
+	<span class="onlineUsers">Website: <a href="{$baseURL}Online/">{$onlineUsers}</a></span>
+	{if isset($logoutURL)}<span class="logout"><a href="{$logoutURL}">Logout</a></span>{/if}
+</div>
+
+<div class="content">
+<a class="button" href="./?profile={$teamid}">back to team profile</a>
+<br /><br />
+
+{if !isset($teamName)}
+<div class="static_page_box">Error: Could not find out team name for specified teamid {$teamid}.</div>
+{else}
+
+{if !isset($teamOpponents) || empty($teamOpponents)}
+<div class="static_page_box">The team {$teamName} has not played any match yet.</div>
+{else}
+<table class="big" id="opponent_stats">
+<caption>Opponent statistics for team {$teamName}</caption>
+<tr>
+	{$sortNext = "asc" nocache}
+	{if isset($sortOrder) && $sortOrder === "asc"}
+		{$sortNext = "desc" nocache}
+	{else}
+		{if isset($sortOrder) && $sortOrder === "desc"}
+			{$sortNext = "" nocache}
+		{/if}
+	{/if}
+	{$colsToDisplay = ['name'=>'Name','matchCount'=>'Total','won'=>'Won','tied'=>'Tied','lost'=>'Lost','winRatio'=>'Win Ratio']}
+	
+	{foreach $colsToDisplay as $colInternalName=>$colDisplayName}
+		{$link = "./?opponent_stats={$teamid}"}
+		{if $sortNext !== "" || (isset($sortCol) && $sortCol !== $colInternalName)}
+			{$link = $link|cat:"&amp;sort={$colInternalName}&amp;"}
+			{$link = $link|cat:"order={if !isset($sortCol) || (isset($sortCol) && $sortCol === $colInternalName)}{$sortNext}{else}{$sortOrder}{/if}"}
+		{/if}
+		
+		<th><a href="{$link}">{$colDisplayName}{if isset($sortCol) && $sortCol === $colInternalName} ({$sortOrder|capitalize}){/if}</a></th>
+	{/foreach}
+</tr>
+{foreach item="team" from=$teamOpponents}
+<tr>
+<td>{if $team->profileLink}<a href="{$team->profileLink}">{$team->name}</a>{else}{$team->name}{/if}</td>
+<td>{$team->matchCount}</td>
+<td>{$team->won}</td>
+<td>{$team->tied}</td>
+<td>{$team->lost}</td>
+<td>{$team->winRatio} %</td>
+</tr>
+{/foreach}
+</table>
+{/if}
+
+{/if}
+
+</div>
+</body>
+</html>

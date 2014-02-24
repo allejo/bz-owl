@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="content-type" />
+	<link href="{$baseURL}themes/{$curTheme}/{$curTheme}.css" rel="stylesheet" type="text/css" />
+	<link rel="icon" type="image/png" href="{$faviconURL}" />
+<title>{$title}</title>
+</head>
+<body>
+<div class="logo"></div>
+
+{foreach $menu as $menuItem}{$menuItem}{foreachelse}
+No menu found.
+{/foreach}
+
+
+<div class="userbuttons">
+	<span class="date">{$date}</span>
+	<span class="Servers">Match servers: <a href="{$baseURL}Servertracker/">{$onlinePlayers}</a></span>
+	<span class="onlineUsers">Website: <a href="{$baseURL}Online/">{$onlineUsers}</a></span>
+	{if isset($logoutURL)}<span class="logout"><a href="{$logoutURL}">Logout</a></span>{/if}
+</div>
+
+<div class="content">
+<a class="button" href="./?profile={$teamid}">{if !isset($teamEditSuccessful) || $teamEditSuccessful === false}Cancel &amp; b{else}B{/if}ack to team profile</a>
+<br /><br />
+
+{if !isset($teamName) || $teamName === false}
+<div class="static_page_box">Error: Could not find out team name for specified teamid {$teamid}.</div>
+{else}
+
+{if !isset($canEditTeam) || !$canEditTeam}
+<div class="static_page_box">You have no permission to edit {$teamName|escape}.</div>
+{else}
+<div class="static_page_box">
+{if isset($teamEditSuccessful) && $teamEditSuccessful}
+<p>Team edited successfully.</p>
+<p><a href="./?profile={$teamid|escape}">Return to team profile.</a></p>
+{else}
+{if isset($form_error)}
+{if $form_error === false}
+<p>Something went wrong while submitting your form. Please check your form values.</p>
+{else}
+<p>{$form_error}</p>
+{/if}
+{/if}
+<form enctype="application/x-www-form-urlencoded" method="post" action="?edit={$teamid|escape}">
+<div><input type="hidden" name="confirmed" value="1" /></div>
+<div><input type="hidden" name="key_name" value="{$keyName}" /></div>
+<div><input type="hidden" name="{$keyName}" value="{$keyValue}" /></div>
+<p>
+	<label class="team_change" for="team_name">Team name:</label>
+	<input type="text" maxlength="30" size="30" name="team_name" value="{($teamName|escape)}" id="team_name" />
+</p>
+<p><label class="team_change" for="team_leader">Leader:</label>
+<select name="team_leader" id="team_leader">
+{if !isset($members) || !is_array($members) || empty($members)}
+	<option value="0">No leader</option>
+{else}
+{foreach item="member" from=$members}
+	<option value="{$member.id}"{if $member.id === $leaderId} selected="selected"{/if}>{$member.name|escape}</option>
+{/foreach}
+{/if}
+</select>
+</p>
+<p>
+	<label class="team_change" for="team_open">Can any teamless player join the team?</label>
+	<input type="hidden" name="team_open" value="0" />
+	<input type="checkbox" name="team_open" value="1" id="team_open"{if isset($teamOpen) && $teamOpen === true} checked="checked" {/if} />
+</p>
+{if isset($buttonsToFormat) && $buttonsToFormat|is_array}
+<div>
+{foreach item="button" from=$buttonsToFormat}
+{$button}
+{/foreach}
+</div>
+{/if}
+<div>
+	<label class="team_change" for="team_description">Edit team description:</label>
+	<span>
+		<textarea id="team_description" rows="10" cols="50" name="team_description">{if !empty($teamDescription)}{$teamDescription|escape}{else}Think of a good team description. Hint: This isn't one ;){/if}</textarea>
+	</span>
+</div>
+<p>
+	<label class="team_change" for="team_avatar_uri">Avatar URI:</label>
+	<input id="team_avatar_uri" type="text" name="team_avatar_uri" maxlength="200" size="60" value="{if isset($avatarURI) && $avatarURI}{$avatarURI|escape}{/if}" />
+</p>
+<p>
+	<input type="submit" name="edit_team_data" value="Submit new team data" id="send" />
+</p>
+</form>
+{/if}
+</div>
+{/if}
+
+{/if}
+
+</div>
+</body>
+</html>

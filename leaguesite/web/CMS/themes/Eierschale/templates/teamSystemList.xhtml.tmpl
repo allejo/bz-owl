@@ -22,9 +22,9 @@ No menu found.
 </div>
 
 <div class="content">
-{if isset($showReactivateButton)}<a class="button" href="?reactivate">Reactivate a team</a>{/if}
-{if !isset($activeTeams) || empty($activeTeams) || !isset($inactiveTeams) || empty($inactiveTeams)}
-There are no active teams.
+{if isset($canReactivateTeams) && $canReactivateTeams}<a class="button" href="?reactivate">Reactivate a team</a>{/if}
+{if !isset($activeTeams) || empty($activeTeams)}
+<div class="static_page_box">There are no active teams.</div>
 {/if}
 
 {if isset($activeTeams) && !empty($activeTeams)}
@@ -39,16 +39,20 @@ There are no active teams.
 	<th>Leader</th>
 	<th>Activity</th>
 	<th>Creation Date</th>
+	{if isset($showTeamActionOptions) && $showTeamActionOptions}
+	<th>Allowed actions</th>
+	{/if}
 </tr>
 {foreach item="team" from=$activeTeams}
 <tr class="teams_overview">
-	<td><a href="{$team.profileLink}">{$team.name}</a></td>
+	<td><a href="{$team.profileLink}">{$team.name|escape}</a></td>
 	<td>{$team.score}<span class="{$team.scoreClass}"></span></td>
 	<td><a href="{$team.matchSearchLink}">{$team.matchCount}</a></td>
 	<td>{$team.memberCount}</td>
 	<td><a href="{$team.leaderLink}">{$team.leaderName}</a></td>
 	<td>{$team.activityNew|string_format:'%.2f'} ({$team.activityOld|string_format:'%.2f'})</td>
 	<td>{$team.created}</td>
+	{if isset($team.canJoin) && $team.canJoin}<td><a class="button" href="?join={$team.id}">Join team</a></td>{/if}
 </tr>
 {/foreach}
 </table>
@@ -69,6 +73,9 @@ There are no active teams.
 	<th>Leader</th>
 	<th>Activity</th>
 	<th>Creation Date</th>
+	{if isset($showTeamActionOptions) && $showTeamActionOptions}
+	<th>Allowed actions</th>
+	{/if}
 </tr>
 {foreach item="team" from=$inactiveTeams}
 <tr class="teams_overview">
@@ -79,6 +86,7 @@ There are no active teams.
 	<td><a href="{$team.leaderLink}">{$team.leaderName}</a></td>
 	<td>{$team.activityNew|string_format:'%.2f'} ({$team.activityOld|string_format:'%.2f'})</td>
 	<td>{$team.created}</td>
+	{if isset($team.canJoin) && $team.canJoin}<td><a class="button" href="?join={$team.id}">Join team</a></td>{/if}
 </tr>
 {/foreach}
 </table>

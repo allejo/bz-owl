@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="content-type" />
+	<link href="{$baseURL}themes/{$curTheme}/{$curTheme}.css" rel="stylesheet" type="text/css" />
+	<link rel="icon" type="image/png" href="{$faviconURL}" />
+<title>{$title}</title>
+</head>
+<body>
+<div class="logo"></div>
+
+{foreach $menu as $menuItem}{$menuItem}{foreachelse}
+No menu found.
+{/foreach}
+
+
+<div class="userbuttons">
+	<span class="date">{$date}</span>
+	<span class="Servers">Match servers: <a href="{$baseURL}Servertracker/">{$onlinePlayers}</a></span>
+	<span class="onlineUsers">Website: <a href="{$baseURL}Online/">{$onlineUsers}</a></span>
+	{if isset($logoutURL)}<span class="logout"><a href="{$logoutURL}">Logout</a></span>{/if}
+</div>
+
+<div class="content">
+<a class="button" href="./?profile={$teamid|escape}">{if !isset($teamLeaveSuccessful) || $teamLeaveSuccessful === false}Cancel &amp; b{else}B{/if}ack to team profile</a>
+<br /><br />
+
+{if isset($teamLeaveSuccessful) && $teamLeaveSuccessful}
+<div class="static_page_box">
+{if $userRequestsLeave}
+	<p>You left the team {$teamName|escape} successfully.</p>
+{else}
+	<p>{$targetUserName|escape} is no longer member of {$teamName|escape}.</p>
+{/if}
+</div>
+{else}
+{if isset($error) && $error !== ''}
+<div class="static_page_box">
+	<p>An error prevented removing team membership from user: {$error|escape}</p>
+</div>
+{else}
+<div class="static_page_box">
+<form enctype="application/x-www-form-urlencoded" method="post" action="?remove={$targetUserId}&amp;team={$teamid|escape}">
+<div><input type="hidden" name="confirmed" value="1" /></div>
+<div><input type="hidden" name="key_name" value="{$keyName}" /></div>
+<div><input type="hidden" name="{$keyName}" value="{$keyValue}" /></div>
+<p style="display:inline">{if $userRequestsLeave}Do you really want to leave your team <a href="./?profile={$teamid|escape}">{$teamName|escape}</a>?{else}Remove {$targetUserName|escape} from team <a href="./?profile={$teamid|escape}">{$teamName|escape}</a>?{/if}</p>
+<div style="display:inline"><input type="submit" name="kick_user_from_team" value="Leave the team" id="send" /></div>
+</form>
+
+</div>
+{/if}
+{/if}
+</div>
+</body>
+</html>

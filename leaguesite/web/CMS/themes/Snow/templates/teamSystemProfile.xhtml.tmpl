@@ -23,22 +23,24 @@ No menu found.
 </div>
 
 <div class="content">
-{if isset($showPMButton) && $showPMButton}<a class="button" href="{$pmLink}">Send message to team</a>{/if}
-{if isset($showEditButton) && $showEditButton}<a class="button" href="./?edit={$teamid}">edit</a>{/if}
+{if isset($canPMTeam) && $canPMTeam}<a class="button" href="{$pmLink}">Send message to team</a>{/if}
+{if isset($canEditTeam) && $canEditTeam}<a class="button" href="./?edit={$teamid|escape}">edit</a>{/if}
+{if isset($canDeleteTeam) && $canDeleteTeam}<a class="button" href="./?delete={$teamid|escape}">delete</a>{/if}
 <a class="button" href="./?opponent_stats={$teamid}">opponent stats</a>
+<br /><br />
 
 {if !isset($team) || empty($team)}
 <div class="static_page_box">
-<p>An error occured: Display of team's profile impossible.</p>
+<p>An error occurred: Display of team's profile impossible.</p>
 </div>
 {else}
 
 <div class="team_area">
 
 	<div class="team_header">
-		<div class="team_name">{$team.name}</div>
-{if isset($team.logo)}
-<img class="team_logo" src="{$team.logo}" style="max-width:300px; max-height:200px" alt="team logo" />
+		<div class="team_name">{$team.name|escape}</div>
+{if isset($team.logo) && !empty($team.logo)}
+<img class="team_logo" src="{$team.logo|escape}" style="max-width:300px; max-height:200px" alt="team logo" />
 {/if}
 		<span class="team_score">Rating: {$team.score}<span class="{$team.scoreClass}"></span></span>
 		<div class="team_activity"><span class="team_activity_announcement">Activity: </span><span class="team_activity">{$team.activityNew} ({$team.activityOld})</span></div>
@@ -58,7 +60,7 @@ No menu found.
 		<td>{$team.wins}</td>
 		<td>{$team.draws}</td>
 		<td>{$team.losses}</td>
-		<td><a href="{$team.matchSearchLink}">{$team.total}</a></td>
+		<td><a href="{$team.matchSearchLink}">{$team.matchCount}</a></td>
 	</tr>
 	</table>
 <br />
@@ -69,7 +71,7 @@ No menu found.
 		<div class="team_profile_header_text">Team description</div>
 
 		<div class="team_description">
-		{$teamDescription}
+		{if $teamDescription|count_characters > 0}{$teamDescription}{else}(No team description set){/if}
 		</div>
 	</div>
 </div>
@@ -129,9 +131,9 @@ No menu found.
 {foreach item="match" from=$matches}
 <tr class="matches_overview">
 <td>{$match.time}</td>
-<td><a href="{$match.teamLink1}">{$match.teamName1}</a> - <a href="{$match.teamLink2}">{$match.teamName2}</a></td>
+<td><a href="{$match.team1Link}">{$match.team1Name|escape}</a> - <a href="{$match.team2Link}">{$match.team2Name|escape}</a></td>
 <td>{$match.score1} - {$match.score2}</td>
-<td>{$match.lastModBy}</td>
+<td>{if isset($match.lastModByLink) && $match.lastModByLink !== 0}<a href="{$match.lastModByLink}">{/if}{$match.lastModByName}{if isset($match.lastModByLink) && $match.lastModByLink !== 0}</a>{/if}</td>
 {if $showMatchActionOptions}
 <td>
 {if $allowEdit}
@@ -148,7 +150,7 @@ No menu found.
 {/if}
 
 </table>
-{if isset($showDeleteButton) && $showDeleteButton}<p><a class="button" href="./?delete={$teamid}">Delete this team</a></p>{/if}
+{if isset($showDeleteButton) && $showDeleteButton}<p><a class="button" href="./?delete={$teamid|escape}">Delete this team</a></p>{/if}
 {/if}
 
 
