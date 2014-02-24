@@ -6,21 +6,21 @@
 //			require_once dirname(dirname(dirname(__FILE__))) . '/classes/' . $class_name . '.php';
 //		}
 		
-		function __construct()
+		public function __construct()
 		{
 			if ($this->isMaintenanceNeeded())
 			{
-				$this->doMaintaince();
+				$this->performMaintenance();
 			}
 		}
 		
-		function __destruct()
+		public function __destruct()
 		{
 			$this->unlockTables();
 		}
 		
 		
-		function isMaintenanceNeeded()
+		private function isMaintenanceNeeded()
 		{
 			global $config;
 			global $db;
@@ -73,7 +73,7 @@
 		}
 		
 		
-		function doMaintaince()
+		public function performMaintenance()
 		{
 			$this->maintainUsers();
 			$this->maintainPMs();
@@ -83,7 +83,7 @@
 			echo '<p>Performed maintenance.</p>';
 		}
 		
-		function unlockTables()
+		private function unlockTables()
 		{
 			global $db;
 			
@@ -95,7 +95,7 @@
 			}
 		}
 		
-		function lockTable($tableName, $write=true)
+		private function lockTable($tableName, $write=true)
 		{
 			global $db;
 			
@@ -328,7 +328,7 @@
 			}
 		}
 		
-		function updateCountries()
+		private function updateCountries()
 		{
 			global $db;
 			
@@ -399,7 +399,7 @@
 			}
 		}
 		
-		function updateTeamActivity($teamid=false)
+		private function updateTeamActivity($teamid=false)
 		{
 			global $db;
 			

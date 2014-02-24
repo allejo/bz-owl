@@ -212,6 +212,31 @@
 			return (isset($_SESSION['user_logged_in']) && ($_SESSION['user_logged_in'] === true));
 		}
 		
+		// get ids of external services bound to this user account
+		// return: array containing objects with id and service type
+		public function getExternalIds()
+		{
+			global $db;
+			
+			$externalids = array();
+			$query = $db->prepare('SELECT `external_id` FROM `users` WHERE `id`=:userid');
+			
+			if ($db->execute($query, array(':userid' => array($this->origUserId, PDO::PARAM_INT))))
+			{
+				while ($row = $db->fetchRow($query))
+				{
+					// euid is external service id from database
+					// service is hardcoded to bzbb as there is no field for this in database at the moment
+					$binding = (object) array('euid' => (string) $row['external_id'],
+											  'service' => 'bzbb');
+					$externalids[] = $binding;
+				}
+				$db->free($query);
+			}
+			
+			return $externalids;
+		}
+		
 		// get the user's id
 		// return: internal id (integer) of user
 		public function getID()
@@ -243,32 +268,27 @@
 			return $internalID;
 		}
 		
-		// find out the internal id bases on username
-		// input: username (string)
-		// return: array of matching internal ids.
+		// get the user's id based on the supplied name
+		// input: the user name (string)
+		// output: the user's id (integer), false (boolean) on error
 		public static function getIdByName($name)
 		{
 			global $db;
 			
-			
-			// internal id is an array of integers of length 11 by database definition
-			$internalID = array();
-			
-			// search for name in player database, there can be several matches
-			$query = $db->prepare('SELECT `id`, `external_id` FROM `users` WHERE `name`=:name');
-			
-			// the id can be of any data type and of any length
-			// just assume it's a 50 characters long string
-			$db->execute($query, array(':name' => array($name, PDO::PARAM_STR, 50)));
-			
-			while ($row = $db->fetchRow($query))
+			$uids = array();
+			$query = $db->prepare('SELECT `id` FROM `users` WHERE `name`=:name');
+			if ($db->execute($query, array(':name' => array($name, PDO::PARAM_STR, 50))))
 			{
-				$internalID[] = array('id' => intval($row['id']),
-									  'external_id' => strval($row['external_id']));
+				while ($row = $db->fetchRow($query))
+				{
+					$uids[] = (int) $row['id'];
+				}
+				$db->free($query);
+				
+				return $uids;
 			}
-			$db->free($query);
 			
-			return $internalID;
+			return false;
 		}
 		
 		// time of user registration
@@ -279,7 +299,7 @@
 			
 			
 			$query = $db->prepare('SELECT `joined` FROM `users_profile` WHERE `userid`=:userid LIMIT 1');
-			if ($db->execute($query, array(':userid' => array($this->userid, PDO::PARAM_INT))))
+			if ($db->execute($query, array(':userid' => array($this->origUserId, PDO::PARAM_INT))))
 			{
 				$row = $db->fetchRow($query);
 				$db->free($query);
@@ -299,7 +319,7 @@
 			
 			
 			$query = $db->prepare('SELECT `last_login` FROM `users_profile` WHERE `userid`=:userid LIMIT 1');
-			if ($db->execute($query, array(':userid' => array($this->userid, PDO::PARAM_INT))))
+			if ($db->execute($query, array(':userid' => array($this->origUserId, PDO::PARAM_INT))))
 			{
 				$row = $db->fetchRow($query);
 				$db->free($query);

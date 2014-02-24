@@ -104,6 +104,11 @@
 			return htmlent($this->info['username']);
 		}
 		
+		public function getType()
+		{
+			return 'bzbb';
+		}
+		
 		public function givePermissions()
 		{
 			// there is no such thing in the reply like the VERIFIED group

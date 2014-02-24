@@ -13,10 +13,7 @@
 			
 			$this->pm = new pm();
 			
-			// FIXME: fallback to default permission name until add-on system is completly implemented
-			$entry_add_permission = 'allow_add_messages';
-			
-			if (!$user->getPermission($entry_add_permission))
+			if (!$user->getPermission('allow_add_messages'))
 			{
 				// no permissions to write a new private message
 				$tmpl->display('NoPerm');

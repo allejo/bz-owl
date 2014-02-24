@@ -51,13 +51,13 @@ No menu found.
 <p>
 {if isset($offsetPrev)}
 {if $offsetPrev === 0}
-<a class="button" href="./">Previous news</a>
+<a class="button" href="./">{if isset($previousBtnText)}{$previousBtnText}{else}Previous news{/if}</a>
 {else}
-<a class="button" href="./?i={$offsetPrev}">Previous news</a>
+<a class="button" href="./?i={$offsetPrev}">{if isset($previousBtnText)}{$previousBtnText}{else}Previous news{/if}</a>
 {/if}
 {/if}
 {if isset($offsetPrev) && isset($offsetNext)} {/if}
-{if isset($offsetNext)}<a class="button" href="./?i={$offsetNext}">Next news</a>{/if}
+{if isset($offsetNext)}<a class="button" href="./?i={$offsetNext}">{if isset($nextBtnText)}{$nextBtnText}{else}Next news{/if}</a>{/if}
 </p>
 
 </div>

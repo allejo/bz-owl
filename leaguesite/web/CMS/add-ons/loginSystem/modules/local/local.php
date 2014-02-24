@@ -522,6 +522,11 @@
 			return htmlent($this->info['username']);
 		}
 		
+		public function getType()
+		{
+			return 'local';
+		}
+		
 		static public function convertAccount($userid, $loginname, &$output)
 		{
 			// can not convert, failsave

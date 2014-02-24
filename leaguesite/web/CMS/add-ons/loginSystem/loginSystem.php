@@ -158,7 +158,6 @@
 		private function doLogin($moduleInstance, $moduleName)
 		{
 			global $config;
-			global $user;
 			
 			
 			// if used login module is not local, then an external login has been used
@@ -199,17 +198,37 @@
 						// check external login id for match with external login module id
 						// $moduleInstance->getID() must have a valid value if login got approved
 						// by the external login module used
-						if ($one_uid['external_id'] !== $moduleInstance->getID())
+						$user = new \user($one_uid);
+						$servicematch = false;
+						foreach ($user->getExternalIds AS $eservice)
 						{
-							// try to resolve the conflict by updating a username that might be forgotten
-							$userOperations->updateUserName($one_uid['id'], $one_uid['external_id'],
-															$moduleInstance->getName());
-						} else
+							// only act on matching service type
+							if ($eservice->service === $moduleInstance->getType)
+							{
+								$servicematch = true;
+								
+								if ($eservice->euid !== $moduleInstance->getID())
+								{
+									// try to resolve the name conflict by updating a username that might be forgotten
+									$userOperations->updateUserName($one_uid, $eservice->euid,
+																	$moduleInstance->getName());
+								} else
+								{
+									$uid = $one_uid;
+									break;
+								}
+							}
+						}
+						
+						if (!$servicematch)
 						{
-							$uid = $one_uid['id'];
-							break;
+							$uid = $one_uid;
 						}
 					}
+					unset($servicematch);
+					unset($eservice);
+					unset($uid_list);
+					unset($one_uid);
 				}
 				
 				

@@ -3,19 +3,28 @@
 	{
 		private $editor;
 		private $edit_id;
+		private $entry_add_permission;
+		private $entry_edit_permission;
+		private $entry_delete_permission;
 		private $page_path;
 		public $randomKeyName = 'newsSystem';
 		
-		function __construct($title, $path)
+		public function __construct($title, $path)
 		{
-			global $entry_add_permission;
-			global $entry_edit_permission;
-			global $entry_delete_permission;
 			global $site;
 			global $tmpl;
 			global $user;
 			
 			
+			// require both title and path to be set
+			if (!isset($title) || !isset($path))
+			{
+				$tmpl->setTemplate('NoPerm');
+				die();
+			}
+			
+			$tmpl->assign('previousBtnText', strtolower($title));
+			$tmpl->assign('nextBtnText', 'Next ' . strtolower($title));
 			$this->page_path = $path;
 			
 			$templateToUse = 'News';
@@ -30,21 +39,21 @@
 			// FIXME: fallback to default permission name until add-on system is completly implemented
 			if ($path === 'Bans/')
 			{
-				$entry_add_permission = 'allow_add_bans';
-				$entry_edit_permission = 'allow_edit_banss';
-				$entry_delete_permission = 'allow_delete_bans';
+				$this->entry_add_permission = 'allow_add_bans';
+				$this->entry_edit_permission = 'allow_edit_banss';
+				$this->entry_delete_permission = 'allow_delete_bans';
 			} else
 			{
-				$entry_add_permission = 'allow_add_news';
-				$entry_edit_permission = 'allow_edit_news';
-				$entry_delete_permission = 'allow_delete_news';
+				$this->entry_add_permission = 'allow_add_news';
+				$this->entry_edit_permission = 'allow_edit_news';
+				$this->entry_delete_permission = 'allow_delete_news';
 			}
 			
 			require_once (dirname(dirname(dirname(__FILE__))) . '/classes/editor.php');
 			
 			// otherwise we'd need a custom name per setup
 			// as top level dir could be named different
-			if ($user->getPermission($entry_edit_permission) && isset($_GET['edit']))
+			if ($user->getPermission($this->entry_edit_permission) && isset($_GET['edit']))
 			{
 				// remove the slashes if magic quotes are sadly on
 				if ($site->magic_quotes_on())
@@ -66,7 +75,7 @@
 			}
 			
 			
-			if ($user->getPermission($entry_add_permission) && isset($_GET['add']))
+			if ($user->getPermission($this->entry_add_permission) && isset($_GET['add']))
 			{
 				// user has permission to add news to the page and requests it
 				if (!$tmpl->setTemplate($templateToUse . '.edit'))
@@ -83,7 +92,7 @@
 			}
 			
 			
-			if ($user->getPermission($entry_delete_permission) && isset($_GET['delete']))
+			if ($user->getPermission($this->entry_delete_permission) && isset($_GET['delete']))
 			{
 				// user has permission to delete news from the page and requests it
 				if (!$tmpl->setTemplate($templateToUse . '.delete'))
@@ -106,7 +115,7 @@
 			}
 			
 			// user looks at page in read mode
-			if ($user->getPermission($entry_add_permission))
+			if ($user->getPermission($this->entry_add_permission))
 			{
 				$tmpl->assign('showAddButton', true);
 			}
@@ -139,7 +148,7 @@
 		}
 		
 		
-		function delete()
+		public function delete()
 		{
 			global $site;
 			global $tmpl;
@@ -194,17 +203,14 @@
 		
 		public function sanityCheck(&$confirmed)
 		{
-			global $entry_add_permission;
-			global $entry_edit_permission;
-			global $entry_delete_permission;
 			global $user;
 			global $tmpl;
 			global $db;
 			
 			
-			if ((!$user->getPermission($entry_add_permission) && isset($_GET['add']))
-				|| (!$user->getPermission($entry_edit_permission) && isset($_GET['edit']))
-				|| (!$user->getPermission($entry_delete_permission) && isset($_GET['delete'])))
+			if ((!$user->getPermission($this->entry_add_permission) && isset($_GET['add']))
+				|| (!$user->getPermission($this->entry_edit_permission) && isset($_GET['edit']))
+				|| (!$user->getPermission($this->entry_delete_permission) && isset($_GET['delete'])))
 			{			
 				// editing cancelled due to missing user permission
 				$confirmed = 0;
@@ -345,7 +351,7 @@
 		}
 		
 		
-		function randomKeyMatch(&$confirmed)
+		public function randomKeyMatch(&$confirmed)
 		{
 			global $site;
 			
@@ -365,10 +371,8 @@
 			return $randomkeysmatch = $site->validateKey($randomKeyName, $randomKeyValue);
 		}
 		
-		function readContent($path, &$author, &$last_modified, $edit=false)
+		private function readContent($path, &$author, &$last_modified, $edit=false)
 		{
-			global $entry_edit_permission;
-			global $entry_delete_permission;
 			global $config;
 			global $tmpl;
 			global $user;
@@ -430,11 +434,11 @@
 			{
 				$showButtons = false;
 				if (!$edit
-					&& $user->getPermission($entry_edit_permission)
-					|| $user->getPermission($entry_delete_permission))
+					&& $user->getPermission($this->entry_edit_permission)
+					|| $user->getPermission($this->entry_delete_permission))
 				{
-					$tmpl->assign('showEditButton', $user->getPermission($entry_edit_permission));
-					$tmpl->assign('showDeleteButton', $user->getPermission($entry_delete_permission));
+					$tmpl->assign('showEditButton', $user->getPermission($this->entry_edit_permission));
+					$tmpl->assign('showDeleteButton', $user->getPermission($this->entry_delete_permission));
 				}
 				
 				if (isset($buttons))

@@ -10,7 +10,7 @@
 		private $teamnameQuery;
 		
 		
-		function __construct()
+		public function __construct()
 		{
 			global $db;
 		
@@ -50,7 +50,7 @@
 		}
 		
 		
-		function getSubject()
+		public function getSubject()
 		{
 			return $this->subject;
 		}
@@ -77,7 +77,7 @@
 		}
 		
 		
-		function getContent()
+		public function getContent()
 		{
 			return $this->content;
 		}
@@ -88,7 +88,7 @@
 		}
 		
 		
-		function getTimestamp()
+		public function getTimestamp()
 		{
 			return $this->timestamp;
 		}
@@ -149,7 +149,7 @@
 			}
 		}
 		
-		function addTeamID($id, $lookupName=false)
+		public function addTeamID($id, $lookupName=false)
 		{
 			$id = intval($id);
 			$teamID = array('id' => $id);
@@ -164,7 +164,7 @@
 			$this->teams[] = $teamID;
 		}
 		
-		function addTeamName($recipientName, $preview=false)
+		public function addTeamName($recipientName, $preview=false)
 		{
 			global $db;
 			
@@ -200,25 +200,21 @@
 		}
 		
 		
-		function countUsers()
+		public function countUsers()
 		{
 			return count($this->users);
 		}
 		
-		function countTeams()
+		public function countTeams()
 		{
 			return count($this->teams);
 		}
 		
 		
-		function getUserIDs()
+		public function getUserIDs()
 		{
-			global $db;
-			
-			
 			// initialise variables
 			$recipientIDs = array();
-			$query = $db->prepare('SELECT `id` FROM `users` WHERE `name`=?');
 			
 			// no need for queries to find out id's if id of first item already set
 			if ((count($this->users) > 0) && isset($this->users[0]['id']))
@@ -234,35 +230,13 @@
 			// id's not in array, have to look them up
 			foreach ($this->users as $oneRecipient)
 			{
-				$db->execute($query, $oneRecipient['name']);
-				
-				if ($row = $db->fetchRow($query))
+				if (($userid = \user::getIdByName($oneRecipient['name'])) !== false)
 				{
-					$recipientIDs[] = $row['id'];
+					$recipientIDs[] = $userid;
 				}
-				
-				$db->free($query);
 			}
 			
 			return $recipientIDs;
-		}
-		
-		function getUsersInTeam($teamid)
-		{
-			global $db;
-			
-			$query = $db->prepare('SELECT `id` FROM `users` WHERE `teamid`=?');
-			$db->execute($query, intval($teamid));
-			
-			// build a new array that contains all the user id's
-			$result = array();
-			while ($row = $db->fetchRow($query))
-			{
-				$result[] = $row['id'];
-			}
-			$db->free($query);
-			
-			return $result;
 		}
 		
 		function getUserNames()
@@ -304,7 +278,11 @@
 			// add the players belonging to the specified teams to the recipients array
 			foreach ($this->teams as $teamid)
 			{
-				$tmp_players = $this->getUsersInTeam($teamid['id']);
+				if (($tmp_players = \user::getMemberIdsOfTeam((int) $team['id'])) === false)
+				{
+					return '<p>Could not find out member ids of teams</p>';
+				}
+				
 				foreach ($tmp_players as $userid)
 				{
 					$recipients[] = $userid;
