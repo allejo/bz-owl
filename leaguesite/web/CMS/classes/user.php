@@ -389,6 +389,10 @@
 			$this->userid = (int) $userid;
 		}
 		
+		// theme which is shown to the user
+		// a theme is supposed to be always valid
+		// if internal validation test of theme fails then the default theme will be output
+		// return: theme (string) that is active
 		function getTheme()
 		{
 			global $config;
@@ -597,15 +601,10 @@
 			return true;
 		}
 		
-		// sets a permission with the specified value
-		// if the permission already exists, its value will be overwritten
-		// otherwise a new permission with the value will be registered
-		function setPermission($permission, $value=true)
-		{
-			$_SESSION[$permission] = $value;
-		}
-		
-		
+		// sets default values for all standard permissions
+		// if other code (such as other classes or add-ons) defines new permissions
+		// this code has to handle these permissions independently
+		// e.g. this code won't set the default values for new permisions
 		function setDefaultPermissions()
 		{
 			// sets user's permisssions to default ones
@@ -674,8 +673,29 @@
 			$this->setPermission('IsAdmin', false);
 		}
 		
+		// sets the last login of user in database
+		// input: when was the last login (DateTime)
+		public function setLastLogin(DateTime $time=null)
+		{
+			if (null === $time)
+			{
+				$time = new DateTime('now', new DateTimeZone('UTC'));
+			}
+			$this->lastLoginTimestamp = $time->format('Y-m-d H:i:s');
+		}
 		
-		function saveTheme($theme)
+		// sets a permission with the specified value
+		// if the permission already exists, its value will be overwritten
+		// otherwise a new permission with the value will be registered
+		function setPermission($permission, $value=true)
+		{
+			$_SESSION[$permission] = $value;
+		}
+		
+		
+		// saves the specified theme in a cookie
+		// input: valid theme (string)
+		public function saveTheme($theme)
 		{
 			global $config;
 			
@@ -690,8 +710,9 @@
 			$_SESSION['themeSaved'] = true;
 		}
 		
-		
-		function getMobile()
+		// is the user visiting using a mobile device/browser
+		// return: true (boolean) if mobile browser or mobile device detected, false (boolean) otherwise
+		public function getMobile()
 		{
 			// this switch should be used sparingly and only in cases where content would not fit on the display
 			if (isset($_SERVER['HTTP_USER_AGENT']))
@@ -733,6 +754,9 @@
 			$this->setDefaultPermissions();
 		}
 		
+		// this code will take away all standard permissions
+		// permissions defined somewhere else will have to be handled
+		// seperately, like with the setPermission function in this class
 		function removeAllPermissions()
 		{
 			// delete bzid
@@ -824,7 +848,7 @@
 			// update id
 			$query = $db->prepare('UPDATE `users` SET `id`=:id WHERE `id`=:origid');
 			if (!$db->execute($query, array(':id' => array($this->userid, PDO::PARAM_INT),
-										   ':origid' => array($this->origUserId, PDO::PARAM_INT))))
+											':origid' => array($this->origUserId, PDO::PARAM_INT))))
 			{
 				return false;
 			}
@@ -835,7 +859,7 @@
 			{
 				$query = $db->prepare('UPDATE `users` SET `status`=:status WHERE `id`=:id');
 				if (!$db->execute($query, array(':status' => array($this->status, PDO::PARAM_INT),
-											   ':id' => array($this->userid, PDO::PARAM_INT))))
+												':id' => array($this->userid, PDO::PARAM_INT))))
 				{
 					return false;
 				}
@@ -846,7 +870,18 @@
 			{
 				$query = $db->prepare('UPDATE `users` SET `teamid`=:teamid WHERE `id`=:id');
 				if (!$db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT),
-											   ':id' => array($this->userid, PDO::PARAM_INT))))
+												':id' => array($this->userid, PDO::PARAM_INT))))
+				{
+					return false;
+				}
+			}
+			
+			
+			if (isset($this->lastLoginTimestamp))
+			{
+				$query = $db->prepare('UPDATE `users_profile` SET `last_login`=:lastlogin WHERE `userid`=:userid LIMIT 1');
+				if (!$db->execute($query, array(':lastlogin' => array($this->lastLoginTimestamp, PDO::PARAM_STR),
+												':userid' => array($this->origUserId, PDO::PARAM_INT))))
 				{
 					return false;
 				}

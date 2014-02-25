@@ -320,7 +320,8 @@
 				user::setCurrentUserID($uid);
 				$moduleInstance->givePermissions();
 				$userOperations->addToVisitsLog($uid);
-				$userOperations->updateLastLogin($uid);
+				$user->setLastLogin();
+				$user->update();
 				$userOperations->addToOnlineUserList($moduleInstance->getName(), $uid);
 				invitation::deleteOldInvitations();
 				

@@ -16,23 +16,6 @@
 		}
 		
 		
-		public function updateLastLogin($id)
-		{
-			$query = $this->prepare('UPDATE `users_profile` SET `last_login`=:lastLogin'
-									. ' WHERE `userid`=:uid LIMIT 1');
-			$this->execute($query, array(':lastLogin' => array(date('Y-m-d H:i:s'), PDO::PARAM_STR),
-										 ':uid' => array($id, PDO::PARAM_INT)));
-			
-			if ($row = $this->fetchRow($query))
-			{
-				$status = $row['status'];
-			}
-			$this->free($query);
-			
-			return;
-		}
-		
-		
 		public function addToOnlineUserList($name, $id)
 		{
 			// find out if table exists
