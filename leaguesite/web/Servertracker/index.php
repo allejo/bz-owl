@@ -64,7 +64,7 @@
 		
 		formatbzfquery("brl.arpa.net:5158", $connection);
 		
-		formatbzfquery("brl.arpa.net:5160", $connection);
+//		formatbzfquery("brl.arpa.net:5160", $connection);
 //		
 //		formatbzfquery("fairserve.bzflag.net:5157", $connection);
 //		
