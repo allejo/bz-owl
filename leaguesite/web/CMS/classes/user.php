@@ -731,9 +731,24 @@
 			}
 		}
 		
+		// is the user currently logged in
+		// utilises online_users table for lookup
+		// return: true (boolean) if logged in, false (boolean) otherwise
 		public function getLoggedIn()
 		{
-			return parent::getCurrentUserLoggedIn();
+			global $db;
+			
+			
+			$query = $db->prepare('SELECT `id` FROM `online_users` WHERE `userid`=:userid LIMIT 1');
+			if ($db->execute($query, array(':userid' => array($this->origUserId, PDO::PARAM_INT))))
+			{
+				$row = $db->fetchRow($query);
+				$db->free($query);
+				
+				// true if user not logged in, false otherwise
+				return !($row === false);
+			}
+			return false;
 		}
 		
 		// logout the user
