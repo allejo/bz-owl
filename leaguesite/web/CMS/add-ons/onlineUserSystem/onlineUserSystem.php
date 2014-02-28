@@ -61,21 +61,30 @@
 		
 		private function showTimeSince($gettime)
 		{
-			$rtn = "";
+			// compute days
 			$gettime = time() - $gettime;
 			$d = floor($gettime / (24 * 3600));
+			
+			// compute hours
 			$gettime = $gettime - ($d * (24 * 3600));
 			$h = floor($gettime / (3600));
+			
+			// compute minutes
 			$gettime = $gettime - ($h * (3600));
 			$m = floor($gettime / (60));
+			
+			// compute seconds
 			$gettime = $gettime - ($m * 60);
 			$s = $gettime;
+			
+			// format return value
 			$rtn = '';
 			if ($d != 0) $rtn .= $d.'d ';
 			if ($h != 0) $rtn .= $h.'h ';
 			if ($m != 0) $rtn .= $m.'m ';
 			if ($s != 0) $rtn .= $s.'s';
 			if ($rtn == '') $rtn = '0s';
+			
 			return $rtn;
 		}
 		
