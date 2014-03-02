@@ -52,22 +52,18 @@
 				$this->teamid = $teamid;
 			} else
 			{
-				// team is closed, valid invitation required
+				// team is closed, valid invitation or permission to join required
 				\invitation::deleteOldInvitations();
 				$invitations = \invitation::getInvitationsForTeam($this->origUserId, $teamid);
 				
-				// check if user has an invitation
-				if (count($invitations) === 0)
-				{
-					return false;
-				}
-				$this->teamid = $teamid;
 				// delete all invitations of team for user
 				// A user is not meant to join using one invite then leaving and joining again
 				foreach($invitations AS $invitation)
 				{
 					$invitation->delete();
 				}
+				
+				$this->teamid = $teamid;
 			}
 			
 			$team->setMemberCount($team->getMemberCount()+1);

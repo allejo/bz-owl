@@ -23,8 +23,8 @@
 		
 		public function __construct($teamid = 0)
 		{
-			$this->teamid = $teamid;
-			$this->origTeamId = $teamid;
+			$this->teamid = (int) $teamid;
+			$this->origTeamId = (int) $teamid;
 		}
 		
 		// sanitises team name

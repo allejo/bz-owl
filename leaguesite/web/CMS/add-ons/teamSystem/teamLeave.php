@@ -26,17 +26,18 @@
 			$tmpl->assign('teamName', $this->team->getName());
 			
 			// user and team must exist, user must belong to team
+			// require a visitor to be logged in, anonymous user removal from teams not allowed
 			if (!\user::getCurrentUserLoggedIn() || !$this->user->exists() || !$this->team->exists() || !$this->user->getMemberOfTeam($teamid))
 			{
 				$tmpl->setTemplate('NoPerm');
 				return;
 			}
 			
-			// user (visitor) that opens form must have permission to remove the selected user in form
-			// require a visitor to be logged in, anonymous user removal from teams not allowed
-			if (!\user::getCurrentUserLoggedIn()
-				|| (\user::getCurrentUserId() !== $this->team->getLeaderId()
-				&& !\user::getCurrentUser()->getPermission('allow_kick_any_team_members')))
+			// either team leader or user with special permissions can kick members
+			if (\user::getCurrentUserId() !== $this->team->getLeaderId()
+				// special users also have permission to kick members
+				&& !\user::getCurrentUser()->getPermission('allow_kick_any_team_members')
+				&& \user::getCurrentUserId() !== $this->user->getID())
 			{
 				$tmpl->setTemplate('NoPerm');
 				return;
@@ -171,7 +172,7 @@
 					$pm->setSubject('You got kicked from your team by ' . \user::getCurrentUser()->getName());
 					$pm->setContent('Player ' . \user::getCurrentUser()->getName() . ' just kicked you from your team.');
 					$pm->setTimestamp(date('Y-m-d H:i:s'));
-					$pm->addTeamID($this->team->getID());
+					$pm->addUserID($this->user->getID());
 					
 					// send it
 					$pm->send();

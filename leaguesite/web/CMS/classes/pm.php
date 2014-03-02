@@ -278,7 +278,7 @@
 			// add the players belonging to the specified teams to the recipients array
 			foreach ($this->teams as $teamid)
 			{
-				if (($tmp_players = \user::getMemberIdsOfTeam((int) $team['id'])) === false)
+				if (($tmp_players = \user::getMemberIdsOfTeam((int) $teamid['id'])) === false)
 				{
 					return '<p>Could not find out member ids of teams</p>';
 				}

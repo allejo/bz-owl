@@ -46,7 +46,7 @@ No menu found.
 <div><input type="hidden" name="key_name" value="{$keyName}" /></div>
 <div><input type="hidden" name="{$keyName}" value="{$keyValue}" /></div>
 <p style="display:inline">{if $userRequestsLeave}Do you really want to leave your team <a href="./?profile={$teamid|escape}">{$teamName|escape}</a>?{else}Remove {$targetUserName|escape} from team <a href="./?profile={$teamid|escape}">{$teamName|escape}</a>?{/if}</p>
-<div style="display:inline"><input type="submit" name="kick_user_from_team" value="Leave the team" id="send" /></div>
+<div style="display:inline"><input type="submit" name="kick_user_from_team" value="{if $userRequestsLeave}Leave the team{else}Kick from team{/if}" id="send" /></div>
 </form>
 
 </div>

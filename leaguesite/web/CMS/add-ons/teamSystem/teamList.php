@@ -265,7 +265,8 @@
 				// a team leader can neither leave or be kicked
 				// a leader must first give someone else leadership to leave
 				if ((\user::getCurrentUserId() === $teamLeader
-					|| \user::getCurrentUser()->getPermission('allow_kick_any_team_members'))
+					|| \user::getCurrentUser()->getPermission('allow_kick_any_team_members')
+					|| \user::getCurrentUserId() === $user->getID())
 					&& $user->getID() !== $teamLeader)
 				{
 					$member['removeLink'] = './?remove=' . $user->getID() . '&amp;team=' . $teamid;
