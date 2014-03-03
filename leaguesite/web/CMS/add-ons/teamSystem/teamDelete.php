@@ -27,6 +27,13 @@
 				return;
 			}
 			
+			// is team already deleted?
+			if ($this->team->getStatus() === 'deleted')
+			{
+				$tmpl->setTemplate('NoPerm');
+				return;
+			}
+			
 			// does the user have permission to delete the team?
 			if (!\user::getCurrentUser()->getPermission('team.allowDelete ' . $this->team->getID())
 				&& !\user::getCurrentUser()->getPermission('allow_delete_any_team')

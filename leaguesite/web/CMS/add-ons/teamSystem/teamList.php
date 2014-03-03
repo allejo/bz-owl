@@ -224,9 +224,10 @@
 			// tell template if user can delete this team
 			// either user has deletion permission for team
 			// or user is leader of team and there are one or less members in team
-			$tmpl->assign('canDeleteTeam', \user::getCurrentUser()->getPermission('team.allowDelete ' . $team->getID())
+			$tmpl->assign('canDeleteTeam', $team->getStatus() !== 'deleted'
+						  && (\user::getCurrentUser()->getPermission('team.allowDelete ' . $team->getID())
 						  || \user::getCurrentUser()->getPermission('allow_delete_any_team')
-						  || (\user::getCurrentUserId() === $team->getLeaderId()));
+						  || (\user::getCurrentUserId() === $team->getLeaderId())));
 			
 			$showMemberActionOptions = false;
 			if (\user::getCurrentUserId() === $teamLeader
