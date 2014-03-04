@@ -12,7 +12,7 @@
 			$tmpl->setTemplate('teamSystemReactivate');
 			
 			// user (that opens form must have permission to reactivate teams
-			if (!\user::getCurrentUser()->getPermission('allow_reactivate_teams'))
+			if (!\user::getCurrentUserLoggedIn() || !\user::getCurrentUser()->getPermission('allow_reactivate_teams'))
 			{
 				$tmpl->setTemplate('NoPerm');
 				return;

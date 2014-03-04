@@ -11,7 +11,8 @@
 			$tmpl->setTemplate('teamSystemDelete');
 			
 			// teamid 0 is reserved and can not be deleted
-			if ((int) $teamid === 0)
+			// no anon team deletion
+			if ((int) $teamid === 0 || !\user::getCurrentUserLoggedIn())
 			{
 				$tmpl->setTemplate('NoPerm');
 				return;

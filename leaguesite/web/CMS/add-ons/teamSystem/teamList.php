@@ -213,10 +213,11 @@
 			$tmpl->assign('team', $teamData);
 			
 			$tmpl->assign('teamid', $teamid);
-			$tmpl->assign('canPMTeam', \user::getCurrentUserId() > 0 ? true : false);
+			$tmpl->assign('canPMTeam', \user::getCurrentUserLoggedIn() && \user::getCurrentUserId() > 0 ? true : false);
 			
 			// tell template if user can edit this team
-			$tmpl->assign('canEditTeam', (\user::getCurrentUserId() === $teamLeader) || \user::getCurrentUser()->getPermission('allow_edit_any_team_profile'));
+			$tmpl->assign('canEditTeam', (\user::getCurrentUserLoggedIn() && \user::getCurrentUserId() === $teamLeader)
+										  || \user::getCurrentUser()->getPermission('allow_edit_any_team_profile'));
 			
 			// tell template if user can delete this team
 			// either user has deletion permission for team

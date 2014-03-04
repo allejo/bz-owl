@@ -8,6 +8,13 @@
 			global $tmpl;
 			
 			
+			// no anon team editing allowed
+			if (!\user::getCurrentUserLoggedIn())
+			{
+				$tmpl->setTemplate('NoPerm');
+				return;
+			}
+			
 			$this->setTemplate();
 			$tmpl->assign('title', 'Edit team');
 			
@@ -26,6 +33,7 @@
 			// do not proceed with request
 			if (!$editPermission)
 			{
+				$tmpl->setTemplate('NoPerm');
 				return;
 			}
 			
