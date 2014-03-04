@@ -162,18 +162,6 @@
 			global $db;
 			
 			
-			if (!$tmpl->setTemplate('teamSystemProfile'))
-			{
-				$tmpl->noTemplateFound();
-				die();
-			}
-			$tmpl->assign('title', 'Team overview');
-			// FIXME: implement something to avoid hardcoded paths
-			$tmpl->assign('pmLink', '../PM/?add&teamid=' . $teamid);
-			
-			// the team's leader
-			$teamLeader = 0;
-			
 			$team = new team($teamid);
 			if (!$team->exists())
 			{
@@ -181,13 +169,22 @@
 				return;
 			}
 			
+			if (!$tmpl->setTemplate('teamSystemProfile'))
+			{
+				$tmpl->noTemplateFound();
+				die();
+			}
 			
-			$teamData = array();
-
+			// FIXME: implement something to avoid hardcoded paths
+			$tmpl->assign('pmLink', '../PM/?add&teamid=' . $teamid);
+			
+			$tmpl->assign('status', $team->getStatus());
 			$tmpl->assign('title', 'Team ' . htmlent($team->getName()));
 			
+			// the team's leader
 			$teamLeader = $team->getLeaderId();
 			
+			$teamData = array();
 			
 			$teamData['profileLink'] = './?profile=' . $team->getID();
 			$teamData['name'] = $team->getName();

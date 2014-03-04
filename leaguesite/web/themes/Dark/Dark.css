@@ -498,6 +498,11 @@ margin-bottom:1em;
 padding:1em;
 }
 
+.team_status_deleted
+{
+color: red;
+}
+
 div.team_header {
 -moz-border-radius:5px;
 -webkit-border-radius:5px;

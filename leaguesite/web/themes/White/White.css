@@ -371,6 +371,11 @@ div.msg_contents
 }
 
 /*team profile*/
+.team_status_deleted
+{
+	color: red;
+}
+
 div.team_area
 {
 	display: inline-block;

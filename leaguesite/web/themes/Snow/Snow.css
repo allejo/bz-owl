@@ -405,6 +405,11 @@ div.msg_contents
 }
 
 /*team profile*/
+.team_status_deleted
+{
+	font-weight: bold;
+}
+
 div.team_area
 {
 	display: inline-block;
