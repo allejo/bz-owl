@@ -41,24 +41,54 @@
 			}
 		}
 		
-		// for who is the invitation valid
+		// set for who the invitation is valid
 		// input: id of a user (integer)
 		public function forUserId($userid)
 		{
 			$this->userids[] = (int) $userid;
 		}
 		
+		// find out when the invitation expires
+		// return: Expiration time (String)
+		public function getExpiration()
+		{
+			global $db;
+			
+			$query = $db->prepare('SELECT `expiration` FROM `invitations` WHERE `id`=:invitationid');
+			if ($db->execute($query, array(':invitationid' => array((int) $this->invitationid, PDO::PARAM_INT))))
+			{
+				while ($row = $db->fetchRow($query))
+				{
+					// build invitation instance based on id stored in db
+					$this->expiration = $row['expiration'];
+				}
+				$db->free($query);
+				
+				return $this->expiration;
+			}
+			
+			return false;
+		}
+		
 		// find out if user has invitations to a team
-		// input: $userid, the id of user (integer); $teamid, the id of team (integer)
+		// input: $teamid, the id of team (integer); $userid, the id of user (integer), use false (boolean) for all users
 		// output: array of invitation instances
-		public static function getInvitationsForTeam($userid, $teamid)
+		public static function getInvitationsForTeam($teamid, $userid = false)
 		{
 			global $db;
 			
 			
-			$query = $db->prepare('SELECT `id` FROM `invitations` WHERE `userid`=:userid AND `teamid`=:teamid');
-			if ($db->execute($query, array(':userid' => array((int) $userid, PDO::PARAM_INT),
-										   ':teamid' => array((int) $teamid, PDO::PARAM_INT))))
+			if ($userid === false)
+			{
+				$query = $db->prepare('SELECT `id` FROM `invitations` WHERE `teamid`=:teamid');
+				$args = array(':teamid' => array((int) $teamid, PDO::PARAM_INT));
+			} else
+			{
+				$query = $db->prepare('SELECT `id` FROM `invitations` WHERE `userid`=:userid AND `teamid`=:teamid');
+				$args = array(':teamid' => array((int) $teamid, PDO::PARAM_INT),
+						      ':userid' => array((int) $userid, PDO::PARAM_INT));
+			}
+			if ($db->execute($query, $args))
 			{
 				$ids = array();
 				while ($row = $db->fetchRow($query))
@@ -93,6 +123,28 @@
 			}
 			
 			return true;
+		}
+		
+		// find out when the invitation expires
+		// return: Expiration time (String)
+		public function getUsers()
+		{
+			global $db;
+			
+			$users = array();
+			$query = $db->prepare('SELECT `userid` FROM `invitations` WHERE `id`=:invitationid');
+			if ($db->execute($query, array(':invitationid' => array((int) $this->invitationid, PDO::PARAM_INT))))
+			{
+				while ($row = $db->fetchRow($query))
+				{
+					$users[] = new user($row['userid']);
+				}
+				$db->free($query);
+				
+				return $users;
+			}
+			
+			return false;
 		}
 		
 		// enter the invitation into database

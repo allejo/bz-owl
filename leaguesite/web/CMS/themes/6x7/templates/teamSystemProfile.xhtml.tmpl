@@ -152,10 +152,20 @@ No menu found.
 {if isset($showDeleteButton) && $showDeleteButton}<p><a class="button" href="./?delete={$teamid|escape}">Delete this team</a></p>{/if}
 {/if}
 
-{if isset($invitations) && is_array($invitations)}
+{if isset($invitations) && is_array($invitations) && !empty($invitations)}
+<table id="table_team_invitations" class="big">
+<caption>Open Invitations</caption>
+<tr>
+	<th>Player</th>
+	<th>Expiration</th>
+</tr>
 {foreach item="invitation" from=$invitations}
-
+<tr class="teams_members_overview">
+	<td><a href="{$invitation.profileLink|escape}">{$invitation.userName|escape}</a></td>
+	<td>{$invitation.expiration|escape}</td>
+</tr>
 {/foreach}
+</table>
 {/if}
 
 </div>

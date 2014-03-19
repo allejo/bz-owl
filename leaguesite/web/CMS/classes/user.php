@@ -54,7 +54,7 @@
 			{
 				// team is closed, valid invitation or permission to join required
 				\invitation::deleteOldInvitations();
-				$invitations = \invitation::getInvitationsForTeam($this->origUserId, $teamid);
+				$invitations = \invitation::getInvitationsForTeam($teamid, $this->origUserId);
 				
 				// delete all invitations of team for user
 				// A user is not meant to join using one invite then leaving and joining again
@@ -156,7 +156,7 @@
 			}
 			
 			require_once(dirname(__FILE__) . '/invitation.php');
-			return $this->getPermission('allow_join_any_team') || (new team($teamid))->getOpen() || invitation::getInvitationsForTeam($this->origUserId, $teamid);
+			return $this->getPermission('allow_join_any_team') || (new team($teamid))->getOpen() || invitation::getInvitationsForTeam($teamid, $this->origUserId);
 		}
 		
 		// get location of user

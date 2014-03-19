@@ -339,6 +339,24 @@
 				$matches[] = $prepared;
 			}
 			$tmpl->assign('matches', $matches);
+			
+			// invitation data visible
+			// for team members
+			// for users who can issue any invitation
+			if (\user::getCurrentUser()->getMemberOfTeam($teamid) ||
+				\user::getCurrentUser()->getPermission('allow_invite_in_any_team'))
+			{
+				$invitationData = array();
+				$invitations = invitation::getInvitationsForTeam($teamid);
+				foreach($invitations AS $invitation)
+				{
+					$invitationUser = $invitation->getUsers()[0];
+					$invitationData[] = array('userName' => $invitationUser->getName(),
+											  'profileLink' => '../Players/?profile=' . $invitationUser->getID(),
+											  'expiration' => $invitation->getExpiration());
+				}
+				$tmpl->assign('invitations', $invitationData);
+			}
 		}
 	}
 ?>

@@ -23,11 +23,12 @@ No menu found.
 </div>
 
 <div class="content">
-{if isset($canPMTeam) && $canPMTeam}<a class="button" href="{$pmLink}">Send message to team</a>{/if}
+<p>
+{if isset($canPMTeam) && $canPMTeam}<a class="button" href="{$pmLink|escape}">Send message to team</a>{/if}
 {if isset($canEditTeam) && $canEditTeam}<a class="button" href="./?edit={$teamid|escape}">edit</a>{/if}
 {if isset($canDeleteTeam) && $canDeleteTeam}<a class="button" href="./?delete={$teamid|escape}">delete</a>{/if}
 <a class="button" href="./?opponent_stats={$teamid}">opponent stats</a>
-<br /><br />
+</p>
 
 {if !isset($team) || empty($team)}
 <div class="static_page_box">
@@ -64,7 +65,6 @@ No menu found.
 		<td><a href="{$team.matchSearchLink}">{$team.matchCount}</a></td>
 	</tr>
 	</table>
-<br />
 	</div>
 </div>
 <div class="team_area">
@@ -75,7 +75,6 @@ No menu found.
 		{if $teamDescription|count_characters > 0}{$teamDescription}{else}(No team description set){/if}
 		</div>
 	</div>
-</div>
 </div>
 
 {if isset($members) && !empty($members)}
@@ -114,7 +113,6 @@ No menu found.
 {/if}
 
 </table>
-<br />
 
 {if isset($matches) && !empty($matches)}
 <table id="table_matches_played" class="big">
@@ -145,15 +143,30 @@ No menu found.
 {/if}
 </td>
 {/if}
+</tr>
 {/foreach}
 {else}
 <div class="static_page_box">No matches entered yet.</div>
 {/if}
-
 </table>
 {if isset($showDeleteButton) && $showDeleteButton}<p><a class="button" href="./?delete={$teamid|escape}">Delete this team</a></p>{/if}
 {/if}
 
+{if isset($invitations) && is_array($invitations) && !empty($invitations)}
+<table id="table_team_invitations" class="big">
+<caption>Open Invitations</caption>
+<tr>
+	<th>Player</th>
+	<th>Expiration</th>
+</tr>
+{foreach item="invitation" from=$invitations}
+<tr class="teams_members_overview">
+	<td><a href="{$invitation.profileLink|escape}">{$invitation.userName|escape}</a></td>
+	<td>{$invitation.expiration|escape}</td>
+</tr>
+{/foreach}
+</table>
+{/if}
 
 </div>
 </body>
