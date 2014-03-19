@@ -531,7 +531,7 @@
 		$db->SQL('ALTER TABLE `matches_edit_stats` CHANGE `team2ID` `team2_id` INT(11)  UNSIGNED  NOT NULL  DEFAULT \'0\'');
 		$db->SQL('ALTER TABLE `users_profile` CHANGE `UTC` `utc` TINYINT(2)  NOT NULL  DEFAULT \'0\'');
 		
-		status('Creating new cms bans and user rejected login tables');
+		status('Creating new cms_bans table');
 		$db->SQL('CREATE TABLE `cms_bans` (
 				 `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
 				 `ip-address` varchar(100) NOT NULL DEFAULT \'0.0.0.0.0\',
@@ -539,6 +539,7 @@
 				 PRIMARY KEY (`id`)
 				 ) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8');
 		
+		status('Creating new users_rejected_logins table');
 		$db->SQL('CREATE TABLE `users_rejected_logins` (
 				 `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
 				 `name` varchar(50) NOT NULL DEFAULT \'\',
@@ -550,6 +551,7 @@
 				 PRIMARY KEY (`id`)
 				 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT=\'Log failed logins with their reason\'');
 		
+		status('Creating new users_permissions table');
 		$db->SQL('CREATE TABLE `users_permissions` (
 				 `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
 				 `userid` int(11) unsigned NOT NULL,
@@ -559,12 +561,15 @@
 				 CONSTRAINT `users_permissions_ibfk_1` FOREIGN KEY (`userid`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 				 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT=\'Applies to local login only at the moment\'');
 		
+		status('Adjusting foreign keys in users_profile table');
 		$db->SQL('ALTER TABLE `users_profile` DROP FOREIGN KEY `users_profile_ibfk_1`');
 		$db->SQL('ALTER TABLE `users_profile` CHANGE `playerid` `userid` INT(11)  UNSIGNED  NOT NULL  DEFAULT \'0\'');
 		$db->SQL('ALTER TABLE `users_profile` ADD FOREIGN KEY (`userid`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE');
+		status('Adjusting foreign keys in users_passwords table');
 		$db->SQL('ALTER TABLE `users_passwords` DROP FOREIGN KEY `users_passwords_ibfk_1`');
 		$db->SQL('ALTER TABLE `users_passwords` CHANGE `playerid` `userid` INT(11)  UNSIGNED  NOT NULL  DEFAULT \'0\'');
 		$db->SQL('ALTER TABLE `users_passwords` ADD FOREIGN KEY (`userid`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE');
+		status('Adjusting foreign keys in visits table');
 		$db->SQL('ALTER TABLE `visits` DROP FOREIGN KEY `visits_ibfk_1`');
 		$db->SQL('ALTER TABLE `visits` CHANGE `playerid` `userid` INT(11)  UNSIGNED  NOT NULL  DEFAULT \'0\'');
 		$db->SQL('ALTER TABLE `visits` ADD FOREIGN KEY (`userid`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE');
@@ -574,7 +579,7 @@
 		status('| If you hardcoded logout path into webserver config you must remove that path now. That path is now set in CMS table. |');
 		status('+----------------------------------------------------------------------------------------------------------------------+');
 		status('');
-		$db->SQL('INSERT INTO `CMS` (`id`, `request_path`, `title`, `addon`) VALUES (\'\', \'Logout/\', \'Logout\', \'logoutSystem\')');
+		$db->SQL('INSERT INTO `CMS` (`request_path`, `title`, `addon`) VALUES (\'Logout/\', \'Logout\', \'logoutSystem\')');
 		
 		
 		status('');
@@ -582,15 +587,17 @@
 		status('| If you hardcoded Online User path into webserver config you must remove that path now. That path is now set in CMS table. |');
 		status('+---------------------------------------------------------------------------------------------------------------------------+');
 		status('');
-		$db->SQL('INSERT INTO `CMS` (`id`, `request_path`, `title`, `addon`) VALUES (NULL, \'Online/\', \'Online users\', \'onlineUserSystem\')');
+		$db->SQL('INSERT INTO `CMS` (`request_path`, `title`, `addon`) VALUES (\'Online/\', \'Online users\', \'onlineUserSystem\')');
 		
 		
+/*
 		status('');
 		status('+-----------------------------------------------------------------------------------------------------------------------+');
 		status('| If you hardcoded Matches path into webserver config you must remove that path now. That path is now set in CMS table. |');
 		status('+-----------------------------------------------------------------------------------------------------------------------+');
 		status('');
-		$db->SQL('INSERT INTO `CMS` (`id`, `request_path`, `title`, `addon`) VALUES (NULL, \'Matches/\', \'Matches\', \'matchServices\')');
+		$db->SQL('INSERT INTO `CMS` (`request_path`, `title`, `addon`) VALUES (\'Matches/\', \'Matches\', \'matchServices\')');
+*/
 		
 		status('Renaming CMS table to cms_paths');
 		$db->SQL('RENAME TABLE `CMS` TO `cms_paths`');
