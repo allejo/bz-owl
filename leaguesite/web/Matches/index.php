@@ -249,11 +249,11 @@
 		$query = 'SELECT `matches`.`timestamp`';
 	}
 	// get name of team 1
-	$query .= ',(SELECT `name` FROM `teams` WHERE `matches`.`team1ID`=`teams`.`id` LIMIT 1) AS `team1_name`';
+	$query .= ',(SELECT `name` FROM `teams` WHERE `matches`.`team1_id`=`teams`.`id` LIMIT 1) AS `team1_name`';
 	// get name of team 2
-	$query .= ',(SELECT `name` FROM `teams` WHERE `matches`.`team2ID`=`teams`.`id` LIMIT 1) AS `team2_name`';
+	$query .= ',(SELECT `name` FROM `teams` WHERE `matches`.`team2_id`=`teams`.`id` LIMIT 1) AS `team2_name`';
 	// also need the id's for quick links to team profiles
-	$query .= ',`matches`.`team1ID`,`matches`.`team2ID`';
+	$query .= ',`matches`.`team1_id`,`matches`.`team2_id`';
 	// the rest of the needed data
 	$query .= ',`matches`.`team1_points`,`matches`.`team2_points`,`matches`.`userid`';
 	$query .= ',`users`.`name` AS `playername`,`matches`.`id`, `matches`.`duration`';
@@ -349,8 +349,8 @@
 		$matchid_list[$id]['duration'] = $row['duration'];
 		$matchid_list[$id]['team1_name'] = $row['team1_name'];
 		$matchid_list[$id]['team2_name'] = $row['team2_name'];
-		$matchid_list[$id]['team1ID'] = $row['team1ID'];
-		$matchid_list[$id]['team2ID'] = $row['team2ID'];
+		$matchid_list[$id]['team1_id'] = $row['team1_id'];
+		$matchid_list[$id]['team2_id'] = $row['team2_id'];
 		$matchid_list[$id]['team1_points'] = $row['team1_points'];
 		$matchid_list[$id]['team2_points'] = $row['team2_points'];
 		$matchid_list[$id]['userid'] = $row['userid'];
@@ -379,13 +379,13 @@
 		echo '</td>' . "\n" . '<td>';
 		
 		// get name of first team
-		team_name_from_id($match_entry['team1ID'], $match_entry['team1_name']);
+		team_name_from_id($match_entry['team1_id'], $match_entry['team1_name']);
 		
 		// seperator showing that opponent team will be named soon
 		echo ' - ';
 		
 		// get name of second team
-		team_name_from_id($match_entry['team2ID'], $match_entry['team2_name']);
+		team_name_from_id($match_entry['team2_id'], $match_entry['team2_name']);
 		
 		// done with the table field, go to next field
 		echo '</td>' . "\n" . '<td>';

@@ -46,7 +46,7 @@
 			show_form($_POST['team_id1'], $_POST['team_id2'], $_POST['team1_points'], $_POST['team2_points'], $readonly=false, $_POST['duration']);
 		} elseif (isset($_GET['edit']) || isset($_GET['delete']))
 		{
-			$query = ('SELECT `timestamp`, `team1ID`, `team2ID`, `team1_points`, `team2_points`, `duration`'
+			$query = ('SELECT `timestamp`, `team1_id`, `team2_id`, `team1_points`, `team2_points`, `duration`'
 					  . ' FROM `matches` WHERE `id`=' . sqlSafeStringQuotes($match_id)
 					  . ' LIMIT 1');
 			if (!($result = @$site->execute_query('matches', $query, $connection)))
@@ -71,8 +71,8 @@
 				
 				$duration = $row['duration'];
 				
-				$team_id1 = intval($row['team1ID']);
-				$team_id2 = intval($row['team2ID']);
+				$team_id1 = intval($row['team1_id']);
+				$team_id2 = intval($row['team2_id']);
 				
 				$team1_caps = intval($row['team1_points']);
 				$team2_caps = intval($row['team2_points']);
@@ -229,7 +229,7 @@
 		
 		// similar match entered already?
 		// strategy: ask for one match before the entered one and one after the one to be entered and do not let the database engine do the comparison
-		$query = 'SELECT `id`,`timestamp`,`team1ID`,`team2ID`,`team1_points`,`team2_points`, `duration` FROM `matches`';
+		$query = 'SELECT `id`,`timestamp`,`team1_id`,`team2_id`,`team1_points`,`team2_points`, `duration` FROM `matches`';
 		$query .= ' WHERE (`timestamp`' . sqlSafeString($comparisonOperator) . sqlSafeStringQuotes($_POST['match_day'] . $_POST['match_time']);
 		// sorting needed
 		$query .= ') ORDER BY `timestamp` DESC';
@@ -263,19 +263,19 @@
 			$team_ids_swapped = false;
 			$timestamp = $row['timestamp'];
 			$duration_matches = (intval($row['duration'])) === $duration;
-			$team_id1_matches = (intval($row['team1ID']) === $team_id1);
+			$team_id1_matches = (intval($row['team1_id']) === $team_id1);
 			if (!$team_id1_matches)
 			{
 				$team_ids_swapped = true;
-				$team_id1_matches = (intval($row['team1ID']) === $team_id2);
+				$team_id1_matches = (intval($row['team1_id']) === $team_id2);
 			}
 			
 			if ($team_ids_swapped)
 			{
-				$team_id2_matches = (intval($row['team2ID']) === $team_id1);
+				$team_id2_matches = (intval($row['team2_id']) === $team_id1);
 			} else
 			{
-				$team_id2_matches = (intval($row['team2ID']) === $team_id2);
+				$team_id2_matches = (intval($row['team2_id']) === $team_id2);
 			}
 			
 			// use helper variable to save some comparisons of points
