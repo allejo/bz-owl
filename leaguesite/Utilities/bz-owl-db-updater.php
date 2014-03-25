@@ -113,7 +113,10 @@
 	
 	function updateDB(&$version)
 	{
-		echo('DB at version ' . $version . "\n");
+		global $config;
+		
+		
+		echo('Database (' . $config->getValue('dbName') . ') is at version ' . $version . "\n");
 		
 		if ($version < MAX_DB_VERSION)
 		{
