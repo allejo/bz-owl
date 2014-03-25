@@ -143,11 +143,11 @@
 						}
 						if ($teamsDeleted)
 						{
+							$this->maintainPMs($uid);
 							$user->delete();
 						}
 					}
 				}
-				$this->maintainPMs($uid);
 			}
 		}
 		

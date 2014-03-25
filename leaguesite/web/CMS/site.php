@@ -15,12 +15,15 @@
 			include dirname(__FILE__) . '/classes/config.php';
 			$config = new config();
 			
-			// setup session
-			ini_set('session.use_trans_sid', 0);
-			ini_set('session.name', 'SID');
-			ini_set('session.gc_maxlifetime', '7200');
-			ini_set('session.cookie_path', $config->getValue('basepath'));
-			session_start();
+			// setup session if no session exists and sessions are enabled
+			if (session_status() === PHP_SESSION_NONE)
+			{
+				ini_set('session.use_trans_sid', 0);
+				ini_set('session.name', 'SID');
+				ini_set('session.gc_maxlifetime', '7200');
+				ini_set('session.cookie_path', $config->getValue('basepath'));
+				session_start();
+			}
 			
 			// set the date and time
 			// suppress warning on invalid value to keep output well-formed
@@ -142,13 +145,19 @@
 	// only add very frequently used functions
 	
 	// shortcut for utf-8 aware htmlentities
-	function htmlent($string)
+	if (!function_exists('htmlent'))
 	{
-		return htmlentities($string, ENT_COMPAT, 'UTF-8');
+		function htmlent($string)
+		{
+			return htmlentities($string, ENT_COMPAT, 'UTF-8');
+		}
 	}
 	
-	function htmlent_decode($string)
+	if (!function_exists('htmlent_decode'))
 	{
-		return html_entity_decode($string, ENT_COMPAT, 'UTF-8');
+		function htmlent_decode($string)
+		{
+			return html_entity_decode($string, ENT_COMPAT, 'UTF-8');
+		}
 	}
 ?>

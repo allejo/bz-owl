@@ -116,7 +116,6 @@
 			$teams = team::getNewTeamIds();
 			$teams = array_merge($teams, team::getActiveTeamIds());
 			$teams = array_merge($teams, team::getReactivatedTeamIds());
-			$teams = array_merge($teams, team::getInactiveTeamIds());
 			
 			
 			$teams = team::getTeamsFromIds($teams);
