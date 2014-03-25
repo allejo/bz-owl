@@ -215,34 +215,40 @@
 		}
 		
 		
-		public function execute(database_result &$dbResult, $inputParameters)
+		public function execute(database_result &$dbResult)
 		{
 			$handle = $dbResult->getHandle();
 			
 			// check if $inputParameters is passed to function ($numArgs >= 2, else 1)
 			$numArgs = func_num_args();
-			if ($numArgs > 1 && !is_array($inputParameters))
+			if ($numArgs > 1)
 			{
-				$inputParameters = array($inputParameters);
-			} else
-			{
-				foreach ($inputParameters as $param => $value)
+				// get second argument
+				$inputParameters = func_get_arg(1);
+				
+				if (!is_array($inputParameters))
 				{
-					// example: $inputParameters[':limit'] = array(1, PDO::PARAM_INT);
-					// mixing '?' and named parameters in the same SQL statement probably does not work
-					if (is_array($value) and preg_match('/^:[a-z]\w*$/i', $param))
+					$inputParameters = array($inputParameters);
+				} else
+				{
+					foreach ($inputParameters as $param => $value)
 					{
-						$handle->bindValue($param, $value[0], $value[1]);
-						// remove processed input parameters from array
-						// works correctly with foreach
-						unset($inputParameters[$param]);
+						// example: $inputParameters[':limit'] = array(1, PDO::PARAM_INT);
+						// mixing '?' and named parameters in the same SQL statement probably does not work
+						if (is_array($value) and preg_match('/^:[a-z]\w*$/i', $param))
+						{
+							$handle->bindValue($param, $value[0], $value[1]);
+							// remove processed input parameters from array
+							// works correctly with foreach
+							unset($inputParameters[$param]);
+						}
 					}
-				}
-				// if all inputParameters have been processed do not bind them in the execute call
-				if (empty($inputParameters))
-				{
-					//$inputParameters = NULL;
-					$numArgs = 1;
+					// if all inputParameters have been processed do not bind them in the execute call
+					if (empty($inputParameters))
+					{
+						//$inputParameters = NULL;
+						$numArgs = 1;
+					}
 				}
 			}
 			

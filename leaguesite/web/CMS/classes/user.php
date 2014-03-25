@@ -385,6 +385,29 @@
 			$this->userid = (int) $userid;
 		}
 		
+		// get team memberships of user
+		// output: array of team ids, false on error
+		public function getTeamIds()
+		{
+			global $db;
+			
+			
+			$teamids = array();
+						
+			// collect teamid of user from database
+			$query = $db->prepare('SELECT `teamid` FROM `users` WHERE `id`=:userid LIMIT 1');
+			if ($db->execute($query, array(':userid' => array($this->origUserId, PDO::PARAM_INT))))
+			{
+				$row = $db->fetchRow($query);
+				$db->free($query);
+				
+				$teamids[] = (int) $row['teamid'];
+				return $teamids;
+			}
+			
+			return false;
+		}
+		
 		// theme which is shown to the user
 		// a theme is supposed to be always valid
 		// if internal validation test of theme fails then the default theme will be output

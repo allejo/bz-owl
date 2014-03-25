@@ -8,6 +8,11 @@
 		
 		public function __construct()
 		{
+			global $site;
+			
+			// load team class source code
+			require_once($site->installationPath() . '/CMS/classes/team.php');
+			
 			if ($this->isMaintenanceNeeded())
 			{
 				$this->performMaintenance();
@@ -76,7 +81,7 @@
 		public function performMaintenance()
 		{
 			$this->maintainUsers();
-			$this->maintainPMs();
+/* 			$this->maintainPMs(); */
 			$this->maintainTeams();
 			$this->updateCountries();
 			$this->updateTeamActivity();
@@ -126,8 +131,8 @@
 						// assume all teams are deleted by default then check status of each team
 						// this will work better with a very high number of teams because it avoids
 						// to load a huge list of deleted team ids into memory first
-						$teamsDeleted = true;
-						foreach ($teamids AS $teamid)
+						$teamsDeleted = count($teamIds) > 0 ? true : false;
+						foreach ($teamIds AS $teamid)
 						{
 							$team = new team($teamid);
 							// if getting status of team failed or status is not deleted then do not delete user
@@ -142,6 +147,7 @@
 						}
 					}
 				}
+				$this->maintainPMs($uid);
 			}
 		}
 		
@@ -169,7 +175,7 @@
 			foreach ($teamIds AS $teamid)
 			{
 				$team = new team($teamid);
-				$lastMatch = $team->getNewestMatchTimestamp()
+				$lastMatch = $team->getNewestMatchTimestamp();
 				// non deleted team did not match last 45 days -> inactive
 				if ($team->getStatus() !== 'inactive' && $lastMatch && $lastMatch < $forty_five_days_in_past)
 				{
@@ -441,7 +447,7 @@
 			
 			// find out how many matches each team did play
 			$matchCountQuery = $db->prepare('SELECT COUNT(*) as `num_matches` FROM `matches` WHERE `timestamp`>?'
-								  . ' AND (`team1ID`=? OR `team2ID`=?)');
+								  . ' AND (`team1_id`=? OR `team2_id`=?)');
 			
 			// find out how many matches each team did play
 			for ($i = 0; $i <= $num_active_teams; $i++)
