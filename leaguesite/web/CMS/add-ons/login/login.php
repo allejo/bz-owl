@@ -255,7 +255,7 @@
 						$suspended_mode = $row['status'];
 						if (strcmp(($row['external_id']), '') === 0)
 						{
-							$convert_to_external_login = $config->getValue('convertUsersToExternalLogin');
+							$convert_to_external_login = $config->getValue('login.modules.local.convertUsersToExternalLogin');
 						}
 					}
 				} elseif (isset($_SESSION['external_id']) && $_SESSION['external_id'])

@@ -40,9 +40,9 @@
 						 // enable updating db from previous version
 						 'maintenance.updateDB' => false,
 						 // display local login on front login page
-						 'login.local.showLoginText' => false,
+						 'login.modules.local.showLoginText' => false,
 						 // does local login module convert users
-						 'login.local.convertUsersToExternalLogin' => true,
+						 'login.modules.local.convertUsersToExternalLogin' => true,
 						 // old website name used by local login module
 						 'login.local.oldWebsiteName' => 'gu.bzleague.com',
 						 // ability to turn off ip-address check on bzbb login
@@ -131,7 +131,6 @@
 						 'basepath' => '/',
 						 'baseaddress' => 'http://example.com/',
 						 'login.modules.forceExternalLoginOnly' => true,
-						 'convertUsersToExternalLogin' => true,
 						 'bbcodeLibAvailable' => true,
 						 'displayedSystemUsername' => 'CTF League System',
 						 // the name displayed in mails sent by the system

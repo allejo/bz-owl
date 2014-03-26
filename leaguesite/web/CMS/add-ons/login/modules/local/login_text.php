@@ -33,7 +33,7 @@
 /* 		$msg .= '<div class="static_page_box">' . "\n"; */
 		
 		$msg .= '<p class="first_p">';
-		if ($config->getValue('ConvertUsersToExternalLogin'))
+		if ($config->getValue('login.modules.local.convertUsersToExternalLogin'))
 		{
 			require_once dirname(dirname(__FILE__)) . '/login_module_list.php';
 			if (isset($module['bzbb']) && ($module['bzbb']))
