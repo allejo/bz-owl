@@ -44,7 +44,7 @@
 						 // does local login module convert users
 						 'login.modules.local.convertUsersToExternalLogin' => true,
 						 // old website name used by local login module
-						 'login.local.oldWebsiteName' => 'gu.bzleague.com',
+						 'login.modules.local.oldWebsiteName' => 'gu.bzleague.com',
 						 // ability to turn off ip-address check on bzbb login
 						 // can be useful for testing behind NAT
 						 // production environments: always use false
