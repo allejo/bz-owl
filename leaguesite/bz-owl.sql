@@ -7,7 +7,7 @@
 #
 # Host: localhost (MySQL 5.1.72)
 # Datenbank: bz-owl
-# Erstellungsdauer: 2014-02-18 13:55:38 +0000
+# Erstellungsdauer: 2014-03-26 21:39:29 +0000
 # ************************************************************
 
 
@@ -337,7 +337,6 @@ DROP TABLE IF EXISTS `teams_overview`;
 CREATE TABLE `teams_overview` (
   `teamid` int(11) unsigned NOT NULL DEFAULT '0',
   `score` int(11) NOT NULL DEFAULT '1200',
-  `num_matches_played` int(11) unsigned NOT NULL DEFAULT '0',
   `activityNew` float NOT NULL DEFAULT '0',
   `activityOld` float NOT NULL DEFAULT '0',
   `member_count` int(11) unsigned NOT NULL DEFAULT '1',
@@ -372,6 +371,7 @@ DROP TABLE IF EXISTS `teams_profile`;
 
 CREATE TABLE `teams_profile` (
   `teamid` int(11) unsigned NOT NULL DEFAULT '0',
+  `num_matches_total` int(11) NOT NULL DEFAULT '0',
   `num_matches_won` int(11) NOT NULL DEFAULT '0',
   `num_matches_draw` int(11) NOT NULL DEFAULT '0',
   `num_matches_lost` int(11) NOT NULL DEFAULT '0',
