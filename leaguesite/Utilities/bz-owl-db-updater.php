@@ -666,6 +666,9 @@
 		}
 		$db->free($query);
 		
+		status('Updating teams_overview: Dropping old num_matches_played column');
+		$db->SQL('ALTER TABLE `teams_overview` DROP `num_matches_played`');
+		
 		return true;
 	}
 ?>

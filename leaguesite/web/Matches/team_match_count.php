@@ -11,8 +11,8 @@
 		global $connection;
 		global $site;
 		
-		$query = 'UPDATE `teams_overview` SET ';
-		$query .= '`num_matches_played`=`num_matches_played`+' . sqlSafeStringQuotes('1');
+		$query = 'UPDATE `teams_profile` SET ';
+		$query .= '`num_matches_total`=`num_matches_total`+' . sqlSafeStringQuotes('1');
 		$query .= ' WHERE (`teamid`=' . sqlSafeStringQuotes($teamid) . ')';
 		// only one team needs to be updated
 		$query .= ' LIMIT 1';
@@ -87,8 +87,8 @@
 		global $connection;
 		global $site;
 		
-		$query = 'UPDATE `teams_overview` SET ';
-		$query .= '`num_matches_played`=`num_matches_played`-' . sqlSafeStringQuotes('1');
+		$query = 'UPDATE `teams_profile` SET ';
+		$query .= '`num_matches_total`=`num_matches_total`-' . sqlSafeStringQuotes('1');
 		$query .= ' WHERE (`teamid`=' . sqlSafeStringQuotes($teamid) . ')';
 		// only one team needs to be updated
 		$query .= ' LIMIT 1';

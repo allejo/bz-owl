@@ -7,7 +7,7 @@
 	function update_match_stats_entered($team_id1, $team_id2, $team1_points, $team2_points, $site, $connection)
 	{
 		// increase match count for teams that participated
-		$query = 'UPDATE `teams_overview` SET `num_matches_played`=`num_matches_played`+1';
+		$query = 'UPDATE `teams_profile` SET `num_matches_total`=`num_matches_total`+1';
 		$query .= ' WHERE (`teamid`=' . sqlSafeStringQuotes($team_id1) . ' OR `teamid`=' . sqlSafeStringQuotes($team_id2) . ')';
 		if (!($result = $site->execute_query('teams_overview', $query, $connection)))
 		{
