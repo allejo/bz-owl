@@ -28,7 +28,7 @@
 		$installationPath = rtrim(file_get_contents($installationPathFile), "\n");
 		
 		// if relative path -> if path does not begin with /
-		if (strcasecmp(substr($path, 0, 1), '/') !== 0)
+		if (strcasecmp(substr($installationPath, 0, 1), '/') !== 0)
 		{
 			$installationPath = dirname(__FILE__) . '/' . $installationPath;
 		}
