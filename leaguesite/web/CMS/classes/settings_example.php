@@ -130,7 +130,7 @@
 						 'domain' => 'example.com',
 						 'basepath' => '/',
 						 'baseaddress' => 'http://example.com/',
-						 'forceExternalLoginOnly' => true,
+						 'login.modules.forceExternalLoginOnly' => true,
 						 'convertUsersToExternalLogin' => true,
 						 'bbcodeLibAvailable' => true,
 						 'displayedSystemUsername' => 'CTF League System',

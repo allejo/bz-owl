@@ -18,7 +18,7 @@
 	{
 		$msg .= '<form action="' . $config->getValue('baseaddress') . 'Login/'. '" method="post">' . "\n";
 		$msg .= '<p class="first_p">' . "\n";
-		if ($config->getValue('forceExternalLoginOnly'))
+		if ($config->getValue('login.modules.forceExternalLoginOnly'))
 		{
 			$msg .= $this->helper->return_self_closing_tag('input type="submit" name="local_login_wanted" value="Update old account from ' . $account_old_website . '"');
 		} else

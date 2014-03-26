@@ -28,7 +28,7 @@
 		
 		// get player id
 		$query = 'SELECT `id`';
-		if ($config->getValue('forceExternalLoginOnly'))
+		if ($config->getValue('login.modules.forceExternalLoginOnly'))
 		{
 			$query .= ', `external_id` ';
 		}
@@ -46,14 +46,14 @@
 		while($row = $db->fetchRow($query))
 		{
 			$playerid = $row['id'];
-			if ($config->getValue('forceExternalLoginOnly') && !(strcmp(($row['external_id']), '') === 0))
+			if ($config->getValue('login.modules.forceExternalLoginOnly') && !(strcmp(($row['external_id']), '') === 0))
 			{
 				$convert_to_external_login = false;
 			}
 		}
 		
 		// local login tried but external login forced in settings
-		if (!$convert_to_external_login && $config->getValue('forceExternalLoginOnly'))
+		if (!$convert_to_external_login && $config->getValue('login.modules.forceExternalLoginOnly'))
 		{
 			$msg = '<span class="unread_messages">You already enabled ';
 			if (isset($module['bzbb']) && ($module['bzbb']))

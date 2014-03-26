@@ -325,7 +325,7 @@
 					$account_needs_to_be_converted = true;
 					$msg .= '<form action="' . $config->getValue('baseaddress') . 'Login/'. '" method="post">' . "\n";
 					$msg .= '<p class="first_p">' . "\n";
-					if ($config->getValue('forceExternalLoginOnly'))
+					if ($config->getValue('login.modules.forceExternalLoginOnly'))
 					{
 						$msg .= $tmpl->return_self_closing_tag('input type="submit" name="local_wanted" value="Update old account from '
 															   . htmlent($config->getValue('oldWebsiteName')) . '"');
@@ -608,7 +608,7 @@
 						}
 						
 						$this->helper->addMsg($msg);
-						if ($config->getValue('forceExternalLoginOnly'))
+						if ($config->getValue('login.modules.forceExternalLoginOnly'))
 						{
 							$this->logoutAndAbort('');
 						}

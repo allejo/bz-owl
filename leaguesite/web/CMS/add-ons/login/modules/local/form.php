@@ -22,7 +22,7 @@
 		$msg .= '</div>' . "\n";
 		
 		$msg .= '<div>' . "\n";
-		if ($config->getValue('forceExternalLoginOnly'))
+		if ($config->getValue('login.modules.forceExternalLoginOnly'))
 		{
 			$msg .= $helper->return_self_closing_tag('input type="submit" value="Update"');
 		} else
