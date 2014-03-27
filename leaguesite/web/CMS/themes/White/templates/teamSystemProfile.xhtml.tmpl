@@ -108,11 +108,11 @@ No menu found.
 {/if}
 </tr>
 {/foreach}
-{else}
-<div class="static_page_box">Error: No team members found.</div>
+</table>
+{elseif !isset($status) || $status !== 'deleted'}
+<div class="static_page_box">Error: No team members found.</div><br />
 {/if}
 
-</table>
 
 {if isset($matches) && !empty($matches)}
 <table id="table_matches_played" class="big">
