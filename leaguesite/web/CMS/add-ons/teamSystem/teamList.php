@@ -99,6 +99,12 @@
 			global $db;
 			
 			
+			
+			// can user create a new team?
+			$tmpl->assign('canCreateTeams', \user::getCurrentUserLoggedIn() &&
+											\user::getCurrentUser()->getPermission('allow_create_teams') &&
+											\user::getCurrentUser()->getIsTeamless());
+			
 			// tell template if user can reactivate maintained/deleted teams and there are teams that could be reactivated
 			if ($user->getPermission('allow_reactivate_teams'))
 			{

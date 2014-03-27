@@ -64,13 +64,13 @@ No menu found.
 {/if}
 </select>
 </p>
-<p>
+<p style="overflow: auto;">
 	<label class="team_change" for="team_open">Can any teamless player join the team?</label>
 	<input type="hidden" name="team_open" value="0" />
 	<input type="checkbox" name="team_open" value="1" id="team_open"{if isset($teamOpen) && $teamOpen === true} checked="checked" {/if} />
 </p>
 {if isset($buttonsToFormat) && $buttonsToFormat|is_array}
-<div>
+<div class="team_edit_bbcodebuttons">
 {foreach item="button" from=$buttonsToFormat}
 {$button}
 {/foreach}

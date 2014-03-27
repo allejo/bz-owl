@@ -28,7 +28,7 @@
 		}
 		
 		// sanitises team name
-		// returns true if name is ok
+		// return: true if name is ok
 		public function cleanTeamName($name)
 		{
 			// check if every character is printable
@@ -51,7 +51,64 @@
 			return false;
 		}
 		
+		// create team in database
+		// return: true on success, false otherwise
+		public function create()
+		{
+			global $db;
+			
+			try
+			{
+				// create team
+				$db->beginTransaction();
+				$query = $db->prepare('INSERT INTO `teams` (name) VALUES(:name)');
+				if ($db->execute($query, array(':name' => array($this->name, PDO::PARAM_STR))))
+				{
+					// fetch id
+					$this->teamid = (int) $db->lastInsertId();
+					$this->origTeamId = $this->teamid;
+					
+					$db->commit();
+					
+					// fill database with empty rows for team
+					$db->beginTransaction();
+					$query = $db->prepare('INSERT INTO `teams_overview` (teamid) VALUES(:teamid)');
+					if ($db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT))))
+					{
+						$query = $db->prepare('INSERT INTO `teams_permissions` (teamid) VALUES(:teamid)');
+						if ($db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT))))
+						{
+							$query = $db->prepare('INSERT INTO `teams_profile` (teamid) VALUES(:teamid)');
+							if ($db->execute($query, array(':teamid' => array($this->teamid, PDO::PARAM_INT))))
+							{
+								// use update function to set the values of team
+								if ($this->update())
+								{
+									// everything good, write changes
+									$db->commit();
+									
+									return true;
+								}
+							}
+						}
+					}
+					
+					// something went wrong, undo last changes
+					$db->rollback();
+					
+					// delete traces of team
+					$this->delete();
+				}
+			} catch(PDOExecption $e)
+			{
+				$db->rollback();
+				$db->logError('Error while creating new team. The supplied database message was ' . $e->getMessage());
+			}
+			return false;
+		}
+		
 		// permanently delete team from database
+		// return: true on success, false otherwise
 		public function delete()
 		{
 			global $db;
@@ -583,6 +640,10 @@
 		{
 			global $db;
 			
+			if (isset($this->score))
+			{
+				return $this->score;
+			}
 			
 			$query = $db->prepare('SELECT `score` FROM `teams_overview` WHERE `teamid`=:teamid LIMIT 1');
 			if ($db->execute($query, array(':teamid' => array($this->origTeamId, PDO::PARAM_INT))))
@@ -705,6 +766,13 @@
 			$this->name = (string) $name;
 		}
 		
+		// set team score
+		// input: score (integer)
+		public function setScore($score)
+		{
+			$this->score = (int) $score;
+		}
+		
 		// assign status to team
 		// valid status values: new, active, deleted, reactivated
 		// return: true on success, false on error (boolean)
@@ -737,7 +805,7 @@
 		}
 		
 		// update team in db
-		// returns true if update is successful
+		// return: true if update is successful, false otherwise
 		public function update()
 		{
 			global $db;
@@ -767,7 +835,7 @@
 				{
 					$query = $db->prepare('UPDATE `teams_profile` SET logo_url=:avataruri WHERE `teamid`=:teamid LIMIT 1');
 					if (!$db->execute($query, array(':avataruri' => array($this->avatarURI, PDO::PARAM_STR),
-												   ':teamid' => array($this->teamid, PDO::PARAM_INT))))
+													':teamid' => array($this->teamid, PDO::PARAM_INT))))
 					{
 						return false;
 					}
@@ -796,7 +864,7 @@
 				{
 					$query = $db->prepare('UPDATE `teams_overview` SET deleted=:status WHERE teamid=:teamid');
 					if (!$db->execute($query, array(':status' => array($status, PDO::PARAM_INT),
-												   ':teamid' => array($this->teamid, PDO::PARAM_INT))))
+													':teamid' => array($this->teamid, PDO::PARAM_INT))))
 					{
 						return false;
 					}
@@ -806,7 +874,7 @@
 				{
 					$query = $db->prepare('UPDATE `teams_overview` SET open=:open WHERE teamid=:teamid');
 					if (!$db->execute($query, array(':open' => array($this->open ? 1 : 0, PDO::PARAM_INT),
-												   ':teamid' => array($this->teamid, PDO::PARAM_INT))))
+													':teamid' => array($this->teamid, PDO::PARAM_INT))))
 					{
 						return false;
 					}
@@ -816,7 +884,7 @@
 				{
 					$query = $db->prepare('UPDATE `teams_profile` SET description=:description WHERE teamid=:teamid');
 					if (!$db->execute($query, array(':description' => array($this->description, PDO::PARAM_STR),
-												   ':teamid' => array($this->teamid, PDO::PARAM_INT))))
+													':teamid' => array($this->teamid, PDO::PARAM_INT))))
 					{
 						return false;
 					}
@@ -826,7 +894,7 @@
 				{
 					$query = $db->prepare('UPDATE `teams` SET leader_userid=:leaderid WHERE id=:teamid');
 					if (!$db->execute($query, array(':leaderid' => array($this->leaderid, PDO::PARAM_INT),
-												   ':teamid' => array($this->teamid, PDO::PARAM_INT))))
+													':teamid' => array($this->teamid, PDO::PARAM_INT))))
 					{
 						return false;
 					}
@@ -836,7 +904,7 @@
 				{
 					$query = $db->prepare('UPDATE `teams_overview` SET member_count=:memberCount WHERE teamid=:teamid');
 					if (!$db->execute($query, array(':memberCount' => array($this->memberCount, PDO::PARAM_STR),
-												   ':teamid' => array($this->teamid, PDO::PARAM_INT))))
+													':teamid' => array($this->teamid, PDO::PARAM_INT))))
 					{
 						return false;
 					}
@@ -846,10 +914,21 @@
 				{
 					$query = $db->prepare('UPDATE `teams_profile` SET raw_description=:rawDescription WHERE teamid=:teamid');
 					if (!$db->execute($query, array(':rawDescription' => array($this->rawDescription, PDO::PARAM_STR),
-												   ':teamid' => array($this->teamid, PDO::PARAM_INT))))
+													':teamid' => array($this->teamid, PDO::PARAM_INT))))
 					{
 						return false;
 					}
+				}
+				
+				if (isset($this->score))
+				{
+					$query = $db->prepare('UPDATE `teams_overview` SET `score`=:score WHERE `teamid`=:teamid LIMIT 1');
+					if (!$db->execute($query, array(':teamid' => array($this->origTeamId, PDO::PARAM_INT),
+													':score' => array($this->score, PDO::PARAM_INT))))
+				   {
+					   return false;
+				   }
+
 				}
 				
 				return true;

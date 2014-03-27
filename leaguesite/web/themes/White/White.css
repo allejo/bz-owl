@@ -146,6 +146,11 @@ label.team_change
 	margin-left: -9.3em;
 }
 
+.team_create_bbcodebuttons, .team_edit_bbcodebuttons
+{
+	margin-left: 9.5em;
+}
+
 input[type=text]
 {
 	width: 10cm;

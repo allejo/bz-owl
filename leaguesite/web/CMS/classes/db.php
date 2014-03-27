@@ -45,6 +45,18 @@
 			$this->unlockTables();
 		}
 		
+		// create a transaction
+		public function beginTransaction()
+		{
+			$this->pdo->beginTransaction();
+		}
+		
+		// commit a transaction
+		public function commit()
+		{
+			$this->pdo->commit();
+		}
+		
 		function getConnection()
 		{
 			return $this->connection;
@@ -299,6 +311,12 @@
 		public function fetchAll(database_result $dbResult)
 		{
 			return $dbResult->getHandle()->fetchAll();
+		}
+		
+		// rolls back a transaction
+		public function rollBack()
+		{
+			$this->pdo->rollBack();
 		}
 		
 		// do not use on SELECT statements as result may vary there,

@@ -143,7 +143,7 @@
 			$query = $db->prepare('SELECT * FROM `matches` '
 								  . 'WHERE `team1_id`=:teamid OR `team2_id`=:teamid');
 			$db->execute($query, $params);
-
+			$stats = array();
 			while ($row = $db->fetchRow($query))
 			{
 				$this->addToOpponentTeamList($teamid, $row, $stats);

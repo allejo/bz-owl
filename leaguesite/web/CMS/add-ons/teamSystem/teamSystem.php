@@ -12,8 +12,7 @@
 			if (isset($_GET['add']))
 			{
 				require_once(dirname(__FILE__) . '/teamAdd.php');
-/* 				new teamAdd(); */
-				die();
+				new teamAdd();
 			} elseif (isset($_GET['edit']))
 			{
 				require_once(dirname(__FILE__) . '/teamEdit.php');

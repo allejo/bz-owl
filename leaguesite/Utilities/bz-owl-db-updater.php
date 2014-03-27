@@ -669,6 +669,10 @@
 		status('Updating teams_overview: Dropping old num_matches_played column');
 		$db->SQL('ALTER TABLE `teams_overview` DROP `num_matches_played`');
 		
+		status('Updating teams_overview: Column member_count is now 0 by default');
+		$db->SQL('ALTER TABLE `teams_overview` CHANGE `member_count` `member_count` INT(11)  UNSIGNED  NOT NULL  DEFAULT \'0\'');
+
+		
 		return true;
 	}
 ?>

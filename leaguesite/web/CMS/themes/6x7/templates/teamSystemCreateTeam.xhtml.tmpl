@@ -5,7 +5,7 @@
 <meta content="text/html; charset=utf-8" http-equiv="content-type" />
 	<link href="{$baseURL}themes/{$curTheme}/{$curTheme}.css" rel="stylesheet" type="text/css" />
 	<link rel="icon" type="image/png" href="{$faviconURL}" />
-<title>{$title}</title>
+<title>Create team</title>
 </head>
 <body>
 <div class="logo"></div>
@@ -23,20 +23,16 @@ No menu found.
 </div>
 
 <div class="content">
-<a class="button" href="./?profile={$teamid}">{if !isset($teamEditSuccessful) || $teamEditSuccessful === false}Cancel &amp; b{else}B{/if}ack to team profile</a>
+<a class="button" href="./">{if !isset($teamEditSuccessful) || $teamEditSuccessful === false}Cancel &amp; b{else}B{/if}ack to team list</a>
 <br /><br />
 
-{if !isset($teamName) || $teamName === false}
-<div class="static_page_box">Error: Could not find out team name for specified teamid {$teamid}.</div>
-{else}
-
-{if !isset($canEditTeam) || !$canEditTeam}
-<div class="static_page_box">You have no permission to edit {$teamName|escape}.</div>
+{if !isset($canCreateTeam) || !$canCreateTeam}
+<div class="static_page_box">You have no permission to create a team.</div>
 {else}
 <div class="static_page_box">
-{if isset($teamEditSuccessful) && $teamEditSuccessful}
-<p>Team edited successfully.</p>
-<p><a href="./?profile={$teamid|escape}">Return to team profile.</a></p>
+{if isset($teamCreateSuccessful) && $teamCreateSuccessful}
+<p>Team created successfully.</p>
+<p><a href="./?profile={$teamid|escape}">Go to team profile.</a></p>
 {else}
 {if isset($form_error)}
 {if $form_error === false}
@@ -45,24 +41,13 @@ No menu found.
 <p>{$form_error}</p>
 {/if}
 {/if}
-<form enctype="application/x-www-form-urlencoded" method="post" action="?edit={$teamid|escape}">
+<form enctype="application/x-www-form-urlencoded" method="post" action="?add">
 <div><input type="hidden" name="confirmed" value="1" /></div>
 <div><input type="hidden" name="key_name" value="{$keyName}" /></div>
 <div><input type="hidden" name="{$keyName}" value="{$keyValue}" /></div>
 <p>
 	<label class="team_change" for="team_name">Team name:</label>
-	<input type="text" maxlength="30" size="30" name="team_name" value="{($teamName|escape)}" id="team_name" />
-</p>
-<p><label class="team_change" for="team_leader">Leader:</label>
-<select name="team_leader" id="team_leader">
-{if !isset($members) || !is_array($members) || empty($members)}
-	<option value="0">No leader</option>
-{else}
-{foreach item="member" from=$members}
-	<option value="{$member.id}"{if $member.id === $leaderId} selected="selected"{/if}>{$member.name|escape}</option>
-{/foreach}
-{/if}
-</select>
+	<input type="text" maxlength="30" size="30" name="team_name" value="" id="team_name" />
 </p>
 <p style="overflow: auto;">
 	<label class="team_change" for="team_open">Can any teamless player join the team?</label>
@@ -70,7 +55,7 @@ No menu found.
 	<input type="checkbox" name="team_open" value="1" id="team_open"{if isset($teamOpen) && $teamOpen === true} checked="checked" {/if} />
 </p>
 {if isset($buttonsToFormat) && $buttonsToFormat|is_array}
-<div class="team_edit_bbcodebuttons">
+<div class="team_create_bbcodebuttons">
 {foreach item="button" from=$buttonsToFormat}
 {$button}
 {/foreach}
@@ -92,8 +77,6 @@ No menu found.
 </form>
 {/if}
 </div>
-{/if}
-
 {/if}
 
 </div>

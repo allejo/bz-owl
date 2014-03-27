@@ -106,8 +106,8 @@
 		// delete the team (does not physically delete but marks as deleted in database)
 		protected function deleteTeam()
 		{
+			global $site;
 			global $tmpl;
-			
 			
 			// perform sanity checks
 			if (($result = $this->sanityCheck()) !== true)
@@ -137,17 +137,28 @@
 			unset($members);
 			unset($member);
 			
-			// set the teams status to deleted
-			$this->team->setStatus('deleted');
+			// if team never matched deleted it from database, otherwise just mark it as deleted
+			require_once($site->installationPath() . '/CMS/classes/match.php');
+			$matchCount = \match::getMatchCountForTeamId($this->team->getID());
 			
-			// save team changes
-			if (!$this->team->update())
+			
+			if ($matchCount > 0 || $matchCount === false)
+			{
+				// set the teams status to deleted
+				$this->team->setStatus('deleted');
+				
+				$deletionTask = $this->team->update();
+			} else
+			{
+				// actually delete team
+				$deletionTask = $this->team->delete();
+			}
+			if (!$deletionTask)
 			{
 				$tmpl->assign('error', 'An unknown error occurred while deleting the team.');
 			} else
 			{
-				
-				// tell joined user that join was successful
+				// tell joined user that deletion was successful
 				$tmpl->assign('teamDeleteSuccessful', true);
 			}
 		}

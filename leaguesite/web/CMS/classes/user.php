@@ -149,10 +149,16 @@
 			// investigate team
 			$team = new team($teamid);
 			
-			// can not join closed team
+			// can not join deleted team
 			if ($team->getStatus() === 'deleted')
 			{
 				return false;
+			}
+			
+			// leader can always join own team (e.g. during team creation)
+			if ($team->getLeaderId() === $this->origUserId)
+			{
+				return true;
 			}
 			
 			require_once(dirname(__FILE__) . '/invitation.php');
@@ -183,7 +189,7 @@
 			return false;
 		}
 		
-		// get instance of current user
+		// get new instance of current user
 		public static function getCurrentUser()
 		{
 			return new static(static::getCurrentUserId());

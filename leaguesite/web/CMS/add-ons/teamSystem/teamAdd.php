@@ -1,62 +1,36 @@
 <?php
-	class teamEdit
+	class teamAdd
 	{
 		private $team;
 		
-		public function __construct($teamid)
+		public function __construct()
 		{
 			global $tmpl;
 			
-			
-			// no anon team editing allowed
-			if (!\user::getCurrentUserLoggedIn())
+			// does user have permission to create a team?
+			if (!$this->checkPermission())
 			{
 				$tmpl->setTemplate('NoPerm');
 				return;
 			}
 			
-			$this->setTemplate();
-			$tmpl->assign('title', 'Edit team');
+			// user has permission, choose template to use for output
+			$tmpl->setTemplate('teamSystemCreateTeam');
+			$tmpl->assign('canCreateTeam', true);
 			
-			$this->team = new team($teamid);
-			
-			
-			$tmpl->assign('teamid', $teamid);
-			$tmpl->assign('teamName', $this->team->getName());
-			
-			$editPermission = \user::getCurrentUser()->getPermission('allow_edit_any_team_profile') || 
-							  $this->team->getPermission('edit', user::getCurrentUserId());
-			
-			$tmpl->assign('canEditTeam', $editPermission);
-			
-			// user has no permission to edit team
-			// do not proceed with request
-			if (!$editPermission)
-			{
-				$tmpl->setTemplate('NoPerm');
-				return;
-			}
-			
-			$tmpl->assign('leaderId', $this->team->getLeaderId());
-			
-			$userids = $this->team->getUserIds();
-			$members = array();
-			foreach($userids AS $userid)
-			{
-				$members[] = array('id' => $userid,
-								   'name' => (new user($userid))->getName());
-			}
-			
-			$tmpl->assign('members', $members);
-			
-			if (!isset($_POST['confirmed']) || (string) $_POST['confirmed'] === '0')
+			// check which action is requested by the user
+			$confirmed = !isset($_POST['confirmed']) ? 0 : (int) $_POST['confirmed'];
+			if ($confirmed === 0)
 			{
 				$this->showForm();
-			} elseif (isset($_POST['confirmed']) && (string) $_POST['confirmed'] === '1')
+			} elseif ($confirmed === 1)
 			{
-				// try to update team
-				// show editing form on error
-				if (($validation = $this->sanityCheck()) !== true || ($validation = $this->updateTeam()) !== true)
+				// handle for new team
+				$this->team = new team();
+				
+				// try to create team
+				// show creation form on error
+				if (($validation = $this->sanityCheck()) !== true || ($validation = $this->createTeam()) !== true)
 				{
 					if ($validation !== true)
 					{
@@ -65,22 +39,22 @@
 					$this->showForm();
 				} else
 				{
-					$tmpl->assign('teamEditSuccessful', true);
+					$tmpl->assign('teamid', $this->team->getID());
+					$tmpl->assign('teamCreateSuccessful', true);
 				}
 			}
 		}
 		
-		// set template to edit a team
-		protected function setTemplate()
+		// check create team permission
+		// returns true if permission is granted, false otherwise
+		protected function checkPermission()
 		{
-			global  $tmpl;
-			
-			
-			if (!$tmpl->setTemplate('teamSystemEditTeam'))
-			{
-				$tmpl->noTemplateFound();
-				die();
-			}
+			// no anonymous team creation
+			// user must have allow_create_teams permission
+			// user must be teamless
+			return \user::getCurrentUserLoggedIn() &&
+				   \user::getCurrentUser()->getPermission('allow_create_teams') &&
+				   \user::getCurrentUser()->getIsTeamless();
 		}
 		
 		// check if user submitted data is valid
@@ -102,7 +76,7 @@
 				return 'Submitted validation key content invalid.';
 			}
 			
-			// sanity check key
+			// check key and value combination
 			if (!$site->validateKey($_POST['key_name'], $_POST[$_POST['key_name']]))
 			{
 				return 'Validation key/value pair invalid.';
@@ -133,26 +107,6 @@
 				}
 				
 				$this->team->setName($teamName);
-			}
-			
-			// validate team leader
-			if (isset($_POST['team_leader']))
-			{
-				$leaderid = (int) $_POST['team_leader'];
-				
-				if ($leaderid === 0)
-				{
-					return 'Check your team leader, a team must have a leader.';
-				}
-				
-				// build a user instance and ask if user (wanted leader) is member of team
-				$user = new user($leaderid);
-				if ($user->getMemberOfTeam($this->team->getID()) !== true)
-				{
-					return 'Check your team leader, a team leader must be member of the team.';
-				}
-				
-				$this->team->setLeaderId($leaderid);
 			}
 			
 			// validate open team
@@ -217,6 +171,7 @@
 			return true;
 		}
 		
+		// fill form with values
 		protected function showForm()
 		{
 			global $site;
@@ -224,15 +179,12 @@
 			
 			
 			// protected against cross site injection attempts
-			$randomKeyName = 'teamEdit_' . $this->team->getID() . '_' . microtime();
+			$randomKeyName = 'teamCreate_' . \user::getCurrentUser()->getID() . '_' . microtime();
 			// convert some special chars to underscores
 			$randomKeyName = strtr($randomKeyName, array(' ' => '_', '.' => '_'));
 			$randomkeyValue = $site->setKey($randomKeyName);
 			$tmpl->assign('keyName', $randomKeyName);
 			$tmpl->assign('keyValue', htmlent($randomkeyValue));
-			
-			// indicate if team is currently opened or closed
-			$tmpl->assign('teamOpen', $this->team->getOpen());
 			
 			// bbcode editor
 			include_once(dirname(dirname(dirname(__FILE__))) . '/bbcode_buttons.php');
@@ -240,20 +192,39 @@
 			// set up name of field to edit so javascript knows which element to manipulate
 			$tmpl->assign('buttonsToFormat', $bbcode->showBBCodeButtons('team_description'));
 			unset($bbcode);
-			
-			$tmpl->assign('teamDescription', $this->team->getRawDescription());
-			$tmpl->assign('avatarURI', $this->team->getAvatarURI());
 		}
 		
-		// does sanity checks on input values
-		// returns true on success, error message as string on error
-		protected function updateTeam()
+		protected function createTeam()
 		{
-			// update team using new data
-			$result = $this->team->update();
+			// create team using submitted data
+			$result = $this->team->create();
+			
+			// add user to team
+			$user = \user::getCurrentUser();
+			if (!$user->addTeamMembership($this->team->getID()))
+			{
+				return 'Could not add current user to team.';
+			}
+			
+			if (!$user->update())
+			{
+				return 'Could not save changes of current user.';
+			}
+			
 			if ($result !== true)
 			{
 				return $result;
+			}
+			
+			// set current user to leader
+			if (!$this->team->setLeaderId(\user::getCurrentUserId()))
+			{
+				return 'Could not set user to new team leader.';
+			}
+			
+			if (!$this->team->update())
+			{
+				return 'Could not save user as team leader.';
 			}
 			
 			return true;

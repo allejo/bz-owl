@@ -22,6 +22,7 @@ No menu found.
 </div>
 
 <div class="content">
+{if isset($canCreateTeams) && $canCreateTeams}<a class="button" href="?add">Create a team</a>{/if}
 {if isset($canReactivateTeams) && $canReactivateTeams}<a class="button" href="?reactivate">Reactivate a team</a>{/if}
 {if !isset($activeTeams) || empty($activeTeams)}
 <div class="static_page_box">There are no active teams.</div>

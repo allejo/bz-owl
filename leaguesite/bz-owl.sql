@@ -7,7 +7,7 @@
 #
 # Host: localhost (MySQL 5.1.72)
 # Datenbank: bz-owl
-# Erstellungsdauer: 2014-03-26 21:39:29 +0000
+# Erstellungsdauer: 2014-03-27 10:01:31 +0000
 # ************************************************************
 
 
@@ -339,7 +339,7 @@ CREATE TABLE `teams_overview` (
   `score` int(11) NOT NULL DEFAULT '1200',
   `activityNew` float NOT NULL DEFAULT '0',
   `activityOld` float NOT NULL DEFAULT '0',
-  `member_count` int(11) unsigned NOT NULL DEFAULT '1',
+  `member_count` int(11) unsigned NOT NULL DEFAULT '0',
   `any_teamless_player_can_join` tinyint(1) NOT NULL DEFAULT '1',
   `deleted` tinyint(1) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`teamid`),
