@@ -137,7 +137,7 @@
 					return 'Check your team name, maximum length is 30 characters.';
 				}
 				
-				if (($teamNameUsed = \team::getTeamsByName($teamName)) && count($teamNameUsed) > 0)
+				if (($teamNameUsed = \team::getTeamsByName($teamName)) && count($teamNameUsed) > 0 && ($this->team->getName() !== $teamName))
 				{
 					return 'Team name is already in use. A team name must be unique.';
 				}
