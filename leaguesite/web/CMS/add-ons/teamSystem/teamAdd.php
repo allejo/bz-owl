@@ -83,31 +83,43 @@
 			}
 			
 			// validate team name
-			$teamName = false;
-			if (isset($_POST['team_name']))
+			if (!isset($_POST['team_name']))
 			{
-				$teamName = (string) $_POST['team_name'];
-				// check for leading and trailing whitespace
-				if (strlen(trim($teamName)) !== strlen($teamName))
-				{
-					return 'Check your team name, no leading or trailing whitespace allowed.';
-				}
-				
-				
-				// 3 characters min team name size
-				if (strlen($teamName) < 3)
-				{
-					return 'Check your team name, at least 3 characters are required.';
-				}
-				
-				// 30 characters max team name size
-				if (strlen($teamName) > 30)
-				{
-					return 'Check your team name, maximum length is 30 characters.';
-				}
-				
-				$this->team->setName($teamName);
+				return 'No team name set. A name is required.';
 			}
+			
+			$teamName = (string) $_POST['team_name'];
+			// check for leading and trailing whitespace
+			if (strlen(trim($teamName)) !== strlen($teamName))
+			{
+				return 'Check your team name, no leading or trailing whitespace allowed.';
+			}
+			
+			// (teamless) is a reserved name
+			if ($teamName === '(teamless)')
+			{
+				return 'Check your team name. The name (teamless) is reserved and can not be used.';
+			}
+			
+			// 3 characters min team name size
+			if (strlen($teamName) < 3)
+			{
+				return 'Check your team name, at least 3 characters are required.';
+			}
+			
+			// 30 characters max team name size
+			if (strlen($teamName) > 30)
+			{
+				return 'Check your team name, maximum length is 30 characters.';
+			}
+			
+			if (($teamNameUsed = \team::getTeamsByName($teamName)) && count($teamNameUsed) > 0)
+			{
+				return 'Team name is already in use. A team name must be unique.';
+			}
+			unset($teamNameUsed);
+			
+			$this->team->setName($teamName);
 			
 			// validate open team
 			if (isset($_POST['team_open']))

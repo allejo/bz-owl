@@ -119,6 +119,11 @@
 					return 'Check your team name, no leading or trailing whitespace allowed.';
 				}
 				
+				// (teamless) is a reserved name
+				if ($teamName === '(teamless)')
+				{
+					return 'Check your team name. The name (teamless) is reserved and can not be used.';
+				}
 				
 				// 3 characters min team name size
 				if (strlen($teamName) < 3)
@@ -131,6 +136,12 @@
 				{
 					return 'Check your team name, maximum length is 30 characters.';
 				}
+				
+				if (($teamNameUsed = \team::getTeamsByName($teamName)) && count($teamNameUsed) > 0)
+				{
+					return 'Team name is already in use. A team name must be unique.';
+				}
+				unset($teamNameUsed);
 				
 				$this->team->setName($teamName);
 			}

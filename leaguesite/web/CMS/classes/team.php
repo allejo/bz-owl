@@ -512,6 +512,34 @@
 			return '$team->getName(' . strval($this->teamid) . ') failed.';
 		}
 		
+		// find out if teams exist for a given name
+		// input: team name (string) to search for
+		// output: array of found teams for name, false on error
+		public static function getTeamsByName($name)
+		{
+			global $db;
+			
+			
+			$teams = array();
+			
+			// collect teams with name from database
+			$query = $db->prepare('SELECT `id` FROM `teams` WHERE `name`=:name');
+			if ($db->execute($query, array(':name' => array($name, PDO::PARAM_STR))))
+			{
+				while($row = $db->fetchRow($query))
+				{
+					$teams[] = new team((int) $row['id']);
+				}
+				$db->free($query);
+				
+				return $teams;
+			}
+			
+			// error handling: log error and show it in end user visible result
+			$db->logError((__FILE__) . ': getName(' . strval($this->teamid) . ') failed.');
+			return false;
+		}
+		
 		// returns array of ids (integer) of new teams
 		public static function getNewTeamIds()
 		{
