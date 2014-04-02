@@ -2,7 +2,7 @@
 bz-owl release notes
 ====================
 
-1.4 (current development trunk)
+1.4 (2014-04-02)
 --
 * /web/index.php now calls a new add-on called pathLoaderSystem
 * pathLoaderSystem add-on uses modules that can flag a user as banned
