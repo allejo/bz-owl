@@ -244,7 +244,10 @@
 			foreach ($teamIds AS $teamid)
 			{
 				$team = new team($teamid);
-				if (($lastMatch = $team->getNewestMatchTimestamp()) && $lastMatch < $three_months_in_past)
+				// delete team if team has never played a match including last 3 months
+				if (0 === $team->getMatchCount()
+					&& false !== $team->getCreationTimestampStr()
+					&& strtotime($team->getCreationTimestampStr()) < $three_months_in_past)
 				{
 					// remove users from team
 					$uids = $team->getUserIds();
